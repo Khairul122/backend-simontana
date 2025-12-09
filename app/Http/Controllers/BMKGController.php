@@ -18,7 +18,47 @@ class BMKGController extends Controller
     }
 
     /**
-     * Get weather information for dashboard
+     * @group BMKG Integration
+     *
+     * Dashboard BMKG Lengkap
+     *
+     * Endpoint untuk mendapatkan data lengkap dari BMKG untuk dashboard.
+     * Data mencakup informasi cuaca, gempa terkini, dan peringatan dini.
+     *
+     * @authenticated
+     *
+     * @response {
+     *   "success": true,
+     *   "message": "Data dashboard BMKG berhasil diambil",
+     *   "data": {
+     *     "cuaca": {
+     *       "status": "available",
+     *       "suhu": "28°C",
+     *       "kelembaban": "75%",
+     *       "cuaca": "Cerah Berawan"
+     *     },
+     *     "gempa": {
+     *       "statistik": {
+     *         "total_24_jam": 3,
+     *         "magnitudo_max": "5.4",
+     *         "terbanyak": "Laut Banda"
+     *       },
+     *       "terbaru": {
+     *         "tanggal": "07 Des 2025",
+     *         "jam": "11:55:55 WIB",
+     *         "magnitudo": "5.4",
+     *         "kedalaman": "103 km",
+     *         "wilayah": "150 km BaratLaut TANIMBAR",
+     *         "potensi": "Tidak berpotensi tsunami"
+     *       }
+     *     },
+     *     "peringatan": {
+     *       "cuaca": "Waspada hujan lebat di beberapa wilayah",
+     *       "tsunami": "Tidak ada peringatan tsunami aktif"
+     *     },
+     *     "update_terakhir": "2023-12-10T01:23:45.678Z"
+     *   }
+     * }
      */
     public function dashboard(Request $request)
     {
@@ -142,7 +182,33 @@ class BMKGController extends Controller
     }
 
     /**
-     * Get latest earthquake information
+     * @group BMKG Integration
+     *
+     * Gempa Terbaru
+     *
+     * Endpoint untuk mendapatkan informasi gempa bumi terbaru dari BMKG.
+     * Data real-time langsung dari BMKG.
+     *
+     * @authenticated
+     *
+     * @response {
+     *   "success": true,
+     *   "message": "Data gempa terbaru berhasil diambil",
+     *   "data": {
+     *     "tanggal": "07 Des 2025",
+     *     "jam": "11:55:55 WIB",
+     *     "magnitudo": "5.4",
+     *     "kedalaman": "103 km",
+     *     "wilayah": "150 km BaratLaut TANIMBAR",
+     *     "potensi": "Tidak berpotensi tsunami",
+     *     "dirasakan": "II-III Saumlaki, II-III Tanimbar Selatan",
+     *     "shakemap": "https://data.bmkg.go.id/eqmap.gif",
+     *     "coordinates": {
+     *       "latitude": -7.89,
+     *       "longitude": 131.45
+     *     }
+     *   }
+     * }
      */
     public function gempaTerbaru(Request $request)
     {

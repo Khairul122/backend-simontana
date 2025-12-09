@@ -13,7 +13,51 @@ use Firebase\JWT\Key;
 class AuthController extends Controller
 {
     /**
-     * Register user baru
+     * @OA\Post(
+     *      path="/api/auth/register",
+     *      tags={"Authentication"},
+     *      summary="Register User Baru",
+     *      description="Endpoint untuk mendaftarkan user baru ke dalam sistem SIMONTA BENCANA.",
+     *      operationId="register",
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(
+     *              required={"nama","username","password","role"},
+     *              @OA\Property(property="nama", type="string", example="John Doe", description="Nama lengkap user"),
+     *              @OA\Property(property="username", type="string", example="johndoe", description="Username unik untuk login"),
+     *              @OA\Property(property="password", type="string", format="password", example="123456", description="Password minimal 6 karakter"),
+     *              @OA\Property(property="role", type="string", enum={"Admin","PetugasBPBD","OperatorDesa","Warga"}, example="Warga", description="Role user"),
+     *              @OA\Property(property="email", type="string", format="email", example="john@example.com", description="Email user"),
+     *              @OA\Property(property="no_telepon", type="string", example="08123456789", description="Nomor telepon"),
+     *              @OA\Property(property="alamat", type="string", example="Jl. Contoh No. 123", description="Alamat lengkap"),
+     *              @OA\Property(property="id_desa", type="integer", example=1, description="ID desa (jika ada)")
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=201,
+     *          description="User berhasil didaftarkan",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example=true),
+     *              @OA\Property(property="message", type="string", example="Registrasi berhasil"),
+     *              @OA\Property(property="data",
+     *                  @OA\Property(property="id", type="integer", example=1),
+     *                  @OA\Property(property="nama", type="string", example="John Doe"),
+     *                  @OA\Property(property="username", type="string", example="johndoe"),
+     *                  @OA\Property(property="role", type="string", example="Warga"),
+     *                  @OA\Property(property="email", type="string", example="john@example.com")
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=422,
+     *          description="Validasi gagal",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example=false),
+     *              @OA\Property(property="message", type="string", example="Validasi gagal"),
+     *              @OA\Property(property="errors", type="object")
+     *          )
+     *      )
+     * )
      */
     public function register(Request $request)
     {
@@ -72,7 +116,58 @@ class AuthController extends Controller
     }
 
     /**
-     * Login user
+     * @OA\Post(
+     *      path="/api/auth/login",
+     *      tags={"Authentication"},
+     *      summary="Login User",
+     *      description="Endpoint untuk autentikasi user dan mendapatkan JWT token.",
+     *      operationId="login",
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(
+     *              required={"username","password"},
+     *              @OA\Property(property="username", type="string", example="admintest", description="Username atau email"),
+     *              @OA\Property(property="password", type="string", format="password", example="123456", description="Password user")
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Login berhasil",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example=true),
+     *              @OA\Property(property="message", type="string", example="Login berhasil"),
+     *              @OA\Property(property="data",
+     *                  @OA\Property(property="user",
+     *                      @OA\Property(property="id", type="integer", example=1),
+     *                      @OA\Property(property="nama", type="string", example="Admin Test"),
+     *                      @OA\Property(property="username", type="string", example="admintest"),
+     *                      @OA\Property(property="role", type="string", example="Admin"),
+     *                      @OA\Property(property="email", type="string", example="admin@example.com")
+     *                  ),
+     *                  @OA\Property(property="token", type="string", example="eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."),
+     *                  @OA\Property(property="token_type", type="string", example="bearer"),
+     *                  @OA\Property(property="expires_in", type="integer", example=3600)
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Username atau password salah",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example=false),
+     *              @OA\Property(property="message", type="string", example="Username atau password salah")
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=422,
+     *          description="Validasi gagal",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example=false),
+     *              @OA\Property(property="message", type="string", example="Validasi gagal"),
+     *              @OA\Property(property="errors", type="object")
+     *          )
+     *      )
+     * )
      */
     public function login(Request $request)
     {
@@ -133,7 +228,30 @@ class AuthController extends Controller
     }
 
     /**
-     * Logout user
+     * @OA\Post(
+     *      path="/api/auth/logout",
+     *      tags={"Authentication"},
+     *      summary="Logout User",
+     *      description="Endpoint untuk logout user dan menghapus JWT token.",
+     *      operationId="logout",
+     *      security={{"bearerAuth":{}}},
+     *      @OA\Response(
+     *          response=200,
+     *          description="Logout berhasil",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example=true),
+     *              @OA\Property(property="message", type="string", example="Logout berhasil")
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthorized",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example=false),
+     *              @OA\Property(property="message", type="string", example="Unauthorized")
+     *          )
+     *      )
+     * )
      */
     public function logout(Request $request)
     {
@@ -156,6 +274,33 @@ class AuthController extends Controller
         }
     }
 
+    /**
+     * @OA\Post(
+     *      path="/api/auth/refresh",
+     *      tags={"Authentication"},
+     *      summary="Refresh JWT Token",
+     *      description="Endpoint untuk memperbarui JWT token yang masih valid.",
+     *      operationId="refreshToken",
+     *      security={{"bearerAuth":{}}},
+     *      @OA\Response(
+     *          response=200,
+     *          description="Token berhasil diperbarui",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example=true),
+     *              @OA\Property(property="message", type="string", example="Token berhasil diperbarui"),
+     *              @OA\Property(property="data",
+     *                  @OA\Property(property="token", type="string", example="eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."),
+     *                  @OA\Property(property="token_type", type="string", example="bearer"),
+     *                  @OA\Property(property="expires_in", type="integer", example=3600)
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthorized - Token tidak valid atau kadaluwarsa"
+     *      )
+     * )
+     */
     /**
      * Refresh token
      */
@@ -187,7 +332,45 @@ class AuthController extends Controller
     }
 
     /**
-     * Get profile user
+     * @OA\Get(
+     *      path="/api/auth/profile",
+     *      tags={"Authentication"},
+     *      summary="Get Profile User",
+     *      description="Endpoint untuk mendapatkan profile user yang sedang login.",
+     *      operationId="profile",
+     *      security={{"bearerAuth":{}}},
+     *      @OA\Response(
+     *          response=200,
+     *          description="Profile berhasil diambil",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example=true),
+     *              @OA\Property(property="message", type="string", example="Profile berhasil diambil"),
+     *              @OA\Property(property="data",
+     *                  @OA\Property(property="id", type="integer", example=1),
+     *                  @OA\Property(property="nama", type="string", example="Admin Test"),
+     *                  @OA\Property(property="username", type="string", example="admintest"),
+     *                  @OA\Property(property="role", type="string", example="Admin"),
+     *                  @OA\Property(property="email", type="string", example="admin@example.com"),
+     *                  @OA\Property(property="no_telepon", type="string", example="08123456789"),
+     *                  @OA\Property(property="alamat", type="string", example="Jl. Contoh No. 123"),
+     *                  @OA\Property(property="desa", type="object",
+     *                      @OA\Property(property="id_desa", type="integer", example=1),
+     *                      @OA\Property(property="nama_desa", type="string", example="Contoh Desa"),
+     *                      @OA\Property(property="kecamatan", type="string", example="Contoh Kecamatan"),
+     *                      @OA\Property(property="kabupaten", type="string", example="Contoh Kabupaten")
+     *                  )
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthorized",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example=false),
+     *              @OA\Property(property="message", type="string", example="Unauthorized")
+     *          )
+     *      )
+     * )
      */
     public function profile(Request $request)
     {

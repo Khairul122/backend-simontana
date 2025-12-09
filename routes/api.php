@@ -10,6 +10,12 @@ use App\Http\Controllers\TindaklanjutController;
 use App\Http\Controllers\MonitoringController;
 use App\Http\Controllers\BMKGController;
 use App\Http\Controllers\OpenStreetMapController;
+use App\Http\Controllers\SystemController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\BPBDController;
+use App\Http\Controllers\OperatorController;
+use App\Http\Controllers\CitizenController;
 
 /*
 |--------------------------------------------------------------------------
@@ -42,46 +48,15 @@ Route::middleware(['jwt.auth'])->group(function () {
         Route::get('/desa-list/kabupaten', [DesaController::class, 'getKabupaten']);
 
         // Dashboard endpoints - all roles
-        Route::get('/dashboard', function (Request $request) {
-            return response()->json([
-                'success' => true,
-                'message' => 'Dashboard accessed successfully',
-                'data' => [
-                    'user' => $request->user(),
-                    'role' => $request->user()->role
-                ]
-            ]);
-        });
+        Route::get('/dashboard', [DashboardController::class, 'index']);
 
         // Admin only routes
         Route::middleware(['role:Admin'])->prefix('admin')->group(function () {
-            Route::get('/users', function () {
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Admin users management'
-                ]);
-            });
-
-            Route::post('/users', function () {
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Admin create user'
-                ]);
-            });
-
-            Route::put('/users/{id}', function () {
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Admin update user'
-                ]);
-            });
-
-            Route::delete('/users/{id}', function () {
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Admin delete user'
-                ]);
-            });
+            // User Management routes
+            Route::get('/pengguna', [AdminController::class, 'getPengguna']);
+            Route::post('/pengguna', [AdminController::class, 'createPengguna']);
+            Route::put('/pengguna/{id}', [AdminController::class, 'updatePengguna']);
+            Route::delete('/pengguna/{id}', [AdminController::class, 'deletePengguna']);
 
             // Kategori Bencana management routes
             Route::get('/kategori-bencana', [KategoriBencanaController::class, 'index']);
@@ -99,112 +74,33 @@ Route::middleware(['jwt.auth'])->group(function () {
             Route::delete('/desa/{desa}', [DesaController::class, 'destroy']);
             Route::get('/desa-statistics', [DesaController::class, 'statistics']);
 
-            Route::get('/system-monitoring', function () {
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Admin system monitoring'
-                ]);
-            });
+            // System monitoring
+            Route::get('/system-monitoring', [AdminController::class, 'systemMonitoring']);
         });
 
         // Petugas BPBD routes
         Route::middleware(['role:PetugasBPBD'])->prefix('bpbd')->group(function () {
-            Route::get('/reports', function () {
-                return response()->json([
-                    'success' => true,
-                    'message' => 'BPBD reports management'
-                ]);
-            });
-
-            Route::get('/reports/{id}', function () {
-                return response()->json([
-                    'success' => true,
-                    'message' => 'BPBD report details'
-                ]);
-            });
-
-            Route::post('/reports/{id}/response', function () {
-                return response()->json([
-                    'success' => true,
-                    'message' => 'BPBD create response to report'
-                ]);
-            });
-
-            Route::put('/responses/{id}', function () {
-                return response()->json([
-                    'success' => true,
-                    'message' => 'BPBD update response status'
-                ]);
-            });
-
-            Route::get('/statistics', function () {
-                return response()->json([
-                    'success' => true,
-                    'message' => 'BPBD disaster statistics'
-                ]);
-            });
-
-            Route::post('/notifications', function () {
-                return response()->json([
-                    'success' => true,
-                    'message' => 'BPBD send notifications'
-                ]);
-            });
+            Route::get('/reports', [BPBDController::class, 'getReports']);
+            Route::get('/reports/{id}', [BPBDController::class, 'getReportDetails']);
+            Route::post('/reports/{id}/response', [BPBDController::class, 'createResponse']);
+            Route::put('/responses/{id}', [BPBDController::class, 'updateResponse']);
+            Route::get('/statistics', [BPBDController::class, 'getStatistics']);
+            Route::post('/notifications', [BPBDController::class, 'sendNotifications']);
         });
 
         // Operator Desa routes
         Route::middleware(['role:OperatorDesa'])->prefix('operator')->group(function () {
-            Route::get('/reports', function () {
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Operator village reports'
-                ]);
-            });
-
-            Route::post('/reports/{id}/verify', function () {
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Operator verify report'
-                ]);
-            });
-
-            Route::post('/reports/{id}/monitor', function () {
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Operator create monitoring record'
-                ]);
-            });
-
-            Route::get('/evacuation-sites', function () {
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Operator evacuation sites'
-                ]);
-            });
-
-            Route::post('/evacuation-sites', function () {
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Operator add evacuation site'
-                ]);
-            });
+            Route::get('/reports', [OperatorController::class, 'getReports']);
+            Route::post('/reports/{id}/verify', [OperatorController::class, 'verifyReport']);
+            Route::post('/reports/{id}/monitor', [OperatorController::class, 'createMonitoring']);
+            Route::get('/evacuation-sites', [OperatorController::class, 'getEvacuationSites']);
+            Route::post('/evacuation-sites', [OperatorController::class, 'addEvacuationSite']);
         });
 
         // Warga routes
         Route::middleware(['role:Warga'])->prefix('citizen')->group(function () {
-            Route::get('/disaster-info', function () {
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Citizen disaster information'
-                ]);
-            });
-
-            Route::get('/evacuation-info', function () {
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Citizen evacuation information'
-                ]);
-            });
+            Route::get('/disaster-info', [CitizenController::class, 'getDisasterInfo']);
+            Route::get('/evacuation-info', [CitizenController::class, 'getEvacuationInfo']);
         });
 
         // Multi-role routes (can be accessed by multiple roles)
@@ -298,11 +194,4 @@ Route::middleware(['jwt.auth'])->group(function () {
 });
 
 // Test route for checking API
-Route::get('/test', function () {
-    return response()->json([
-        'success' => true,
-        'message' => 'SIMONTA BENCANA API is running',
-        'version' => '1.0.0',
-        'timestamp' => now()
-    ]);
-});
+Route::get('/test', [SystemController::class, 'test']);

@@ -1,0 +1,941 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "SIMONTA BENCANA API Documentation",
+        "description": "Sistem Informasi Manajemen Bencana Terpadu - RESTful API untuk pengelolaan data bencana, laporan, monitoring, dan integrasi dengan BMKG.",
+        "contact": {
+            "email": "support@simonta-bencana.id"
+        },
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://localhost:8000",
+            "description": "Development server"
+        }
+    ],
+    "paths": {
+        "/api/admin/system-monitoring": {
+            "get": {
+                "tags": [
+                    "Admin Management"
+                ],
+                "summary": "System Monitoring (Admin Only)",
+                "description": "Endpoint untuk monitoring sistem (hanya untuk Admin).",
+                "operationId": "adminSystemMonitoring",
+                "responses": {
+                    "200": {
+                        "description": "System monitoring data retrieved",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Admin system monitoring"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden - Admin access required"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/osm/admin/cache": {
+            "delete": {
+                "tags": [
+                    "OpenStreetMap Integration"
+                ],
+                "summary": "Clear OSM Cache (Admin Only)",
+                "description": "Endpoint untuk membersihkan cache data OpenStreetMap (hanya Admin).",
+                "operationId": "osmClearCache",
+                "responses": {
+                    "200": {
+                        "description": "Cache cleared successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "OSM cache cleared successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden - Admin access required"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/auth/register": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Register User Baru",
+                "description": "Endpoint untuk mendaftarkan user baru ke dalam sistem SIMONTA BENCANA.",
+                "operationId": "register",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "nama",
+                                    "username",
+                                    "password",
+                                    "role"
+                                ],
+                                "properties": {
+                                    "nama": {
+                                        "description": "Nama lengkap user",
+                                        "type": "string",
+                                        "example": "John Doe"
+                                    },
+                                    "username": {
+                                        "description": "Username unik untuk login",
+                                        "type": "string",
+                                        "example": "johndoe"
+                                    },
+                                    "password": {
+                                        "description": "Password minimal 6 karakter",
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "123456"
+                                    },
+                                    "role": {
+                                        "description": "Role user",
+                                        "type": "string",
+                                        "enum": [
+                                            "Admin",
+                                            "PetugasBPBD",
+                                            "OperatorDesa",
+                                            "Warga"
+                                        ],
+                                        "example": "Warga"
+                                    },
+                                    "email": {
+                                        "description": "Email user",
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "john@example.com"
+                                    },
+                                    "no_telepon": {
+                                        "description": "Nomor telepon",
+                                        "type": "string",
+                                        "example": "08123456789"
+                                    },
+                                    "alamat": {
+                                        "description": "Alamat lengkap",
+                                        "type": "string",
+                                        "example": "Jl. Contoh No. 123"
+                                    },
+                                    "id_desa": {
+                                        "description": "ID desa (jika ada)",
+                                        "type": "integer",
+                                        "example": 1
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "User berhasil didaftarkan",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Registrasi berhasil"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "nama": {
+                                                    "type": "string",
+                                                    "example": "John Doe"
+                                                },
+                                                "username": {
+                                                    "type": "string",
+                                                    "example": "johndoe"
+                                                },
+                                                "role": {
+                                                    "type": "string",
+                                                    "example": "Warga"
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "example": "john@example.com"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validasi gagal",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Validasi gagal"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/auth/login": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Login User",
+                "description": "Endpoint untuk autentikasi user dan mendapatkan JWT token.",
+                "operationId": "login",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "username",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "username": {
+                                        "description": "Username atau email",
+                                        "type": "string",
+                                        "example": "admintest"
+                                    },
+                                    "password": {
+                                        "description": "Password user",
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "123456"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Login berhasil",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Login berhasil"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "user": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "nama": {
+                                                            "type": "string",
+                                                            "example": "Admin Test"
+                                                        },
+                                                        "username": {
+                                                            "type": "string",
+                                                            "example": "admintest"
+                                                        },
+                                                        "role": {
+                                                            "type": "string",
+                                                            "example": "Admin"
+                                                        },
+                                                        "email": {
+                                                            "type": "string",
+                                                            "example": "admin@example.com"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "token": {
+                                                    "type": "string",
+                                                    "example": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
+                                                },
+                                                "token_type": {
+                                                    "type": "string",
+                                                    "example": "bearer"
+                                                },
+                                                "expires_in": {
+                                                    "type": "integer",
+                                                    "example": 3600
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Username atau password salah",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Username atau password salah"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validasi gagal",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Validasi gagal"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/auth/logout": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Logout User",
+                "description": "Endpoint untuk logout user dan menghapus JWT token.",
+                "operationId": "logout",
+                "responses": {
+                    "200": {
+                        "description": "Logout berhasil",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Logout berhasil"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthorized"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/auth/profile": {
+            "get": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Get Profile User",
+                "description": "Endpoint untuk mendapatkan profile user yang sedang login.",
+                "operationId": "profile",
+                "responses": {
+                    "200": {
+                        "description": "Profile berhasil diambil",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Profile berhasil diambil"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "nama": {
+                                                    "type": "string",
+                                                    "example": "Admin Test"
+                                                },
+                                                "username": {
+                                                    "type": "string",
+                                                    "example": "admintest"
+                                                },
+                                                "role": {
+                                                    "type": "string",
+                                                    "example": "Admin"
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "example": "admin@example.com"
+                                                },
+                                                "no_telepon": {
+                                                    "type": "string",
+                                                    "example": "08123456789"
+                                                },
+                                                "alamat": {
+                                                    "type": "string",
+                                                    "example": "Jl. Contoh No. 123"
+                                                },
+                                                "desa": {
+                                                    "properties": {
+                                                        "id_desa": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "nama_desa": {
+                                                            "type": "string",
+                                                            "example": "Contoh Desa"
+                                                        },
+                                                        "kecamatan": {
+                                                            "type": "string",
+                                                            "example": "Contoh Kecamatan"
+                                                        },
+                                                        "kabupaten": {
+                                                            "type": "string",
+                                                            "example": "Contoh Kabupaten"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthorized"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/bpbd/notifications": {
+            "post": {
+                "tags": [
+                    "BPBD Management"
+                ],
+                "summary": "Send BPBD Notifications",
+                "description": "Endpoint untuk mengirim notifikasi ke publik (Petugas BPBD).",
+                "operationId": "bpbdSendNotifications",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "judul",
+                                    "pesan",
+                                    "target"
+                                ],
+                                "properties": {
+                                    "judul": {
+                                        "description": "Judul notifikasi",
+                                        "type": "string",
+                                        "example": "Peringatan Banjir"
+                                    },
+                                    "pesan": {
+                                        "description": "Isi pesan notifikasi",
+                                        "type": "string",
+                                        "example": "Warga diminta waspada terhadap potensi banjir"
+                                    },
+                                    "target": {
+                                        "description": "Target penerima notifikasi",
+                                        "type": "string",
+                                        "enum": [
+                                            "Semua",
+                                            "Warga",
+                                            "Petugas",
+                                            "Admin"
+                                        ],
+                                        "example": "Semua"
+                                    },
+                                    "kategori": {
+                                        "description": "Kategori notifikasi",
+                                        "type": "string",
+                                        "enum": [
+                                            "Info",
+                                            "Peringatan",
+                                            "Darurat"
+                                        ],
+                                        "example": "Peringatan"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Notification sent successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "BPBD send notifications"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden - BPBD access required"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/citizen/evacuation-info": {
+            "get": {
+                "tags": [
+                    "Citizen Access"
+                ],
+                "summary": "Get Evacuation Information",
+                "description": "Endpoint untuk mendapatkan informasi evakuasi (Warga).",
+                "operationId": "citizenGetEvacuationInfo",
+                "responses": {
+                    "200": {
+                        "description": "Evacuation information retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Citizen evacuation information"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden - Citizen access required"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/dashboard": {
+            "get": {
+                "tags": [
+                    "Dashboard"
+                ],
+                "summary": "Get User Dashboard",
+                "description": "Endpoint untuk mendapatkan dashboard user berdasarkan role.",
+                "operationId": "getDashboard",
+                "responses": {
+                    "200": {
+                        "description": "Dashboard accessed successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Dashboard accessed successfully"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "user": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "nama": {
+                                                            "type": "string",
+                                                            "example": "Admin Test"
+                                                        },
+                                                        "username": {
+                                                            "type": "string",
+                                                            "example": "admintest"
+                                                        },
+                                                        "role": {
+                                                            "type": "string",
+                                                            "example": "Admin"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "role": {
+                                                    "type": "string",
+                                                    "example": "Admin"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/operator/evacuation-sites": {
+            "post": {
+                "tags": [
+                    "Operator Management"
+                ],
+                "summary": "Add Evacuation Site",
+                "description": "Endpoint untuk menambah lokasi evakuasi baru (Operator Desa).",
+                "operationId": "operatorAddEvacuationSite",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "nama_lokasi",
+                                    "alamat",
+                                    "kapasitas"
+                                ],
+                                "properties": {
+                                    "nama_lokasi": {
+                                        "description": "Nama lokasi evakuasi",
+                                        "type": "string",
+                                        "example": "Pos Evakuasi Utama"
+                                    },
+                                    "alamat": {
+                                        "description": "Alamat lengkap",
+                                        "type": "string",
+                                        "example": "Jl. Evakuasi No. 123"
+                                    },
+                                    "kapasitas": {
+                                        "description": "Kapasitas maksimal",
+                                        "type": "integer",
+                                        "example": 500
+                                    },
+                                    "koordinat": {
+                                        "description": "Koordinat GPS",
+                                        "type": "string",
+                                        "example": "-6.200000,106.816666"
+                                    },
+                                    "fasilitas": {
+                                        "description": "Fasilitas tersedia",
+                                        "type": "string",
+                                        "example": "Makanan, Medis, Listrik"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Evacuation site added successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Operator add evacuation site"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden - Operator access required"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/test": {
+            "get": {
+                "tags": [
+                    "System"
+                ],
+                "summary": "Test API Connection",
+                "description": "Endpoint untuk testing koneksi API SIMONTA BENCANA.",
+                "operationId": "testApi",
+                "responses": {
+                    "200": {
+                        "description": "API running successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "SIMONTA BENCANA API is running"
+                                        },
+                                        "version": {
+                                            "type": "string",
+                                            "example": "1.0.0"
+                                        },
+                                        "timestamp": {
+                                            "type": "string",
+                                            "example": "2024-12-10T10:30:00.000000Z"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Authentication",
+            "description": "API Endpoints untuk Authentication"
+        },
+        {
+            "name": "Dashboard",
+            "description": "API Endpoints untuk Dashboard"
+        },
+        {
+            "name": "Admin Management",
+            "description": "API Endpoints untuk Manajemen Admin"
+        },
+        {
+            "name": "BPBD Management",
+            "description": "API Endpoints untuk Manajemen Petugas BPBD"
+        },
+        {
+            "name": "Operator Management",
+            "description": "API Endpoints untuk Manajemen Operator Desa"
+        },
+        {
+            "name": "Citizen Access",
+            "description": "API Endpoints untuk Akses Warga"
+        },
+        {
+            "name": "OpenStreetMap Integration",
+            "description": "API Endpoints untuk Integrasi OpenStreetMap"
+        },
+        {
+            "name": "System",
+            "description": "API Endpoints untuk System dan Testing"
+        }
+    ],
+    "components": {
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT",
+                "description": "JWT authentication token. Dapatkan token dengan melakukan login ke endpoint /api/auth/login menggunakan username \"admintest\" dan password \"123456\"."
+            }
+        }
+    },
+    "security": [
+        {
+            "bearerAuth": []
+        }
+    ]
+}

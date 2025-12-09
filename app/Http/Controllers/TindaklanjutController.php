@@ -12,7 +12,103 @@ use Illuminate\Support\Facades\Storage;
 class TindaklanjutController extends Controller
 {
     /**
-     * Display a listing of tindaklanjut.
+     * @OA\Get(
+     *      path="/api/tindaklanjut",
+     *      tags={"Disaster Response Actions"},
+     *      summary="Get List Tindaklanjut Bencana",
+     *      description="Endpoint untuk mendapatkan daftar tindaklanjut bencana dengan berbagai filter",
+     *      operationId="tindaklanjutIndex",
+     *      security={{"bearerAuth":{}}},
+     *      @OA\Parameter(
+     *          name="status",
+     *          in="query",
+     *          description="Filter status tindaklanjut",
+     *          required=false,
+     *          @OA\Schema(type="string", enum={"menunggu_penugasan","sedang_diproses","menunggu_verifikasi","selesai","dibatalkan"})
+     *      ),
+     *      @OA\Parameter(
+     *          name="prioritas",
+     *          in="query",
+     *          description="Filter prioritas tindaklanjut",
+     *          required=false,
+     *          @OA\Schema(type="string", enum={"rendah","sedang","tinggi","darurat"})
+     *      ),
+     *      @OA\Parameter(
+     *          name="jenis_tindakan",
+     *          in="query",
+     *          description="Filter jenis tindakan",
+     *          required=false,
+     *          @OA\Schema(type="string", enum={"evakuasi","penanganan_medis","distribusi_bantuan","perbaikan_infrastruktur","pembersihan","lainnya"})
+     *      ),
+     *      @OA\Parameter(
+     *          name="start_date",
+     *          in="query",
+     *          description="Filter tanggal mulai (YYYY-MM-DD)",
+     *          required=false,
+     *          @OA\Schema(type="string", format="date")
+     *      ),
+     *      @OA\Parameter(
+     *          name="end_date",
+     *          in="query",
+     *          description="Filter tanggal akhir (YYYY-MM-DD)",
+     *          required=false,
+     *          @OA\Schema(type="string", format="date")
+     *      ),
+     *      @OA\Parameter(
+     *          name="search",
+     *          in="query",
+     *          description="Pencarian berdasarkan deskripsi tindakan",
+     *          required=false,
+     *          @OA\Schema(type="string")
+     *      ),
+     *      @OA\Parameter(
+     *          name="per_page",
+     *          in="query",
+     *          description="Jumlah data per halaman",
+     *          required=false,
+     *          @OA\Schema(type="integer", default=15)
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Daftar tindaklanjut berhasil diambil",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example=true),
+     *              @OA\Property(property="message", type="string", example="Daftar tindaklanjut berhasil diambil"),
+     *              @OA\Property(property="data", type="array",
+     *                  @OA\Items(type="object",
+     *                      @OA\Property(property="id_tindaklanjut", type="integer", example=1),
+     *                      @OA\Property(property="id_laporan", type="integer", example=1),
+     *                      @OA\Property(property="id_petugas", type="integer", example=2),
+     *                      @OA\Property(property="jenis_tindakan", type="string", example="evakuasi"),
+     *                      @OA\Property(property="deskripsi_tindakan", type="string", example="Evakuasi warga ke lokasi aman"),
+     *                      @OA\Property(property="status_tindakan", type="string", example="sedang_diproses"),
+     *                      @OA\Property(property="prioritas", type="string", example="tinggi"),
+     *                      @OA\Property(property="tanggal_tanggapan", type="string", example="2023-12-10T02:30:00.000000Z"),
+     *                      @OA\Property(property="estimasi_waktu", type="string", example="2023-12-10T18:00:00.000000Z"),
+     *                      @OA\Property(property="dokumentasi", type="array", @OA\Items(type="string")),
+     *                      @OA\Property(property="laporan", type="object",
+     *                          @OA\Property(property="id_laporan", type="integer", example=1),
+     *                          @OA\Property(property="lokasi", type="string", example="Jl. Contoh No. 123"),
+     *                          @OA\Property(property="kategori", type="object",
+     *                              @OA\Property(property="id_kategori", type="integer", example=1),
+     *                              @OA\Property(property="nama_kategori", type="string", example="Banjir"),
+     *                              @OA\Property(property="icon", type="string", example="🌊")
+     *                          )
+     *                      ),
+     *                      @OA\Property(property="petugas", type="object",
+     *                          @OA\Property(property="id", type="integer", example=2),
+     *                          @OA\Property(property="nama", type="string", example="Petugas BPBD"),
+     *                          @OA\Property(property="username", type="string", example="petugas1")
+     *                      )
+     *                  )
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthorized"
+     *      )
+     * )
      */
     public function index(Request $request)
     {
@@ -69,7 +165,83 @@ class TindaklanjutController extends Controller
     }
 
     /**
-     * Store a newly created tindaklanjut in storage.
+     * @OA\Post(
+     *      path="/api/tindaklanjut",
+     *      tags={"Disaster Response Actions"},
+     *      summary="Create Tindaklanjut Bencana Baru",
+     *      description="Endpoint untuk membuat tindaklanjut bencana baru. Akses: Petugas BPBD, Admin",
+     *      operationId="tindaklanjutStore",
+     *      security={{"bearerAuth":{}}},
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(
+     *              required={"id_laporan","jenis_tindakan","deskripsi_tindakan","prioritas"},
+     *              @OA\Property(property="id_laporan", type="integer", example=1, description="ID laporan yang akan ditindaklanjuti"),
+     *              @OA\Property(property="jenis_tindakan", type="string", example="evakuasi", description="Jenis tindakan yang akan dilakukan", enum={"evakuasi","penanganan_medis","distribusi_bantuan","perbaikan_infrastruktur","pembersihan","lainnya"}),
+     *              @OA\Property(property="deskripsi_tindakan", type="string", example="Evakuasi warga ke lokasi aman yang telah disiapkan", description="Deskripsi detail tindakan yang akan dilakukan"),
+     *              @OA\Property(property="prioritas", type="string", example="tinggi", description="Prioritas tindakan", enum={"rendah","sedang","tinggi","darurat"}),
+     *              @OA\Property(property="estimasi_waktu", type="string", format="date", example="2023-12-10T18:00:00.000000Z", description="Estimasi waktu penyelesaian"),
+     *              @OA\Property(property="dokumentasi", type="array", @OA\Items(type="string", format="binary"), description="Dokumentasi pendukung (max 2MB per file, format: jpeg,png,jpg)")
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=201,
+     *          description="Tindaklanjut berhasil dibuat",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example=true),
+     *              @OA\Property(property="message", type="string", example="Tindaklanjut berhasil dibuat"),
+     *              @OA\Property(property="data", type="object",
+     *                  @OA\Property(property="id_tindaklanjut", type="integer", example=1),
+     *                  @OA\Property(property="id_laporan", type="integer", example=1),
+     *                  @OA\Property(property="id_petugas", type="integer", example=2),
+     *                  @OA\Property(property="jenis_tindakan", type="string", example="evakuasi"),
+     *                  @OA\Property(property="deskripsi_tindakan", type="string", example="Evakuasi warga ke lokasi aman"),
+     *                  @OA\Property(property="status_tindakan", type="string", example="menunggu_penugasan"),
+     *                  @OA\Property(property="prioritas", type="string", example="tinggi"),
+     *                  @OA\Property(property="tanggal_tanggapan", type="string", example="2023-12-10T02:30:00.000000Z"),
+     *                  @OA\Property(property="estimasi_waktu", type="string", example="2023-12-10T18:00:00.000000Z"),
+     *                  @OA\Property(property="dokumentasi", type="array", @OA\Items(type="string")),
+     *                  @OA\Property(property="laporan", type="object",
+     *                      @OA\Property(property="id_laporan", type="integer", example=1),
+     *                      @OA\Property(property="kategori", type="object",
+     *                          @OA\Property(property="id_kategori", type="integer", example=1),
+     *                          @OA\Property(property="nama_kategori", type="string", example="Banjir"),
+     *                          @OA\Property(property="icon", type="string", example="🌊")
+     *                      )
+     *                  ),
+     *                  @OA\Property(property="petugas", type="object",
+     *                      @OA\Property(property="id", type="integer", example=2),
+     *                      @OA\Property(property="nama", type="string", example="Petugas BPBD"),
+     *                      @OA\Property(property="username", type="string", example="petugas1")
+     *                  )
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=403,
+     *          description="Access Denied",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example=false),
+     *              @OA\Property(property="message", type="string", example="Akses ditolak. Hanya Petugas BPBD dan Admin yang dapat membuat tindaklanjut.")
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=422,
+     *          description="Validasi gagal",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example=false),
+     *              @OA\Property(property="message", type="string", example="Validasi gagal"),
+     *              @OA\Property(property="errors", type="object",
+     *                  @OA\Property(property="id_laporan", type="array", @OA\Items(type="string", example="ID laporan wajib diisi")),
+     *                  @OA\Property(property="jenis_tindakan", type="array", @OA\Items(type="string", example="Jenis tindakan wajib dipilih"))
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthorized"
+     *      )
+     * )
      */
     public function store(Request $request)
     {
@@ -189,7 +361,84 @@ class TindaklanjutController extends Controller
     }
 
     /**
-     * Display the specified tindaklanjut.
+     * @OA\Get(
+     *      path="/api/tindaklanjut/{id}",
+     *      tags={"Disaster Response Actions"},
+     *      summary="Get Detail Tindaklanjut Bencana",
+     *      description="Endpoint untuk mendapatkan detail tindaklanjut bencana berdasarkan ID",
+     *      operationId="tindaklanjutShow",
+     *      security={{"bearerAuth":{}}},
+     *      @OA\Parameter(
+     *          name="id",
+     *          in="path",
+     *          description="ID tindaklanjut",
+     *          required=true,
+     *          @OA\Schema(type="integer")
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Detail tindaklanjut berhasil diambil",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example=true),
+     *              @OA\Property(property="message", type="string", example="Detail tindaklanjut berhasil diambil"),
+     *              @OA\Property(property="data", type="object",
+     *                  @OA\Property(property="id_tindaklanjut", type="integer", example=1),
+     *                  @OA\Property(property="id_laporan", type="integer", example=1),
+     *                  @OA\Property(property="id_petugas", type="integer", example=2),
+     *                  @OA\Property(property="jenis_tindakan", type="string", example="evakuasi"),
+     *                  @OA\Property(property="deskripsi_tindakan", type="string", example="Evakuasi warga ke lokasi aman"),
+     *                  @OA\Property(property="status_tindakan", type="string", example="sedang_diproses"),
+     *                  @OA\Property(property="prioritas", type="string", example="tinggi"),
+     *                  @OA\Property(property="tanggal_tanggapan", type="string", example="2023-12-10T02:30:00.000000Z"),
+     *                  @OA\Property(property="estimasi_waktu", type="string", example="2023-12-10T18:00:00.000000Z"),
+     *                  @OA\Property(property="dokumentasi", type="array", @OA\Items(type="string")),
+     *                  @OA\Property(property="laporan", type="object",
+     *                      @OA\Property(property="id_laporan", type="integer", example=1),
+     *                      @OA\Property(property="lokasi", type="string", example="Jl. Contoh No. 123"),
+     *                      @OA\Property(property="deskripsi", type="string", example="Terjadi banjir di kawasan tersebut"),
+     *                      @OA\Property(property="status_laporan", type="string", example="dalam_penanganan"),
+     *                      @OA\Property(property="kategori", type="object",
+     *                          @OA\Property(property="id_kategori", type="integer", example=1),
+     *                          @OA\Property(property="nama_kategori", type="string", example="Banjir"),
+     *                          @OA\Property(property="icon", type="string", example="🌊")
+     *                      ),
+     *                      @OA\Property(property="pengguna", type="object",
+     *                          @OA\Property(property="id", type="integer", example=1),
+     *                          @OA\Property(property="nama", type="string", example="John Doe"),
+     *                          @OA\Property(property="username", type="string", example="johndoe"),
+     *                          @OA\Property(property="role", type="string", example="Warga")
+     *                      )
+     *                  ),
+     *                  @OA\Property(property="petugas", type="object",
+     *                      @OA\Property(property="id", type="integer", example=2),
+     *                      @OA\Property(property="nama", type="string", example="Petugas BPBD"),
+     *                      @OA\Property(property="username", type="string", example="petugas1")
+     *                  ),
+     *                  @OA\Property(property="riwayat_tindakan", type="array", @OA\Items(type="object"))
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=403,
+     *          description="Access Denied",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example=false),
+     *              @OA\Property(property="message", type="string", example="Akses ditolak. Anda tidak dapat melihat tindaklanjut ini.")
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="Not Found",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example=false),
+     *              @OA\Property(property="message", type="string", example="Tindaklanjut tidak ditemukan")
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthorized"
+     *      )
+     * )
      */
     public function show(string $id)
     {
@@ -236,7 +485,96 @@ class TindaklanjutController extends Controller
     }
 
     /**
-     * Update the specified tindaklanjut in storage.
+     * @OA\Put(
+     *      path="/api/tindaklanjut/{id}",
+     *      tags={"Disaster Response Actions"},
+     *      summary="Update Tindaklanjut Bencana",
+     *      description="Endpoint untuk memperbarui tindaklanjut bencana. Akses: Admin, Petugas BPBD (hanya yang ditugaskan)",
+     *      operationId="tindaklanjutUpdate",
+     *      security={{"bearerAuth":{}}},
+     *      @OA\Parameter(
+     *          name="id",
+     *          in="path",
+     *          description="ID tindaklanjut",
+     *          required=true,
+     *          @OA\Schema(type="integer")
+     *      ),
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(
+     *              required={"status_tindakan"},
+     *              @OA\Property(property="status_tindakan", type="string", example="sedang_diproses", description="Status tindakan", enum={"menunggu_penugasan","sedang_diproses","menunggu_verifikasi","selesai","dibatalkan"}),
+     *              @OA\Property(property="deskripsi_tindakan", type="string", example="Evakuasi sedang berlangsung dengan 3 tim", description="Deskripsi update tindakan"),
+     *              @OA\Property(property="prioritas", type="string", example="tinggi", description="Prioritas tindakan", enum={"rendah","sedang","tinggi","darurat"}),
+     *              @OA\Property(property="estimasi_waktu", type="string", format="date", example="2023-12-10T20:00:00.000000Z", description="Estimasi waktu penyelesaian"),
+     *              @OA\Property(property="dokumentasi", type="array", @OA\Items(type="string", format="binary"), description="Dokumentasi tambahan (max 2MB per file, format: jpeg,png,jpg)"),
+     *              @OA\Property(property="catatan_update", type="string", example="Update progress evakuasi", description="Catatan update progress")
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Tindaklanjut berhasil diperbarui",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example=true),
+     *              @OA\Property(property="message", type="string", example="Tindaklanjut berhasil diperbarui"),
+     *              @OA\Property(property="data", type="object",
+     *                  @OA\Property(property="id_tindaklanjut", type="integer", example=1),
+     *                  @OA\Property(property="id_laporan", type="integer", example=1),
+     *                  @OA\Property(property="jenis_tindakan", type="string", example="evakuasi"),
+     *                  @OA\Property(property="deskripsi_tindakan", type="string", example="Evakuasi sedang berlangsung"),
+     *                  @OA\Property(property="status_tindakan", type="string", example="sedang_diproses"),
+     *                  @OA\Property(property="prioritas", type="string", example="tinggi"),
+     *                  @OA\Property(property="tanggal_tanggapan", type="string", example="2023-12-10T02:30:00.000000Z"),
+     *                  @OA\Property(property="estimasi_waktu", type="string", example="2023-12-10T20:00:00.000000Z"),
+     *                  @OA\Property(property="dokumentasi", type="array", @OA\Items(type="string")),
+     *                  @OA\Property(property="laporan", type="object",
+     *                      @OA\Property(property="id_laporan", type="integer", example=1),
+     *                      @OA\Property(property="kategori", type="object",
+     *                          @OA\Property(property="id_kategori", type="integer", example=1),
+     *                          @OA\Property(property="nama_kategori", type="string", example="Banjir"),
+     *                          @OA\Property(property="icon", type="string", example="🌊")
+     *                      )
+     *                  ),
+     *                  @OA\Property(property="petugas", type="object",
+     *                      @OA\Property(property="id", type="integer", example=2),
+     *                      @OA\Property(property="nama", type="string", example="Petugas BPBD"),
+     *                      @OA\Property(property="username", type="string", example="petugas1")
+     *                  )
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=403,
+     *          description="Access Denied",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example=false),
+     *              @OA\Property(property="message", type="string", example="Akses ditolak.")
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="Not Found",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example=false),
+     *              @OA\Property(property="message", type="string", example="Tindaklanjut tidak ditemukan")
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=422,
+     *          description="Validasi gagal",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example=false),
+     *              @OA\Property(property="message", type="string", example="Validasi gagal"),
+     *              @OA\Property(property="errors", type="object",
+     *                  @OA\Property(property="status_tindakan", type="array", @OA\Items(type="string", example="Status tindakan wajib dipilih"))
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthorized"
+     *      )
+     * )
      */
     public function update(Request $request, string $id)
     {
@@ -351,7 +689,57 @@ class TindaklanjutController extends Controller
     }
 
     /**
-     * Remove the specified tindaklanjut from storage.
+     * @OA\Delete(
+     *      path="/api/tindaklanjut/{id}",
+     *      tags={"Disaster Response Actions"},
+     *      summary="Delete Tindaklanjut Bencana",
+     *      description="Endpoint untuk menghapus tindaklanjut bencana. Akses: Admin saja",
+     *      operationId="tindaklanjutDestroy",
+     *      security={{"bearerAuth":{}}},
+     *      @OA\Parameter(
+     *          name="id",
+     *          in="path",
+     *          description="ID tindaklanjut",
+     *          required=true,
+     *          @OA\Schema(type="integer")
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Tindaklanjut berhasil dihapus",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example=true),
+     *              @OA\Property(property="message", type="string", example="Tindaklanjut berhasil dihapus")
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=403,
+     *          description="Access Denied",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example=false),
+     *              @OA\Property(property="message", type="string", example="Akses ditolak. Hanya admin yang dapat menghapus tindaklanjut.")
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="Not Found",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example=false),
+     *              @OA\Property(property="message", type="string", example="Tindaklanjut tidak ditemukan")
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=422,
+     *          description="Cannot Delete",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example=false),
+     *              @OA\Property(property="message", type="string", example="Tindaklanjut tidak dapat dihapus karena sedang diproses")
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthorized"
+     *      )
+     * )
      */
     public function destroy(string $id)
     {
@@ -418,7 +806,40 @@ class TindaklanjutController extends Controller
     }
 
     /**
-     * Get tindaklanjut statistics.
+     * @OA\Get(
+     *      path="/api/tindaklanjut/statistics",
+     *      tags={"Disaster Response Actions"},
+     *      summary="Get Tindaklanjut Bencana Statistics",
+     *      description="Endpoint untuk mendapatkan statistik tindaklanjut bencana",
+     *      operationId="tindaklanjutStatistics",
+     *      security={{"bearerAuth":{}}},
+     *      @OA\Response(
+     *          response=200,
+     *          description="Statistik tindaklanjut berhasil diambil",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example=true),
+     *              @OA\Property(property="message", type="string", example="Statistik tindaklanjut berhasil diambil"),
+     *              @OA\Property(property="data", type="object",
+     *                  @OA\Property(property="total_tindaklanjut", type="integer", example=85),
+     *                  @OA\Property(property="menunggu_penugasan", type="integer", example=15),
+     *                  @OA\Property(property="sedang_diproses", type="integer", example=35),
+     *                  @OA\Property(property="menunggu_verifikasi", type="integer", example=20),
+     *                  @OA\Property(property="selesai", type="integer", example=30),
+     *                  @OA\Property(property="dibatalkan", type="integer", example=5),
+     *                  @OA\Property(property="prioritas_darurat", type="integer", example=8),
+     *                  @OA\Property(property="tindaklanjut_terlambat", type="integer", example=12),
+     *                  @OA\Property(property="jenis_tindakan_terbanyak", type="object",
+     *                      @OA\Property(property="jenis_tindakan", type="string", example="evakuasi"),
+     *                      @OA\Property(property="total", type="integer", example=40)
+     *                  )
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthorized"
+     *      )
+     * )
      */
     public function statistics(Request $request)
     {

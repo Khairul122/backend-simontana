@@ -12,6 +12,75 @@ use Illuminate\Support\Facades\DB;
 class DesaController extends Controller
 {
     /**
+     * @OA\Get(
+     *      path="/api/desa",
+     *      tags={"Village Management"},
+     *      summary="Get All Desa (Admin)",
+     *      description="Endpoint untuk mendapatkan daftar semua desa yang ada dalam sistem (Admin).",
+     *      operationId="getAllDesaAdmin",
+     *      security={{"bearerAuth":{}}},
+     *      @OA\Parameter(
+     *          name="search",
+     *          in="query",
+     *          description="Search desa by name, kecamatan, or kabupaten",
+     *          required=false,
+     *          @OA\Schema(type="string", example="Jakarta")
+     *      ),
+     *      @OA\Parameter(
+     *          name="kecamatan",
+     *          in="query",
+     *          description="Filter by kecamatan",
+     *          required=false,
+     *          @OA\Schema(type="string", example="Menteng")
+     *      ),
+     *      @OA\Parameter(
+     *          name="kabupaten",
+     *          in="query",
+     *          description="Filter by kabupaten",
+     *          required=false,
+     *          @OA\Schema(type="string", example="Jakarta Pusat")
+     *      ),
+     *      @OA\Parameter(
+     *          name="per_page",
+     *          in="query",
+     *          description="Items per page for pagination",
+     *          required=false,
+     *          @OA\Schema(type="integer", example=15)
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Daftar desa berhasil diambil",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example=true),
+     *              @OA\Property(property="message", type="string", example="Daftar desa berhasil diambil"),
+     *              @OA\Property(property="data", type="object",
+     *                  @OA\Property(property="current_page", type="integer", example=1),
+     *                  @OA\Property(property="data", type="array",
+     *                      @OA\Items(type="object",
+     *                          @OA\Property(property="id_desa", type="integer", example=1),
+     *                          @OA\Property(property="nama_desa", type="string", example="Desa Example"),
+     *                          @OA\Property(property="kecamatan", type="string", example="Menteng"),
+     *                          @OA\Property(property="kabupaten", type="string", example="Jakarta Pusat"),
+     *                          @OA\Property(property="created_at", type="string", example="2024-12-10T10:30:00.000000Z"),
+     *                          @OA\Property(property="updated_at", type="string", example="2024-12-10T10:30:00.000000Z"),
+     *                          @OA\Property(property="jumlah_pengguna", type="integer", example=25)
+     *                      )
+     *                  ),
+     *                  @OA\Property(property="total", type="integer", example=50)
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthorized"
+     *      ),
+     *      @OA\Response(
+     *          response=403,
+     *          description="Forbidden - Admin access required"
+     *      )
+     * )
+     */
+    /**
      * Display a listing of desa.
      */
     public function index(Request $request)
@@ -64,6 +133,60 @@ class DesaController extends Controller
     }
 
     /**
+     * @OA\Post(
+     *      path="/api/desa",
+     *      tags={"Village Management"},
+     *      summary="Create Desa",
+     *      description="Endpoint untuk menambahkan desa baru ke dalam sistem (Admin).",
+     *      operationId="createDesa",
+     *      security={{"bearerAuth":{}}},
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(
+     *              required={"nama_desa","kecamatan","kabupaten"},
+     *              @OA\Property(property="nama_desa", type="string", maxLength=255, example="Desa Baru", description="Nama desa"),
+     *              @OA\Property(property="kecamatan", type="string", maxLength=255, example="Kecamatan Baru", description="Nama kecamatan"),
+     *              @OA\Property(property="kabupaten", type="string", maxLength=255, example="Kabupaten Baru", description="Nama kabupaten")
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=201,
+     *          description="Desa berhasil ditambahkan",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example=true),
+     *              @OA\Property(property="message", type="string", example="Desa berhasil ditambahkan"),
+     *              @OA\Property(property="data", type="object",
+     *                  @OA\Property(property="id_desa", type="integer", example=1),
+     *                  @OA\Property(property="nama_desa", type="string", example="Desa Baru"),
+     *                  @OA\Property(property="kecamatan", type="string", example="Kecamatan Baru"),
+     *                  @OA\Property(property="kabupaten", type="string", example="Kabupaten Baru"),
+     *                  @OA\Property(property="created_at", type="string", example="2024-12-10T10:30:00.000000Z"),
+     *                  @OA\Property(property="updated_at", type="string", example="2024-12-10T10:30:00.000000Z")
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=422,
+     *          description="Validation Error",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example=false),
+     *              @OA\Property(property="message", type="string", example="Validasi gagal"),
+     *              @OA\Property(property="errors", type="object",
+     *                  @OA\Property(property="nama_desa", type="array", @OA\Items(type="string", example="Nama desa wajib diisi"))
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthorized"
+     *      ),
+     *      @OA\Response(
+     *          response=403,
+     *          description="Forbidden - Admin access required"
+     *      )
+     * )
+     */
+    /**
      * Store a newly created desa in storage.
      */
     public function store(StoreDesaRequest $request)
@@ -94,6 +217,52 @@ class DesaController extends Controller
         }
     }
 
+    /**
+     * @OA\Get(
+     *      path="/api/desa/{id}",
+     *      tags={"Village Management"},
+     *      summary="Get Desa Details",
+     *      description="Endpoint untuk mendapatkan detail desa berdasarkan ID.",
+     *      operationId="getDesaById",
+     *      security={{"bearerAuth":{}}},
+     *      @OA\Parameter(
+     *          name="id",
+     *          in="path",
+     *          required=true,
+     *          description="ID desa",
+     *          @OA\Schema(type="integer", example=1)
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Detail desa berhasil diambil",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example=true),
+     *              @OA\Property(property="message", type="string", example="Detail desa berhasil diambil"),
+     *              @OA\Property(property="data", type="object",
+     *                  @OA\Property(property="id_desa", type="integer", example=1),
+     *                  @OA\Property(property="nama_desa", type="string", example="Desa Example"),
+     *                  @OA\Property(property="kecamatan", type="string", example="Menteng"),
+     *                  @OA\Property(property="kabupaten", type="string", example="Jakarta Pusat"),
+     *                  @OA\Property(property="created_at", type="string", example="2024-12-10T10:30:00.000000Z"),
+     *                  @OA\Property(property="updated_at", type="string", example="2024-12-10T10:30:00.000000Z"),
+     *                  @OA\Property(property="jumlah_pengguna", type="integer", example=25)
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="Desa tidak ditemukan",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example=false),
+     *              @OA\Property(property="message", type="string", example="Desa tidak ditemukan")
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthorized"
+     *      )
+     * )
+     */
     /**
      * Display the specified desa.
      */
@@ -129,6 +298,71 @@ class DesaController extends Controller
         }
     }
 
+    /**
+     * @OA\Put(
+     *      path="/api/desa/{id}",
+     *      tags={"Village Management"},
+     *      summary="Update Desa",
+     *      description="Endpoint untuk memperbarui desa yang ada dalam sistem (Admin).",
+     *      operationId="updateDesa",
+     *      security={{"bearerAuth":{}}},
+     *      @OA\Parameter(
+     *          name="id",
+     *          in="path",
+     *          required=true,
+     *          description="ID desa",
+     *          @OA\Schema(type="integer", example=1)
+     *      ),
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(
+     *              required={"nama_desa","kecamatan","kabupaten"},
+     *              @OA\Property(property="nama_desa", type="string", maxLength=255, example="Desa Updated", description="Nama desa yang diperbarui"),
+     *              @OA\Property(property="kecamatan", type="string", maxLength=255, example="Kecamatan Updated", description="Nama kecamatan yang diperbarui"),
+     *              @OA\Property(property="kabupaten", type="string", maxLength=255, example="Kabupaten Updated", description="Nama kabupaten yang diperbarui")
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Desa berhasil diperbarui",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example=true),
+     *              @OA\Property(property="message", type="string", example="Desa berhasil diperbarui"),
+     *              @OA\Property(property="data", type="object",
+     *                  @OA\Property(property="id_desa", type="integer", example=1),
+     *                  @OA\Property(property="nama_desa", type="string", example="Desa Updated"),
+     *                  @OA\Property(property="kecamatan", type="string", example="Kecamatan Updated"),
+     *                  @OA\Property(property="kabupaten", type="string", example="Kabupaten Updated"),
+     *                  @OA\Property(property="created_at", type="string", example="2024-12-10T10:30:00.000000Z"),
+     *                  @OA\Property(property="updated_at", type="string", example="2024-12-10T11:00:00.000000Z")
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=422,
+     *          description="Validation Error",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example=false),
+     *              @OA\Property(property="message", type="string", example="Validasi gagal"),
+     *              @OA\Property(property="errors", type="object",
+     *                  @OA\Property(property="nama_desa", type="array", @OA\Items(type="string", example="Nama desa wajib diisi"))
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="Desa tidak ditemukan"
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthorized"
+     *      ),
+     *      @OA\Response(
+     *          response=403,
+     *          description="Forbidden - Admin access required"
+     *      )
+     * )
+     */
     /**
      * Update the specified desa in storage.
      */
@@ -177,6 +411,55 @@ class DesaController extends Controller
     }
 
     /**
+     * @OA\Delete(
+     *      path="/api/desa/{id}",
+     *      tags={"Village Management"},
+     *      summary="Delete Desa",
+     *      description="Endpoint untuk menghapus desa dari sistem (Admin).",
+     *      operationId="deleteDesa",
+     *      security={{"bearerAuth":{}}},
+     *      @OA\Parameter(
+     *          name="id",
+     *          in="path",
+     *          required=true,
+     *          description="ID desa",
+     *          @OA\Schema(type="integer", example=1)
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Desa berhasil dihapus",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example=true),
+     *              @OA\Property(property="message", type="string", example="Desa berhasil dihapus")
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="Desa tidak ditemukan",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example=false),
+     *              @OA\Property(property="message", type="string", example="Desa tidak ditemukan")
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=409,
+     *          description="Conflict - Desa tidak dapat dihapus karena masih digunakan",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example=false),
+     *              @OA\Property(property="message", type="string", example="Desa tidak dapat dihapus karena masih memiliki pengguna terkait")
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthorized"
+     *      ),
+     *      @OA\Response(
+     *          response=403,
+     *          description="Forbidden - Admin access required"
+     *      )
+     * )
+     */
+    /**
      * Remove the specified desa from storage.
      */
     public function destroy(string $id)
@@ -219,6 +502,31 @@ class DesaController extends Controller
     }
 
     /**
+     * @OA\Get(
+     *      path="/api/desa-list/kecamatan",
+     *      tags={"Village Management"},
+     *      summary="Get All Kecamatan",
+     *      description="Endpoint untuk mendapatkan daftar semua kecamatan yang ada dalam sistem.",
+     *      operationId="getAllKecamatan",
+     *      security={{"bearerAuth":{}}},
+     *      @OA\Response(
+     *          response=200,
+     *          description="Daftar kecamatan berhasil diambil",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example=true),
+     *              @OA\Property(property="message", type="string", example="Daftar kecamatan berhasil diambil"),
+     *              @OA\Property(property="data", type="array",
+     *                  @OA\Items(type="string", example="Kecamatan Example")
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthorized"
+     *      )
+     * )
+     */
+    /**
      * Get kecamatan list for filter dropdown
      */
     public function getKecamatan()
@@ -244,6 +552,31 @@ class DesaController extends Controller
     }
 
     /**
+     * @OA\Get(
+     *      path="/api/desa-list/kabupaten",
+     *      tags={"Village Management"},
+     *      summary="Get All Kabupaten",
+     *      description="Endpoint untuk mendapatkan daftar semua kabupaten yang ada dalam sistem.",
+     *      operationId="getAllKabupaten",
+     *      security={{"bearerAuth":{}}},
+     *      @OA\Response(
+     *          response=200,
+     *          description="Daftar kabupaten berhasil diambil",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example=true),
+     *              @OA\Property(property="message", type="string", example="Daftar kabupaten berhasil diambil"),
+     *              @OA\Property(property="data", type="array",
+     *                  @OA\Items(type="string", example="Kabupaten Example")
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthorized"
+     *      )
+     * )
+     */
+    /**
      * Get kabupaten list for filter dropdown
      */
     public function getKabupaten()
@@ -268,6 +601,51 @@ class DesaController extends Controller
         }
     }
 
+    /**
+     * @OA\Get(
+     *      path="/api/desa-statistics",
+     *      tags={"Village Management"},
+     *      summary="Get Desa Statistics",
+     *      description="Endpoint untuk mendapatkan statistik desa.",
+     *      operationId="getDesaStatistics",
+     *      security={{"bearerAuth":{}}},
+     *      @OA\Response(
+     *          response=200,
+     *          description="Statistik desa berhasil diambil",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example=true),
+     *              @OA\Property(property="message", type="string", example="Statistik desa berhasil diambil"),
+     *              @OA\Property(property="data", type="object",
+     *                  @OA\Property(property="total_desa", type="integer", example=150),
+     *                  @OA\Property(property="total_kecamatan", type="integer", example=25),
+     *                  @OA\Property(property="total_kabupaten", type="integer", example=8),
+     *                  @OA\Property(property="desa_terbanyak_pengguna", type="object",
+     *                      @OA\Property(property="id_desa", type="integer", example=1),
+     *                      @OA\Property(property="nama_desa", type="string", example="Desa Example"),
+     *                      @OA\Property(property="kecamatan", type="string", example="Menteng"),
+     *                      @OA\Property(property="kabupaten", type="string", example="Jakarta Pusat"),
+     *                      @OA\Property(property="jumlah_pengguna", type="integer", example=150)
+     *                  ),
+     *                  @OA\Property(property="distribusi_per_kabupaten", type="array",
+     *                      @OA\Items(type="object",
+     *                          @OA\Property(property="kabupaten", type="string", example="Jakarta Pusat"),
+     *                          @OA\Property(property="jumlah_desa", type="integer", example=20),
+     *                          @OA\Property(property="jumlah_pengguna", type="integer", example=500)
+     *                      )
+     *                  )
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthorized"
+     *      ),
+     *      @OA\Response(
+     *          response=403,
+     *          description="Forbidden - Admin access required"
+     *      )
+     * )
+     */
     /**
      * Get desa statistics
      */

@@ -10,6 +10,59 @@ use Illuminate\Support\Facades\DB;
 class KategoriBencanaController extends Controller
 {
     /**
+     * @OA\Get(
+     *      path="/api/kategori-bencana",
+     *      tags={"Kategori Bencana Management"},
+     *      summary="Get All Kategori Bencana",
+     *      description="Endpoint untuk mendapatkan daftar semua kategori bencana yang ada dalam sistem.",
+     *      operationId="getAllKategoriBencana",
+     *      security={{"bearerAuth":{}}},
+     *      @OA\Parameter(
+     *          name="search",
+     *          in="query",
+     *          description="Search kategori bencana by name",
+     *          required=false,
+     *          @OA\Schema(type="string", example="Banjir")
+     *      ),
+     *      @OA\Parameter(
+     *          name="per_page",
+     *          in="query",
+     *          description="Items per page for pagination",
+     *          required=false,
+     *          @OA\Schema(type="integer", example=15)
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Daftar kategori bencana berhasil diambil",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example=true),
+     *              @OA\Property(property="message", type="string", example="Daftar kategori bencana berhasil diambil"),
+     *              @OA\Property(property="data", type="object",
+     *                  @OA\Property(property="current_page", type="integer", example=1),
+     *                  @OA\Property(property="data", type="array",
+     *                      @OA\Items(type="object",
+     *                          @OA\Property(property="id_kategori", type="integer", example=1),
+     *                          @OA\Property(property="nama_kategori", type="string", example="Banjir"),
+     *                          @OA\Property(property="created_at", type="string", example="2024-12-10T10:30:00.000000Z"),
+     *                          @OA\Property(property="updated_at", type="string", example="2024-12-10T10:30:00.000000Z"),
+     *                          @OA\Property(property="jumlah_laporan", type="integer", example=5)
+     *                      )
+     *                  ),
+     *                  @OA\Property(property="total", type="integer", example=10)
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthorized"
+     *      ),
+     *      @OA\Response(
+     *          response=403,
+     *          description="Forbidden - Admin access required"
+     *      )
+     * )
+     */
+    /**
      * Display a listing of kategori_bencana.
      */
     public function index(Request $request)
@@ -47,6 +100,56 @@ class KategoriBencanaController extends Controller
         }
     }
 
+    /**
+     * @OA\Post(
+     *      path="/api/kategori-bencana",
+     *      tags={"Kategori Bencana Management"},
+     *      summary="Create Kategori Bencana",
+     *      description="Endpoint untuk menambahkan kategori bencana baru ke dalam sistem.",
+     *      operationId="createKategoriBencana",
+     *      security={{"bearerAuth":{}}},
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(
+     *              required={"nama_kategori"},
+     *              @OA\Property(property="nama_kategori", type="string", maxLength=255, example="Kebakaran Hutan", description="Nama kategori bencana")
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=201,
+     *          description="Kategori bencana berhasil ditambahkan",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example=true),
+     *              @OA\Property(property="message", type="string", example="Kategori bencana berhasil ditambahkan"),
+     *              @OA\Property(property="data", type="object",
+     *                  @OA\Property(property="id_kategori", type="integer", example=1),
+     *                  @OA\Property(property="nama_kategori", type="string", example="Kebakaran Hutan"),
+     *                  @OA\Property(property="created_at", type="string", example="2024-12-10T10:30:00.000000Z"),
+     *                  @OA\Property(property="updated_at", type="string", example="2024-12-10T10:30:00.000000Z")
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=422,
+     *          description="Validation Error",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example=false),
+     *              @OA\Property(property="message", type="string", example="Validasi gagal"),
+     *              @OA\Property(property="errors", type="object",
+     *                  @OA\Property(property="nama_kategori", type="array", @OA\Items(type="string", example="Nama kategori bencana wajib diisi"))
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthorized"
+     *      ),
+     *      @OA\Response(
+     *          response=403,
+     *          description="Forbidden - Admin access required"
+     *      )
+     * )
+     */
     /**
      * Store a newly created kategori_bencana in storage.
      */
@@ -93,6 +196,58 @@ class KategoriBencanaController extends Controller
     }
 
     /**
+     * @OA\Get(
+     *      path="/api/kategori-bencana/{id}",
+     *      tags={"Kategori Bencana Management"},
+     *      summary="Get Kategori Bencana Details",
+     *      description="Endpoint untuk mendapatkan detail kategori bencana berdasarkan ID.",
+     *      operationId="getKategoriBencanaById",
+     *      security={{"bearerAuth":{}}},
+     *      @OA\Parameter(
+     *          name="id",
+     *          in="path",
+     *          required=true,
+     *          description="ID kategori bencana",
+     *          @OA\Schema(type="integer", example=1)
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Detail kategori bencana berhasil diambil",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example=true),
+     *              @OA\Property(property="message", type="string", example="Detail kategori bencana berhasil diambil"),
+     *              @OA\Property(property="data", type="object",
+     *                  @OA\Property(property="id_kategori", type="integer", example=1),
+     *                  @OA\Property(property="nama_kategori", type="string", example="Banjir"),
+     *                  @OA\Property(property="created_at", type="string", example="2024-12-10T10:30:00.000000Z"),
+     *                  @OA\Property(property="updated_at", type="string", example="2024-12-10T10:30:00.000000Z"),
+     *                  @OA\Property(property="laporan_count", type="integer", example=15),
+     *                  @OA\Property(property="laporan_terbaru", type="array",
+     *                      @OA\Items(type="object",
+     *                          @OA\Property(property="id_laporan", type="integer", example=1),
+     *                          @OA\Property(property="pengirim", type="string", example="Ahmad"),
+     *                          @OA\Property(property="tanggal_lapor", type="string", example="2024-12-10T10:30:00.000000Z"),
+     *                          @OA\Property(property="status_laporan", type="string", example="Baru")
+     *                      )
+     *                  )
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="Kategori bencana tidak ditemukan",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example=false),
+     *              @OA\Property(property="message", type="string", example="Kategori bencana tidak ditemukan")
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthorized"
+     *      )
+     * )
+     */
+    /**
      * Display the specified kategori_bencana.
      */
     public function show(string $id)
@@ -127,6 +282,67 @@ class KategoriBencanaController extends Controller
         }
     }
 
+    /**
+     * @OA\Put(
+     *      path="/api/kategori-bencana/{id}",
+     *      tags={"Kategori Bencana Management"},
+     *      summary="Update Kategori Bencana",
+     *      description="Endpoint untuk memperbarui kategori bencana yang ada dalam sistem.",
+     *      operationId="updateKategoriBencana",
+     *      security={{"bearerAuth":{}}},
+     *      @OA\Parameter(
+     *          name="id",
+     *          in="path",
+     *          required=true,
+     *          description="ID kategori bencana",
+     *          @OA\Schema(type="integer", example=1)
+     *      ),
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(
+     *              required={"nama_kategori"},
+     *              @OA\Property(property="nama_kategori", type="string", maxLength=255, example="Banjir Bandang", description="Nama kategori bencana yang diperbarui")
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Kategori bencana berhasil diperbarui",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example=true),
+     *              @OA\Property(property="message", type="string", example="Kategori bencana berhasil diperbarui"),
+     *              @OA\Property(property="data", type="object",
+     *                  @OA\Property(property="id_kategori", type="integer", example=1),
+     *                  @OA\Property(property="nama_kategori", type="string", example="Banjir Bandang"),
+     *                  @OA\Property(property="created_at", type="string", example="2024-12-10T10:30:00.000000Z"),
+     *                  @OA\Property(property="updated_at", type="string", example="2024-12-10T11:00:00.000000Z")
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=422,
+     *          description="Validation Error",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example=false),
+     *              @OA\Property(property="message", type="string", example="Validasi gagal"),
+     *              @OA\Property(property="errors", type="object",
+     *                  @OA\Property(property="nama_kategori", type="array", @OA\Items(type="string", example="Nama kategori bencana sudah ada"))
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="Kategori bencana tidak ditemukan"
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthorized"
+     *      ),
+     *      @OA\Response(
+     *          response=403,
+     *          description="Forbidden - Admin access required"
+     *      )
+     * )
+     */
     /**
      * Update the specified kategori_bencana in storage.
      */
@@ -182,6 +398,55 @@ class KategoriBencanaController extends Controller
     }
 
     /**
+     * @OA\Delete(
+     *      path="/api/kategori-bencana/{id}",
+     *      tags={"Kategori Bencana Management"},
+     *      summary="Delete Kategori Bencana",
+     *      description="Endpoint untuk menghapus kategori bencana dari sistem.",
+     *      operationId="deleteKategoriBencana",
+     *      security={{"bearerAuth":{}}},
+     *      @OA\Parameter(
+     *          name="id",
+     *          in="path",
+     *          required=true,
+     *          description="ID kategori bencana",
+     *          @OA\Schema(type="integer", example=1)
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Kategori bencana berhasil dihapus",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example=true),
+     *              @OA\Property(property="message", type="string", example="Kategori bencana berhasil dihapus")
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="Kategori bencana tidak ditemukan",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example=false),
+     *              @OA\Property(property="message", type="string", example="Kategori bencana tidak ditemukan")
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=409,
+     *          description="Conflict - Kategori bencana tidak dapat dihapus karena masih digunakan",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example=false),
+     *              @OA\Property(property="message", type="string", example="Kategori bencana tidak dapat dihapus karena masih digunakan dalam laporan")
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthorized"
+     *      ),
+     *      @OA\Response(
+     *          response=403,
+     *          description="Forbidden - Admin access required"
+     *      )
+     * )
+     */
+    /**
      * Remove the specified kategori_bencana from storage.
      */
     public function destroy(string $id)
@@ -223,6 +488,52 @@ class KategoriBencanaController extends Controller
         }
     }
 
+    /**
+     * @OA\Get(
+     *      path="/api/kategori-bencana-statistics",
+     *      tags={"Kategori Bencana Management"},
+     *      summary="Get Kategori Bencana Statistics",
+     *      description="Endpoint untuk mendapatkan statistik kategori bencana.",
+     *      operationId="getKategoriBencanaStatistics",
+     *      security={{"bearerAuth":{}}},
+     *      @OA\Response(
+     *          response=200,
+     *          description="Statistik kategori bencana berhasil diambil",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example=true),
+     *              @OA\Property(property="message", type="string", example="Statistik kategori bencana berhasil diambil"),
+     *              @OA\Property(property="data", type="object",
+     *                  @OA\Property(property="total_kategori", type="integer", example=8),
+     *                  @OA\Property(property="kategori_terbanyak_laporan", type="object",
+     *                      @OA\Property(property="id_kategori", type="integer", example=1),
+     *                      @OA\Property(property="nama_kategori", type="string", example="Banjir"),
+     *                      @OA\Property(property="laporan_count", type="integer", example=25)
+     *                  ),
+     *                  @OA\Property(property="kategori_paling_sedikit", type="object",
+     *                      @OA\Property(property="id_kategori", type="integer", example=8),
+     *                      @OA\Property(property="nama_kategori", type="string", example="Tornado"),
+     *                      @OA\Property(property="laporan_count", type="integer", example=2)
+     *                  ),
+     *                  @OA\Property(property="distribusi_kategori", type="array",
+     *                      @OA\Items(type="object",
+     *                          @OA\Property(property="nama_kategori", type="string", example="Banjir"),
+     *                          @OA\Property(property="jumlah_laporan", type="integer", example=25),
+     *                          @OA\Property(property="persentase", type="number", format="float", example=31.25)
+     *                      )
+     *                  )
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthorized"
+     *      ),
+     *      @OA\Response(
+     *          response=403,
+     *          description="Forbidden - Admin access required"
+     *      )
+     * )
+     */
     /**
      * Get kategori statistics
      */
