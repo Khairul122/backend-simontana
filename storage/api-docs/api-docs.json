@@ -559,6 +559,428 @@
                 ]
             }
         },
+        "/api/bmkg/gempa/terbaru": {
+            "get": {
+                "tags": [
+                    "BMKG Integration"
+                ],
+                "summary": "Get Latest Earthquake Information",
+                "description": "Endpoint untuk mendapatkan informasi gempa terbaru dari BMKG.",
+                "operationId": "getLatestEarthquake",
+                "responses": {
+                    "200": {
+                        "description": "Data gempa terbaru berhasil diambil",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Data gempa terbaru berhasil diambil"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "tanggal": {
+                                                    "type": "string",
+                                                    "example": "07 Des 2025"
+                                                },
+                                                "jam": {
+                                                    "type": "string",
+                                                    "example": "11:55:55 WIB"
+                                                },
+                                                "magnitudo": {
+                                                    "type": "string",
+                                                    "example": "5.4"
+                                                },
+                                                "kedalaman": {
+                                                    "type": "string",
+                                                    "example": "103 km"
+                                                },
+                                                "wilayah": {
+                                                    "type": "string",
+                                                    "example": "150 km BaratLaut TANIMBAR"
+                                                },
+                                                "potensi": {
+                                                    "type": "string",
+                                                    "example": "Tidak berpotensi tsunami"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/bmkg/gempa/24-jam": {
+            "get": {
+                "tags": [
+                    "BMKG Integration"
+                ],
+                "summary": "Get Earthquake Information for Last 24 Hours",
+                "description": "Endpoint untuk mendapatkan informasi gempa bumi dalam periode 24 jam terakhir dari BMKG.",
+                "operationId": "getEarthquakes24Hours",
+                "responses": {
+                    "200": {
+                        "description": "Data gempa 24 jam berhasil diambil",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Data gempa 24 jam terakhir berhasil diambil"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "tanggal": {
+                                                        "type": "string",
+                                                        "example": "07 Des 2025"
+                                                    },
+                                                    "jam": {
+                                                        "type": "string",
+                                                        "example": "11:55:55 WIB"
+                                                    },
+                                                    "magnitudo": {
+                                                        "type": "string",
+                                                        "example": "5.4"
+                                                    },
+                                                    "kedalaman": {
+                                                        "type": "string",
+                                                        "example": "103 km"
+                                                    },
+                                                    "wilayah": {
+                                                        "type": "string",
+                                                        "example": "150 km BaratLaut TANIMBAR"
+                                                    },
+                                                    "potensi": {
+                                                        "type": "string",
+                                                        "example": "Tidak berpotensi tsunami"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/bmkg/gempa/riwayat": {
+            "get": {
+                "tags": [
+                    "BMKG Integration"
+                ],
+                "summary": "Get Earthquake History",
+                "description": "Endpoint untuk mendapatkan riwayat gempa bumi dengan filter tanggal.",
+                "operationId": "getEarthquakeHistory",
+                "parameters": [
+                    {
+                        "name": "start_date",
+                        "in": "query",
+                        "description": "Tanggal mulai (format: YYYY-MM-DD)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date",
+                            "example": "2024-01-01"
+                        }
+                    },
+                    {
+                        "name": "end_date",
+                        "in": "query",
+                        "description": "Tanggal akhir (format: YYYY-MM-DD)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date",
+                            "example": "2024-12-31"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Riwayat gempa berhasil diambil",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Data riwayat gempa berhasil diambil"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "tanggal": {
+                                                        "type": "string",
+                                                        "example": "07 Des 2025"
+                                                    },
+                                                    "jam": {
+                                                        "type": "string",
+                                                        "example": "11:55:55 WIB"
+                                                    },
+                                                    "magnitudo": {
+                                                        "type": "string",
+                                                        "example": "5.4"
+                                                    },
+                                                    "kedalaman": {
+                                                        "type": "string",
+                                                        "example": "103 km"
+                                                    },
+                                                    "wilayah": {
+                                                        "type": "string",
+                                                        "example": "150 km BaratLaut TANIMBAR"
+                                                    },
+                                                    "potensi": {
+                                                        "type": "string",
+                                                        "example": "Tidak berpotensi tsunami"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "422": {
+                        "description": "Validasi gagal",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Validasi gagal"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/bmkg/gempa/statistik": {
+            "get": {
+                "tags": [
+                    "BMKG Integration"
+                ],
+                "summary": "Get Earthquake Statistics",
+                "description": "Endpoint untuk mendapatkan statistik gempa bumi dari BMKG.",
+                "operationId": "getEarthquakeStats",
+                "responses": {
+                    "200": {
+                        "description": "Statistik gempa berhasil diambil",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Statistik gempa berhasil diambil"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "total_gempa": {
+                                                    "type": "integer",
+                                                    "example": 15
+                                                },
+                                                "gempa_terbesar": {
+                                                    "properties": {
+                                                        "magnitudo": {
+                                                            "type": "string",
+                                                            "example": "6.4"
+                                                        },
+                                                        "tanggal": {
+                                                            "type": "string",
+                                                            "example": "2024-12-10"
+                                                        },
+                                                        "lokasi": {
+                                                            "type": "string",
+                                                            "example": "150 km BaratLaut TANIMBAR"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "distribusi_magnitudo": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "range": {
+                                                                "type": "string",
+                                                                "example": "5.0-6.0"
+                                                            },
+                                                            "jumlah": {
+                                                                "type": "integer",
+                                                                "example": 8
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "gempa_terbanyak": {
+                                                    "type": "string",
+                                                    "example": "Laut Banda"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/bmkg/gempa/peringatan-tsunami": {
+            "get": {
+                "tags": [
+                    "BMKG Integration"
+                ],
+                "summary": "Get Tsunami Warning Information",
+                "description": "Endpoint untuk mendapatkan informasi peringatan tsunami dari BMKG.",
+                "operationId": "getTsunamiWarnings",
+                "responses": {
+                    "200": {
+                        "description": "Data peringatan tsunami berhasil diambil",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Data peringatan tsunami berhasil diambil"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "tanggal": {
+                                                        "type": "string",
+                                                        "example": "07 Des 2025"
+                                                    },
+                                                    "jam": {
+                                                        "type": "string",
+                                                        "example": "11:55:55 WIB"
+                                                    },
+                                                    "magnitudo": {
+                                                        "type": "string",
+                                                        "example": "5.4"
+                                                    },
+                                                    "kedalaman": {
+                                                        "type": "string",
+                                                        "example": "103 km"
+                                                    },
+                                                    "wilayah": {
+                                                        "type": "string",
+                                                        "example": "150 km BaratLaut TANIMBAR"
+                                                    },
+                                                    "peringatan_tsunami": {
+                                                        "type": "string",
+                                                        "example": "Berpotensi tsunami"
+                                                    },
+                                                    "status": {
+                                                        "type": "string",
+                                                        "example": "Siaga"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/bpbd/notifications": {
             "post": {
                 "tags": [
@@ -763,6 +1185,1195 @@
                 ]
             }
         },
+        "/api/my-reports": {
+            "get": {
+                "tags": [
+                    "Citizen Access"
+                ],
+                "summary": "Get My Reports (Warga Only)",
+                "description": "Endpoint untuk mendapatkan daftar laporan yang dibuat oleh user warga sendiri.",
+                "operationId": "myReports",
+                "responses": {
+                    "200": {
+                        "description": "Daftar laporan yang dibuat berhasil diambil",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Daftar laporan saya berhasil diambil"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id_laporan": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "id_kategori": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "lokasi": {
+                                                        "type": "string",
+                                                        "example": "Jl. Contoh No. 123"
+                                                    },
+                                                    "deskripsi": {
+                                                        "type": "string",
+                                                        "example": "Terjadi banjir di kawasan tersebut"
+                                                    },
+                                                    "status_laporan": {
+                                                        "type": "string",
+                                                        "example": "pending"
+                                                    },
+                                                    "tanggal_lapor": {
+                                                        "type": "string",
+                                                        "example": "2023-12-10T01:23:45.000000Z"
+                                                    },
+                                                    "kategori": {
+                                                        "properties": {
+                                                            "id_kategori": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "nama_kategori": {
+                                                                "type": "string",
+                                                                "example": "Banjir"
+                                                            },
+                                                            "icon": {
+                                                                "type": "string",
+                                                                "example": "🌊"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden - Warga access required"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/laporan": {
+            "post": {
+                "tags": [
+                    "Disaster Reports"
+                ],
+                "summary": "Create Laporan Bencana Baru",
+                "description": "Endpoint untuk membuat laporan bencana baru. Akses: Warga, Operator Desa, Admin, Petugas BPBD",
+                "operationId": "laporanStore",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "jenis_bencana",
+                                    "lokasi",
+                                    "deskripsi"
+                                ],
+                                "properties": {
+                                    "jenis_bencana": {
+                                        "description": "Jenis bencana yang terjadi",
+                                        "type": "string",
+                                        "example": "Banjir"
+                                    },
+                                    "lokasi": {
+                                        "description": "Lokasi detail kejadian bencana",
+                                        "type": "string",
+                                        "example": "Jl. Merdeka No. 123, Kelurahan Contoh"
+                                    },
+                                    "deskripsi": {
+                                        "description": "Deskripsi detail kondisi bencana",
+                                        "type": "string",
+                                        "example": "Banjir setinggi 50 cm menggenangi rumah warga"
+                                    },
+                                    "foto": {
+                                        "description": "Foto bukti kejadian (max 2MB, format: jpeg,png,jpg)",
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "kontak_pelapor": {
+                                        "description": "Nomor kontak pelapor",
+                                        "type": "string",
+                                        "example": "08123456789"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Laporan berhasil dibuat",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Laporan berhasil dibuat"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id_laporan": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "id_kategori": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "lokasi": {
+                                                    "type": "string",
+                                                    "example": "Jl. Merdeka No. 123, Kelurahan Contoh"
+                                                },
+                                                "deskripsi": {
+                                                    "type": "string",
+                                                    "example": "Banjir setinggi 50 cm menggenangi rumah warga"
+                                                },
+                                                "status_laporan": {
+                                                    "type": "string",
+                                                    "example": "pending"
+                                                },
+                                                "tanggal_lapor": {
+                                                    "type": "string",
+                                                    "example": "2023-12-10T01:23:45.000000Z"
+                                                },
+                                                "foto": {
+                                                    "type": "string",
+                                                    "example": "laporan/1234567890_banjir.jpg"
+                                                },
+                                                "kontak_pelapor": {
+                                                    "type": "string",
+                                                    "example": "08123456789"
+                                                },
+                                                "id_warga": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "kategori": {
+                                                    "properties": {
+                                                        "id_kategori": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "nama_kategori": {
+                                                            "type": "string",
+                                                            "example": "Banjir"
+                                                        },
+                                                        "icon": {
+                                                            "type": "string",
+                                                            "example": "🌊"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "422": {
+                        "description": "Validasi gagal",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Validasi gagal"
+                                        },
+                                        "errors": {
+                                            "properties": {
+                                                "jenis_bencana": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "Jenis bencana wajib diisi"
+                                                    }
+                                                },
+                                                "lokasi": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "Lokasi kejadian wajib diisi"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/laporan/{id}": {
+            "get": {
+                "tags": [
+                    "Disaster Reports"
+                ],
+                "summary": "Get Detail Laporan Bencana",
+                "description": "Endpoint untuk mendapatkan detail laporan bencana berdasarkan ID",
+                "operationId": "laporanShow",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID laporan",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Detail laporan berhasil diambil",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Detail laporan berhasil diambil"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id_laporan": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "id_kategori": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "lokasi": {
+                                                    "type": "string",
+                                                    "example": "Jl. Contoh No. 123"
+                                                },
+                                                "deskripsi": {
+                                                    "type": "string",
+                                                    "example": "Terjadi banjir di kawasan tersebut"
+                                                },
+                                                "status_laporan": {
+                                                    "type": "string",
+                                                    "example": "pending"
+                                                },
+                                                "tanggal_lapor": {
+                                                    "type": "string",
+                                                    "example": "2023-12-10T01:23:45.000000Z"
+                                                },
+                                                "foto": {
+                                                    "type": "string",
+                                                    "example": "laporan/1234567890_banjir.jpg"
+                                                },
+                                                "kontak_pelapor": {
+                                                    "type": "string",
+                                                    "example": "08123456789"
+                                                },
+                                                "kategori": {
+                                                    "properties": {
+                                                        "id_kategori": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "nama_kategori": {
+                                                            "type": "string",
+                                                            "example": "Banjir"
+                                                        },
+                                                        "icon": {
+                                                            "type": "string",
+                                                            "example": "🌊"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "pengguna": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "nama": {
+                                                            "type": "string",
+                                                            "example": "John Doe"
+                                                        },
+                                                        "username": {
+                                                            "type": "string",
+                                                            "example": "johndoe"
+                                                        },
+                                                        "role": {
+                                                            "type": "string",
+                                                            "example": "Warga"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "tindaklanjut": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "riwayat_tindakan": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Access Denied",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Akses ditolak. Anda tidak dapat melihat laporan ini."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Laporan tidak ditemukan"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Disaster Reports"
+                ],
+                "summary": "Update Laporan Bencana",
+                "description": "Endpoint untuk memperbarui status laporan bencana. Akses: Admin, Operator Desa",
+                "operationId": "laporanUpdate",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID laporan",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "status"
+                                ],
+                                "properties": {
+                                    "status": {
+                                        "description": "Status laporan",
+                                        "type": "string",
+                                        "enum": [
+                                            "pending",
+                                            "diverifikasi",
+                                            "dalam_penanganan",
+                                            "selesai",
+                                            "ditolak"
+                                        ],
+                                        "example": "diverifikasi"
+                                    },
+                                    "catatan_verifikasi": {
+                                        "description": "Catatan verifikasi status",
+                                        "type": "string",
+                                        "example": "Laporan telah diverifikasi dan akan ditindaklanjuti"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Laporan berhasil diperbarui",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Laporan berhasil diperbarui"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id_laporan": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "id_kategori": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "lokasi": {
+                                                    "type": "string",
+                                                    "example": "Jl. Merdeka No. 123, Kelurahan Contoh"
+                                                },
+                                                "deskripsi": {
+                                                    "type": "string",
+                                                    "example": "Banjir setinggi 50 cm menggenangi rumah warga"
+                                                },
+                                                "status_laporan": {
+                                                    "type": "string",
+                                                    "example": "diverifikasi"
+                                                },
+                                                "tanggal_lapor": {
+                                                    "type": "string",
+                                                    "example": "2023-12-10T01:23:45.000000Z"
+                                                },
+                                                "kategori": {
+                                                    "properties": {
+                                                        "id_kategori": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "nama_kategori": {
+                                                            "type": "string",
+                                                            "example": "Banjir"
+                                                        },
+                                                        "icon": {
+                                                            "type": "string",
+                                                            "example": "🌊"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Access Denied",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Akses ditolak. Hanya admin dan operator yang dapat memperbarui laporan."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Laporan tidak ditemukan"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validasi gagal",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Validasi gagal"
+                                        },
+                                        "errors": {
+                                            "properties": {
+                                                "status": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "Status laporan wajib dipilih"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Disaster Reports"
+                ],
+                "summary": "Delete Laporan Bencana",
+                "description": "Endpoint untuk menghapus laporan bencana. Akses: Admin saja",
+                "operationId": "laporanDestroy",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID laporan",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Laporan berhasil dihapus",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Laporan berhasil dihapus"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Access Denied",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Akses ditolak. Hanya admin yang dapat menghapus laporan."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Laporan tidak ditemukan"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Cannot Delete",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Laporan tidak dapat dihapus karena sudah ada tindaklanjut terkait"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/laporan/statistics": {
+            "get": {
+                "tags": [
+                    "Disaster Reports"
+                ],
+                "summary": "Get Laporan Bencana Statistics",
+                "description": "Endpoint untuk mendapatkan statistik laporan bencana",
+                "operationId": "laporanStatistics",
+                "responses": {
+                    "200": {
+                        "description": "Statistik laporan berhasil diambil",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Statistik laporan berhasil diambil"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "total": {
+                                                    "type": "integer",
+                                                    "example": 150
+                                                },
+                                                "menunggu": {
+                                                    "type": "integer",
+                                                    "example": 25
+                                                },
+                                                "diverifikasi": {
+                                                    "type": "integer",
+                                                    "example": 30
+                                                },
+                                                "diproses": {
+                                                    "type": "integer",
+                                                    "example": 45
+                                                },
+                                                "selesai": {
+                                                    "type": "integer",
+                                                    "example": 40
+                                                },
+                                                "ditolak": {
+                                                    "type": "integer",
+                                                    "example": 10
+                                                },
+                                                "laporan_bulan_ini": {
+                                                    "type": "integer",
+                                                    "example": 35
+                                                },
+                                                "jenis_bencana_terbanyak": {
+                                                    "properties": {
+                                                        "id_kategori": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "total": {
+                                                            "type": "integer",
+                                                            "example": 45
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/osm/evacuation-centers": {
+            "get": {
+                "tags": [
+                    "OpenStreetMap Integration"
+                ],
+                "summary": "Get Evacuation Centers and Shelters",
+                "description": "Endpoint untuk mendapatkan lokasi pusat evakuasi dan shelter terdekat menggunakan OpenStreetMap.",
+                "operationId": "osmGetEvacuationCenters",
+                "parameters": [
+                    {
+                        "name": "latitude",
+                        "in": "query",
+                        "description": "Latitude titik awal pencarian",
+                        "required": false,
+                        "schema": {
+                            "type": "number",
+                            "format": "double",
+                            "example": -6.2
+                        }
+                    },
+                    {
+                        "name": "longitude",
+                        "in": "query",
+                        "description": "Longitude titik awal pencarian",
+                        "required": false,
+                        "schema": {
+                            "type": "number",
+                            "format": "double",
+                            "example": 106.816666
+                        }
+                    },
+                    {
+                        "name": "bounds",
+                        "in": "query",
+                        "description": "Batas area pencarian [min_lat, min_lon, max_lat, max_lon]",
+                        "required": false,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "number",
+                                "format": "double"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Pencarian pusat evakuasi berhasil",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Pencarian pusat evakuasi berhasil dilakukan"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string",
+                                                        "example": "way/987654321"
+                                                    },
+                                                    "nama_tempat": {
+                                                        "type": "string",
+                                                        "example": "Posko Evakuasi Contoh"
+                                                    },
+                                                    "latitude": {
+                                                        "type": "number",
+                                                        "format": "double",
+                                                        "example": -6.2
+                                                    },
+                                                    "longitude": {
+                                                        "type": "number",
+                                                        "format": "double",
+                                                        "example": 106.816666
+                                                    },
+                                                    "jenis_lokasi": {
+                                                        "type": "string",
+                                                        "example": "emergency_shelter"
+                                                    },
+                                                    "alamat": {
+                                                        "type": "string",
+                                                        "example": "Jl. Evakuasi No. 456, Jakarta"
+                                                    },
+                                                    "kapasitas": {
+                                                        "type": "integer",
+                                                        "example": 200
+                                                    },
+                                                    "jarak_meter": {
+                                                        "type": "integer",
+                                                        "example": 1500
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "422": {
+                        "description": "Validasi gagal",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Validasi gagal"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/osm/disaster-map": {
+            "get": {
+                "tags": [
+                    "OpenStreetMap Integration"
+                ],
+                "summary": "Get Disaster Map Data",
+                "description": "Endpoint untuk mendapatkan data peta untuk visualisasi bencana menggunakan OpenStreetMap.",
+                "operationId": "osmGetDisasterMap",
+                "parameters": [
+                    {
+                        "name": "latitude",
+                        "in": "query",
+                        "description": "Latitude pusat peta",
+                        "required": true,
+                        "schema": {
+                            "type": "number",
+                            "format": "double",
+                            "example": -6.2
+                        }
+                    },
+                    {
+                        "name": "longitude",
+                        "in": "query",
+                        "description": "Longitude pusat peta",
+                        "required": true,
+                        "schema": {
+                            "type": "number",
+                            "format": "double",
+                            "example": 106.816666
+                        }
+                    },
+                    {
+                        "name": "radius",
+                        "in": "query",
+                        "description": "Radius area peta dalam meter (1000-50000)",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 10000
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Data peta bencana berhasil diambil",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Data peta bencana berhasil diambil"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "pusat": {
+                                                    "properties": {
+                                                        "latitude": {
+                                                            "type": "number",
+                                                            "format": "double",
+                                                            "example": -6.2
+                                                        },
+                                                        "longitude": {
+                                                            "type": "number",
+                                                            "format": "double",
+                                                            "example": 106.816666
+                                                        },
+                                                        "radius": {
+                                                            "type": "integer",
+                                                            "example": 10000
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "lokasi_bencana": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string",
+                                                                "example": "node/123456789"
+                                                            },
+                                                            "nama": {
+                                                                "type": "string",
+                                                                "example": "Lokasi Bencana"
+                                                            },
+                                                            "latitude": {
+                                                                "type": "number",
+                                                                "format": "double",
+                                                                "example": -6.201
+                                                            },
+                                                            "longitude": {
+                                                                "type": "number",
+                                                                "format": "double",
+                                                                "example": 106.817666
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "fasilitas_kesehatan": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string",
+                                                                "example": "way/987654321"
+                                                            },
+                                                            "nama": {
+                                                                "type": "string",
+                                                                "example": "RSUD Terdekat"
+                                                            },
+                                                            "latitude": {
+                                                                "type": "number",
+                                                                "format": "double",
+                                                                "example": -6.199
+                                                            },
+                                                            "longitude": {
+                                                                "type": "number",
+                                                                "format": "double",
+                                                                "example": 106.815666
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "pusat_evakuasi": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string",
+                                                                "example": "way/456789123"
+                                                            },
+                                                            "nama": {
+                                                                "type": "string",
+                                                                "example": "Posko Evakuasi"
+                                                            },
+                                                            "latitude": {
+                                                                "type": "number",
+                                                                "format": "double",
+                                                                "example": -6.202
+                                                            },
+                                                            "longitude": {
+                                                                "type": "number",
+                                                                "format": "double",
+                                                                "example": 106.818666
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "waktu_update": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2024-12-10T10:30:00.000000Z"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "422": {
+                        "description": "Validasi gagal",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Validasi gagal"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/operator/evacuation-sites": {
             "post": {
                 "tags": [
@@ -887,6 +2498,1173 @@
                     }
                 }
             }
+        },
+        "/api/tindaklanjut": {
+            "get": {
+                "tags": [
+                    "Disaster Response Actions"
+                ],
+                "summary": "Get List Tindaklanjut Bencana",
+                "description": "Endpoint untuk mendapatkan daftar tindaklanjut bencana dengan berbagai filter",
+                "operationId": "tindaklanjutIndex",
+                "parameters": [
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Filter status tindaklanjut",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "menunggu_penugasan",
+                                "sedang_diproses",
+                                "menunggu_verifikasi",
+                                "selesai",
+                                "dibatalkan"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "prioritas",
+                        "in": "query",
+                        "description": "Filter prioritas tindaklanjut",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "rendah",
+                                "sedang",
+                                "tinggi",
+                                "darurat"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "jenis_tindakan",
+                        "in": "query",
+                        "description": "Filter jenis tindakan",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "evakuasi",
+                                "penanganan_medis",
+                                "distribusi_bantuan",
+                                "perbaikan_infrastruktur",
+                                "pembersihan",
+                                "lainnya"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "start_date",
+                        "in": "query",
+                        "description": "Filter tanggal mulai (YYYY-MM-DD)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "end_date",
+                        "in": "query",
+                        "description": "Filter tanggal akhir (YYYY-MM-DD)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Pencarian berdasarkan deskripsi tindakan",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Jumlah data per halaman",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 15
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Daftar tindaklanjut berhasil diambil",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Daftar tindaklanjut berhasil diambil"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id_tindaklanjut": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "id_laporan": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "id_petugas": {
+                                                        "type": "integer",
+                                                        "example": 2
+                                                    },
+                                                    "jenis_tindakan": {
+                                                        "type": "string",
+                                                        "example": "evakuasi"
+                                                    },
+                                                    "deskripsi_tindakan": {
+                                                        "type": "string",
+                                                        "example": "Evakuasi warga ke lokasi aman"
+                                                    },
+                                                    "status_tindakan": {
+                                                        "type": "string",
+                                                        "example": "sedang_diproses"
+                                                    },
+                                                    "prioritas": {
+                                                        "type": "string",
+                                                        "example": "tinggi"
+                                                    },
+                                                    "tanggal_tanggapan": {
+                                                        "type": "string",
+                                                        "example": "2023-12-10T02:30:00.000000Z"
+                                                    },
+                                                    "estimasi_waktu": {
+                                                        "type": "string",
+                                                        "example": "2023-12-10T18:00:00.000000Z"
+                                                    },
+                                                    "dokumentasi": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "laporan": {
+                                                        "properties": {
+                                                            "id_laporan": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "lokasi": {
+                                                                "type": "string",
+                                                                "example": "Jl. Contoh No. 123"
+                                                            },
+                                                            "kategori": {
+                                                                "properties": {
+                                                                    "id_kategori": {
+                                                                        "type": "integer",
+                                                                        "example": 1
+                                                                    },
+                                                                    "nama_kategori": {
+                                                                        "type": "string",
+                                                                        "example": "Banjir"
+                                                                    },
+                                                                    "icon": {
+                                                                        "type": "string",
+                                                                        "example": "🌊"
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    },
+                                                    "petugas": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 2
+                                                            },
+                                                            "nama": {
+                                                                "type": "string",
+                                                                "example": "Petugas BPBD"
+                                                            },
+                                                            "username": {
+                                                                "type": "string",
+                                                                "example": "petugas1"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Disaster Response Actions"
+                ],
+                "summary": "Create Tindaklanjut Bencana Baru",
+                "description": "Endpoint untuk membuat tindaklanjut bencana baru. Akses: Petugas BPBD, Admin",
+                "operationId": "tindaklanjutStore",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "id_laporan",
+                                    "jenis_tindakan",
+                                    "deskripsi_tindakan",
+                                    "prioritas"
+                                ],
+                                "properties": {
+                                    "id_laporan": {
+                                        "description": "ID laporan yang akan ditindaklanjuti",
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "jenis_tindakan": {
+                                        "description": "Jenis tindakan yang akan dilakukan",
+                                        "type": "string",
+                                        "enum": [
+                                            "evakuasi",
+                                            "penanganan_medis",
+                                            "distribusi_bantuan",
+                                            "perbaikan_infrastruktur",
+                                            "pembersihan",
+                                            "lainnya"
+                                        ],
+                                        "example": "evakuasi"
+                                    },
+                                    "deskripsi_tindakan": {
+                                        "description": "Deskripsi detail tindakan yang akan dilakukan",
+                                        "type": "string",
+                                        "example": "Evakuasi warga ke lokasi aman yang telah disiapkan"
+                                    },
+                                    "prioritas": {
+                                        "description": "Prioritas tindakan",
+                                        "type": "string",
+                                        "enum": [
+                                            "rendah",
+                                            "sedang",
+                                            "tinggi",
+                                            "darurat"
+                                        ],
+                                        "example": "tinggi"
+                                    },
+                                    "estimasi_waktu": {
+                                        "description": "Estimasi waktu penyelesaian",
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2023-12-10T18:00:00.000000Z"
+                                    },
+                                    "dokumentasi": {
+                                        "description": "Dokumentasi pendukung (max 2MB per file, format: jpeg,png,jpg)",
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "binary"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Tindaklanjut berhasil dibuat",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Tindaklanjut berhasil dibuat"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id_tindaklanjut": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "id_laporan": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "id_petugas": {
+                                                    "type": "integer",
+                                                    "example": 2
+                                                },
+                                                "jenis_tindakan": {
+                                                    "type": "string",
+                                                    "example": "evakuasi"
+                                                },
+                                                "deskripsi_tindakan": {
+                                                    "type": "string",
+                                                    "example": "Evakuasi warga ke lokasi aman"
+                                                },
+                                                "status_tindakan": {
+                                                    "type": "string",
+                                                    "example": "menunggu_penugasan"
+                                                },
+                                                "prioritas": {
+                                                    "type": "string",
+                                                    "example": "tinggi"
+                                                },
+                                                "tanggal_tanggapan": {
+                                                    "type": "string",
+                                                    "example": "2023-12-10T02:30:00.000000Z"
+                                                },
+                                                "estimasi_waktu": {
+                                                    "type": "string",
+                                                    "example": "2023-12-10T18:00:00.000000Z"
+                                                },
+                                                "dokumentasi": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "laporan": {
+                                                    "properties": {
+                                                        "id_laporan": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "kategori": {
+                                                            "properties": {
+                                                                "id_kategori": {
+                                                                    "type": "integer",
+                                                                    "example": 1
+                                                                },
+                                                                "nama_kategori": {
+                                                                    "type": "string",
+                                                                    "example": "Banjir"
+                                                                },
+                                                                "icon": {
+                                                                    "type": "string",
+                                                                    "example": "🌊"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "petugas": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "example": 2
+                                                        },
+                                                        "nama": {
+                                                            "type": "string",
+                                                            "example": "Petugas BPBD"
+                                                        },
+                                                        "username": {
+                                                            "type": "string",
+                                                            "example": "petugas1"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Access Denied",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Akses ditolak. Hanya Petugas BPBD dan Admin yang dapat membuat tindaklanjut."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validasi gagal",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Validasi gagal"
+                                        },
+                                        "errors": {
+                                            "properties": {
+                                                "id_laporan": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "ID laporan wajib diisi"
+                                                    }
+                                                },
+                                                "jenis_tindakan": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "Jenis tindakan wajib dipilih"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/tindaklanjut/{id}": {
+            "get": {
+                "tags": [
+                    "Disaster Response Actions"
+                ],
+                "summary": "Get Detail Tindaklanjut Bencana",
+                "description": "Endpoint untuk mendapatkan detail tindaklanjut bencana berdasarkan ID",
+                "operationId": "tindaklanjutShow",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID tindaklanjut",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Detail tindaklanjut berhasil diambil",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Detail tindaklanjut berhasil diambil"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id_tindaklanjut": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "id_laporan": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "id_petugas": {
+                                                    "type": "integer",
+                                                    "example": 2
+                                                },
+                                                "jenis_tindakan": {
+                                                    "type": "string",
+                                                    "example": "evakuasi"
+                                                },
+                                                "deskripsi_tindakan": {
+                                                    "type": "string",
+                                                    "example": "Evakuasi warga ke lokasi aman"
+                                                },
+                                                "status_tindakan": {
+                                                    "type": "string",
+                                                    "example": "sedang_diproses"
+                                                },
+                                                "prioritas": {
+                                                    "type": "string",
+                                                    "example": "tinggi"
+                                                },
+                                                "tanggal_tanggapan": {
+                                                    "type": "string",
+                                                    "example": "2023-12-10T02:30:00.000000Z"
+                                                },
+                                                "estimasi_waktu": {
+                                                    "type": "string",
+                                                    "example": "2023-12-10T18:00:00.000000Z"
+                                                },
+                                                "dokumentasi": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "laporan": {
+                                                    "properties": {
+                                                        "id_laporan": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "lokasi": {
+                                                            "type": "string",
+                                                            "example": "Jl. Contoh No. 123"
+                                                        },
+                                                        "deskripsi": {
+                                                            "type": "string",
+                                                            "example": "Terjadi banjir di kawasan tersebut"
+                                                        },
+                                                        "status_laporan": {
+                                                            "type": "string",
+                                                            "example": "dalam_penanganan"
+                                                        },
+                                                        "kategori": {
+                                                            "properties": {
+                                                                "id_kategori": {
+                                                                    "type": "integer",
+                                                                    "example": 1
+                                                                },
+                                                                "nama_kategori": {
+                                                                    "type": "string",
+                                                                    "example": "Banjir"
+                                                                },
+                                                                "icon": {
+                                                                    "type": "string",
+                                                                    "example": "🌊"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        },
+                                                        "pengguna": {
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "integer",
+                                                                    "example": 1
+                                                                },
+                                                                "nama": {
+                                                                    "type": "string",
+                                                                    "example": "John Doe"
+                                                                },
+                                                                "username": {
+                                                                    "type": "string",
+                                                                    "example": "johndoe"
+                                                                },
+                                                                "role": {
+                                                                    "type": "string",
+                                                                    "example": "Warga"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "petugas": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "example": 2
+                                                        },
+                                                        "nama": {
+                                                            "type": "string",
+                                                            "example": "Petugas BPBD"
+                                                        },
+                                                        "username": {
+                                                            "type": "string",
+                                                            "example": "petugas1"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "riwayat_tindakan": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Access Denied",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Akses ditolak. Anda tidak dapat melihat tindaklanjut ini."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Tindaklanjut tidak ditemukan"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Disaster Response Actions"
+                ],
+                "summary": "Update Tindaklanjut Bencana",
+                "description": "Endpoint untuk memperbarui tindaklanjut bencana. Akses: Admin, Petugas BPBD (hanya yang ditugaskan)",
+                "operationId": "tindaklanjutUpdate",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID tindaklanjut",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "status_tindakan"
+                                ],
+                                "properties": {
+                                    "status_tindakan": {
+                                        "description": "Status tindakan",
+                                        "type": "string",
+                                        "enum": [
+                                            "menunggu_penugasan",
+                                            "sedang_diproses",
+                                            "menunggu_verifikasi",
+                                            "selesai",
+                                            "dibatalkan"
+                                        ],
+                                        "example": "sedang_diproses"
+                                    },
+                                    "deskripsi_tindakan": {
+                                        "description": "Deskripsi update tindakan",
+                                        "type": "string",
+                                        "example": "Evakuasi sedang berlangsung dengan 3 tim"
+                                    },
+                                    "prioritas": {
+                                        "description": "Prioritas tindakan",
+                                        "type": "string",
+                                        "enum": [
+                                            "rendah",
+                                            "sedang",
+                                            "tinggi",
+                                            "darurat"
+                                        ],
+                                        "example": "tinggi"
+                                    },
+                                    "estimasi_waktu": {
+                                        "description": "Estimasi waktu penyelesaian",
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2023-12-10T20:00:00.000000Z"
+                                    },
+                                    "dokumentasi": {
+                                        "description": "Dokumentasi tambahan (max 2MB per file, format: jpeg,png,jpg)",
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "binary"
+                                        }
+                                    },
+                                    "catatan_update": {
+                                        "description": "Catatan update progress",
+                                        "type": "string",
+                                        "example": "Update progress evakuasi"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Tindaklanjut berhasil diperbarui",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Tindaklanjut berhasil diperbarui"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id_tindaklanjut": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "id_laporan": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "jenis_tindakan": {
+                                                    "type": "string",
+                                                    "example": "evakuasi"
+                                                },
+                                                "deskripsi_tindakan": {
+                                                    "type": "string",
+                                                    "example": "Evakuasi sedang berlangsung"
+                                                },
+                                                "status_tindakan": {
+                                                    "type": "string",
+                                                    "example": "sedang_diproses"
+                                                },
+                                                "prioritas": {
+                                                    "type": "string",
+                                                    "example": "tinggi"
+                                                },
+                                                "tanggal_tanggapan": {
+                                                    "type": "string",
+                                                    "example": "2023-12-10T02:30:00.000000Z"
+                                                },
+                                                "estimasi_waktu": {
+                                                    "type": "string",
+                                                    "example": "2023-12-10T20:00:00.000000Z"
+                                                },
+                                                "dokumentasi": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "laporan": {
+                                                    "properties": {
+                                                        "id_laporan": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "kategori": {
+                                                            "properties": {
+                                                                "id_kategori": {
+                                                                    "type": "integer",
+                                                                    "example": 1
+                                                                },
+                                                                "nama_kategori": {
+                                                                    "type": "string",
+                                                                    "example": "Banjir"
+                                                                },
+                                                                "icon": {
+                                                                    "type": "string",
+                                                                    "example": "🌊"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "petugas": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "example": 2
+                                                        },
+                                                        "nama": {
+                                                            "type": "string",
+                                                            "example": "Petugas BPBD"
+                                                        },
+                                                        "username": {
+                                                            "type": "string",
+                                                            "example": "petugas1"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Access Denied",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Akses ditolak."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Tindaklanjut tidak ditemukan"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validasi gagal",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Validasi gagal"
+                                        },
+                                        "errors": {
+                                            "properties": {
+                                                "status_tindakan": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "Status tindakan wajib dipilih"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Disaster Response Actions"
+                ],
+                "summary": "Delete Tindaklanjut Bencana",
+                "description": "Endpoint untuk menghapus tindaklanjut bencana. Akses: Admin saja",
+                "operationId": "tindaklanjutDestroy",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID tindaklanjut",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Tindaklanjut berhasil dihapus",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Tindaklanjut berhasil dihapus"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Access Denied",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Akses ditolak. Hanya admin yang dapat menghapus tindaklanjut."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Tindaklanjut tidak ditemukan"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Cannot Delete",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Tindaklanjut tidak dapat dihapus karena sedang diproses"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/tindaklanjut/statistics": {
+            "get": {
+                "tags": [
+                    "Disaster Response Actions"
+                ],
+                "summary": "Get Tindaklanjut Bencana Statistics",
+                "description": "Endpoint untuk mendapatkan statistik tindaklanjut bencana",
+                "operationId": "tindaklanjutStatistics",
+                "responses": {
+                    "200": {
+                        "description": "Statistik tindaklanjut berhasil diambil",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Statistik tindaklanjut berhasil diambil"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "total_tindaklanjut": {
+                                                    "type": "integer",
+                                                    "example": 85
+                                                },
+                                                "menunggu_penugasan": {
+                                                    "type": "integer",
+                                                    "example": 15
+                                                },
+                                                "sedang_diproses": {
+                                                    "type": "integer",
+                                                    "example": 35
+                                                },
+                                                "menunggu_verifikasi": {
+                                                    "type": "integer",
+                                                    "example": 20
+                                                },
+                                                "selesai": {
+                                                    "type": "integer",
+                                                    "example": 30
+                                                },
+                                                "dibatalkan": {
+                                                    "type": "integer",
+                                                    "example": 5
+                                                },
+                                                "prioritas_darurat": {
+                                                    "type": "integer",
+                                                    "example": 8
+                                                },
+                                                "tindaklanjut_terlambat": {
+                                                    "type": "integer",
+                                                    "example": 12
+                                                },
+                                                "jenis_tindakan_terbanyak": {
+                                                    "properties": {
+                                                        "jenis_tindakan": {
+                                                            "type": "string",
+                                                            "example": "evakuasi"
+                                                        },
+                                                        "total": {
+                                                            "type": "integer",
+                                                            "example": 40
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
         }
     },
     "tags": [
@@ -915,12 +3693,24 @@
             "description": "API Endpoints untuk Akses Warga"
         },
         {
+            "name": "Disaster Reports",
+            "description": "API Endpoints untuk Laporan Bencana"
+        },
+        {
+            "name": "BMKG Integration",
+            "description": "API Endpoints untuk Integrasi BMKG"
+        },
+        {
             "name": "OpenStreetMap Integration",
             "description": "API Endpoints untuk Integrasi OpenStreetMap"
         },
         {
             "name": "System",
             "description": "API Endpoints untuk System dan Testing"
+        },
+        {
+            "name": "Disaster Response Actions",
+            "description": "Disaster Response Actions"
         }
     ],
     "components": {

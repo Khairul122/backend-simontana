@@ -94,6 +94,48 @@ class BMKGController extends Controller
     }
 
     /**
+     * @OA\Get(
+     *      path="/api/bmkg/cuaca",
+     *      tags={"BMKG Integration"},
+     *      summary="Get Weather Information",
+     *      description="Endpoint untuk mendapatkan informasi cuaca dari BMKG.",
+     *      operationId="getWeatherInfo",
+     *      security={{"bearerAuth":{}}},
+     *      @OA\Parameter(
+     *          name="area",
+     *          in="query",
+     *          description="Nama area/wilayah",
+     *          required=false,
+     *          @OA\Schema(type="string", example="Jakarta")
+     *      ),
+     *      @OA\Parameter(
+     *          name="coordinates",
+     *          in="query",
+     *          description="Koordinat lokasi",
+     *          required=false,
+     *          @OA\Schema(type="string", example="-6.200000,106.816666")
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Data cuaca berhasil diambil",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example=true),
+     *              @OA\Property(property="message", type="string", example="Data cuaca fallback berhasil diambil"),
+     *              @OA\Property(property="data", type="object",
+     *                  @OA\Property(property="status", type="string", example="fallback"),
+     *                  @OA\Property(property="message", type="string", example="Data cuaca BMKG sedang dalam pemeliharaan. API cuaca tidak tersedia saat ini."),
+     *                  @OA\Property(property="waktu_update", type="string", example="2024-12-10T10:30:00.000000Z")
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthorized"
+     *      )
+     * )
+     */
+    
+    /**
      * Get weather information
      */
     public function cuaca(Request $request)
@@ -160,6 +202,41 @@ class BMKGController extends Controller
     }
 
     /**
+     * @OA\Get(
+     *      path="/api/bmkg/cuaca/peringatan",
+     *      tags={"BMKG Integration"},
+     *      summary="Get Weather Warnings/Alerts",
+     *      description="Endpoint untuk mendapatkan data peringatan cuaca dari BMKG.",
+     *      operationId="getWeatherWarnings",
+     *      security={{"bearerAuth":{}}},
+     *      @OA\Response(
+     *          response=200,
+     *          description="Data peringatan cuaca berhasil diambil",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example=true),
+     *              @OA\Property(property="message", type="string", example="Data peringatan cuaca berhasil diambil"),
+     *              @OA\Property(property="data", type="object",
+     *                  @OA\Property(property="peringatan", type="array",
+     *                      @OA\Items(type="object",
+     *                          @OA\Property(property="id", type="integer", example=1),
+     *                          @OA\Property(property="jenis", type="string", example="Hujan Lebat Disertai Petir"),
+     *                          @OA\Property(property="tingkat", type="string", example="Waspada"),
+     *                          @OA\Property(property="daerah", type="string", example="DKI Jakarta, Jawa Barat"),
+     *                          @OA\Property(property="waktu_berlaku", type="string", example="2024-12-10T10:30:00.000000Z"),
+     *                          @OA\Property(property="keterangan", type="string", example="Waspada hujan lebat disertai petir dan angin kencang")
+     *                      )
+     *                  )
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthorized"
+     *      )
+     * )
+     */
+
+    /**
      * Get weather warnings/alerts
      */
     public function peringatanCuaca(Request $request)
@@ -210,6 +287,36 @@ class BMKGController extends Controller
      *   }
      * }
      */
+    /**
+     * @OA\Get(
+     *      path="/api/bmkg/gempa/terbaru",
+     *      tags={"BMKG Integration"},
+     *      summary="Get Latest Earthquake Information",
+     *      description="Endpoint untuk mendapatkan informasi gempa terbaru dari BMKG.",
+     *      operationId="getLatestEarthquake",
+     *      security={{"bearerAuth":{}}},
+     *      @OA\Response(
+     *          response=200,
+     *          description="Data gempa terbaru berhasil diambil",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example=true),
+     *              @OA\Property(property="message", type="string", example="Data gempa terbaru berhasil diambil"),
+     *              @OA\Property(property="data", type="object",
+     *                  @OA\Property(property="tanggal", type="string", example="07 Des 2025"),
+     *                  @OA\Property(property="jam", type="string", example="11:55:55 WIB"),
+     *                  @OA\Property(property="magnitudo", type="string", example="5.4"),
+     *                  @OA\Property(property="kedalaman", type="string", example="103 km"),
+     *                  @OA\Property(property="wilayah", type="string", example="150 km BaratLaut TANIMBAR"),
+     *                  @OA\Property(property="potensi", type="string", example="Tidak berpotensi tsunami")
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthorized"
+     *      )
+     * )
+     */
     public function gempaTerbaru(Request $request)
     {
         try {
@@ -232,6 +339,38 @@ class BMKGController extends Controller
     /**
      * Get earthquake information for last 24 hours
      */
+    /**
+     * @OA\Get(
+     *      path="/api/bmkg/gempa/24-jam",
+     *      tags={"BMKG Integration"},
+     *      summary="Get Earthquake Information for Last 24 Hours",
+     *      description="Endpoint untuk mendapatkan informasi gempa bumi dalam periode 24 jam terakhir dari BMKG.",
+     *      operationId="getEarthquakes24Hours",
+     *      security={{"bearerAuth":{}}},
+     *      @OA\Response(
+     *          response=200,
+     *          description="Data gempa 24 jam berhasil diambil",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example=true),
+     *              @OA\Property(property="message", type="string", example="Data gempa 24 jam terakhir berhasil diambil"),
+     *              @OA\Property(property="data", type="array",
+     *                  @OA\Items(type="object",
+     *                      @OA\Property(property="tanggal", type="string", example="07 Des 2025"),
+     *                      @OA\Property(property="jam", type="string", example="11:55:55 WIB"),
+     *                      @OA\Property(property="magnitudo", type="string", example="5.4"),
+     *                      @OA\Property(property="kedalaman", type="string", example="103 km"),
+     *                      @OA\Property(property="wilayah", type="string", example="150 km BaratLaut TANIMBAR"),
+     *                      @OA\Property(property="potensi", type="string", example="Tidak berpotensi tsunami")
+     *                  )
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthorized"
+     *      )
+     * )
+     */
     public function gempa24Jam(Request $request)
     {
         try {
@@ -253,6 +392,61 @@ class BMKGController extends Controller
 
     /**
      * Get earthquake history
+     */
+    /**
+     * @OA\Get(
+     *      path="/api/bmkg/gempa/riwayat",
+     *      tags={"BMKG Integration"},
+     *      summary="Get Earthquake History",
+     *      description="Endpoint untuk mendapatkan riwayat gempa bumi dengan filter tanggal.",
+     *      operationId="getEarthquakeHistory",
+     *      security={{"bearerAuth":{}}},
+     *      @OA\Parameter(
+     *          name="start_date",
+     *          in="query",
+     *          description="Tanggal mulai (format: YYYY-MM-DD)",
+     *          required=false,
+     *          @OA\Schema(type="string", format="date", example="2024-01-01")
+     *      ),
+     *      @OA\Parameter(
+     *          name="end_date",
+     *          in="query",
+     *          description="Tanggal akhir (format: YYYY-MM-DD)",
+     *          required=false,
+     *          @OA\Schema(type="string", format="date", example="2024-12-31")
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Riwayat gempa berhasil diambil",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example=true),
+     *              @OA\Property(property="message", type="string", example="Data riwayat gempa berhasil diambil"),
+     *              @OA\Property(property="data", type="array",
+     *                  @OA\Items(type="object",
+     *                      @OA\Property(property="tanggal", type="string", example="07 Des 2025"),
+     *                      @OA\Property(property="jam", type="string", example="11:55:55 WIB"),
+     *                      @OA\Property(property="magnitudo", type="string", example="5.4"),
+     *                      @OA\Property(property="kedalaman", type="string", example="103 km"),
+     *                      @OA\Property(property="wilayah", type="string", example="150 km BaratLaut TANIMBAR"),
+     *                      @OA\Property(property="potensi", type="string", example="Tidak berpotensi tsunami")
+     *                  )
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthorized"
+     *      ),
+     *      @OA\Response(
+     *          response=422,
+     *          description="Validasi gagal",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example=false),
+     *              @OA\Property(property="message", type="string", example="Validasi gagal"),
+     *              @OA\Property(property="errors", type="object")
+     *          )
+     *      )
+     * )
      */
     public function riwayatGempa(Request $request)
     {
@@ -293,6 +487,43 @@ class BMKGController extends Controller
     /**
      * Get earthquake statistics
      */
+    /**
+     * @OA\Get(
+     *      path="/api/bmkg/gempa/statistik",
+     *      tags={"BMKG Integration"},
+     *      summary="Get Earthquake Statistics",
+     *      description="Endpoint untuk mendapatkan statistik gempa bumi dari BMKG.",
+     *      operationId="getEarthquakeStats",
+     *      security={{"bearerAuth":{}}},
+     *      @OA\Response(
+     *          response=200,
+     *          description="Statistik gempa berhasil diambil",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example=true),
+     *              @OA\Property(property="message", type="string", example="Statistik gempa berhasil diambil"),
+     *              @OA\Property(property="data", type="object",
+     *                  @OA\Property(property="total_gempa", type="integer", example=15),
+     *                  @OA\Property(property="gempa_terbesar", type="object",
+     *                      @OA\Property(property="magnitudo", type="string", example="6.4"),
+     *                      @OA\Property(property="tanggal", type="string", example="2024-12-10"),
+     *                      @OA\Property(property="lokasi", type="string", example="150 km BaratLaut TANIMBAR")
+     *                  ),
+     *                  @OA\Property(property="distribusi_magnitudo", type="array",
+     *                      @OA\Items(type="object",
+     *                          @OA\Property(property="range", type="string", example="5.0-6.0"),
+     *                          @OA\Property(property="jumlah", type="integer", example=8)
+     *                      )
+     *                  ),
+     *                  @OA\Property(property="gempa_terbanyak", type="string", example="Laut Banda")
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthorized"
+     *      )
+     * )
+     */
     public function statistikGempa(Request $request)
     {
         try {
@@ -311,6 +542,69 @@ class BMKGController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * @OA\Get(
+     *      path="/api/bmkg/gempa/cek-koordinat",
+     *      tags={"BMKG Integration"},
+     *      summary="Check Earthquakes by Coordinates",
+     *      description="Endpoint untuk mengecek gempa di sekitar koordinat tertentu.",
+     *      operationId="checkEarthquakesByCoordinates",
+     *      security={{"bearerAuth":{}}},
+     *      @OA\Parameter(
+     *          name="latitude",
+     *          in="query",
+     *          description="Latitude lokasi (antara -90 dan 90)",
+     *          required=true,
+     *          @OA\Schema(type="number", format="double", example=-6.200000)
+     *      ),
+     *      @OA\Parameter(
+     *          name="longitude",
+     *          in="query",
+     *          description="Longitude lokasi (antara -180 dan 180)",
+     *          required=true,
+     *          @OA\Schema(type="number", format="double", example=106.816666)
+     *      ),
+     *      @OA\Parameter(
+     *          name="radius",
+     *          in="query",
+     *          description="Radius pencarian dalam kilometer (1-500 km)",
+     *          required=false,
+     *          @OA\Schema(type="integer", example=50)
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Pemeriksaan gempa berdasarkan koordinat berhasil",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example=true),
+     *              @OA\Property(property="message", type="string", example="Pemeriksaan gempa berdasarkan koordinat berhasil"),
+     *              @OA\Property(property="data", type="array",
+     *                  @OA\Items(type="object",
+     *                      @OA\Property(property="tanggal", type="string", example="07 Des 2025"),
+     *                      @OA\Property(property="jam", type="string", example="11:55:55 WIB"),
+     *                      @OA\Property(property="magnitudo", type="string", example="5.4"),
+     *                      @OA\Property(property="kedalaman", type="string", example="103 km"),
+     *                      @OA\Property(property="lokasi", type="string", example="150 km BaratLaut TANIMBAR"),
+     *                      @OA\Property(property="jarak", type="number", format="double", example=45.5)
+     *                  )
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthorized"
+     *      ),
+     *      @OA\Response(
+     *          response=422,
+     *          description="Validasi gagal",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example=false),
+     *              @OA\Property(property="message", type="string", example="Validasi gagal"),
+     *              @OA\Property(property="errors", type="object")
+     *          )
+     *      )
+     * )
+     */
 
     /**
      * Check earthquakes by coordinates
@@ -363,6 +657,39 @@ class BMKGController extends Controller
     /**
      * Get tsunami warnings
      */
+    /**
+     * @OA\Get(
+     *      path="/api/bmkg/gempa/peringatan-tsunami",
+     *      tags={"BMKG Integration"},
+     *      summary="Get Tsunami Warning Information",
+     *      description="Endpoint untuk mendapatkan informasi peringatan tsunami dari BMKG.",
+     *      operationId="getTsunamiWarnings",
+     *      security={{"bearerAuth":{}}},
+     *      @OA\Response(
+     *          response=200,
+     *          description="Data peringatan tsunami berhasil diambil",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example=true),
+     *              @OA\Property(property="message", type="string", example="Data peringatan tsunami berhasil diambil"),
+     *              @OA\Property(property="data", type="array",
+     *                  @OA\Items(type="object",
+     *                      @OA\Property(property="tanggal", type="string", example="07 Des 2025"),
+     *                      @OA\Property(property="jam", type="string", example="11:55:55 WIB"),
+     *                      @OA\Property(property="magnitudo", type="string", example="5.4"),
+     *                      @OA\Property(property="kedalaman", type="string", example="103 km"),
+     *                      @OA\Property(property="wilayah", type="string", example="150 km BaratLaut TANIMBAR"),
+     *                      @OA\Property(property="peringatan_tsunami", type="string", example="Berpotensi tsunami"),
+     *                      @OA\Property(property="status", type="string", example="Siaga")
+     *                  )
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthorized"
+     *      )
+     * )
+     */
     public function peringatanTsunami(Request $request)
     {
         try {
@@ -381,6 +708,39 @@ class BMKGController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * @OA\Delete(
+     *      path="/api/bmkg/admin/cache",
+     *      tags={"BMKG Admin"},
+     *      summary="Clear BMKG Cache",
+     *      description="Endpoint untuk membersihkan cache data BMKG (Admin Only).",
+     *      operationId="clearBMKCCache",
+     *      security={{"bearerAuth":{}}},
+     *      @OA\Response(
+     *          response=200,
+     *          description="Cache BMKG berhasil dibersihkan",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example=true),
+     *              @OA\Property(property="message", type="string", example="Cache BMKG berhasil dibersihkan"),
+     *              @OA\Property(property="data", type="object",
+     *                  @OA\Property(property="cuaca_cache", type="boolean", example=true),
+     *                  @OA\Property(property="gempa_cache", type="boolean", example=true),
+     *                  @OA\Property(property="cleaned_by", type="string", example="Admin Test"),
+     *                  @OA\Property(property="waktu_clean", type="string", example="2024-12-10T10:30:00.000000Z")
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthorized"
+     *      ),
+     *      @OA\Response(
+     *          response=403,
+     *          description="Forbidden - Admin access required"
+     *      )
+     * )
+     */
 
     /**
      * Clear BMKG cache

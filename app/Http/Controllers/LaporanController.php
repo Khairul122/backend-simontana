@@ -95,6 +95,48 @@ class LaporanController extends Controller
      *      )
      * )
      */
+
+    /**
+     * @OA\Get(
+     *      path="/api/my-reports",
+     *      tags={"Citizen Access"},
+     *      summary="Get My Reports (Warga Only)",
+     *      description="Endpoint untuk mendapatkan daftar laporan yang dibuat oleh user warga sendiri.",
+     *      operationId="myReports",
+     *      security={{"bearerAuth":{}}},
+     *      @OA\Response(
+     *          response=200,
+     *          description="Daftar laporan yang dibuat berhasil diambil",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example=true),
+     *              @OA\Property(property="message", type="string", example="Daftar laporan saya berhasil diambil"),
+     *              @OA\Property(property="data", type="array",
+     *                  @OA\Items(type="object",
+     *                      @OA\Property(property="id_laporan", type="integer", example=1),
+     *                      @OA\Property(property="id_kategori", type="integer", example=1),
+     *                      @OA\Property(property="lokasi", type="string", example="Jl. Contoh No. 123"),
+     *                      @OA\Property(property="deskripsi", type="string", example="Terjadi banjir di kawasan tersebut"),
+     *                      @OA\Property(property="status_laporan", type="string", example="pending"),
+     *                      @OA\Property(property="tanggal_lapor", type="string", example="2023-12-10T01:23:45.000000Z"),
+     *                      @OA\Property(property="kategori", type="object",
+     *                          @OA\Property(property="id_kategori", type="integer", example=1),
+     *                          @OA\Property(property="nama_kategori", type="string", example="Banjir"),
+     *                          @OA\Property(property="icon", type="string", example="🌊")
+     *                      )
+     *                  )
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthorized"
+     *      ),
+     *      @OA\Response(
+     *          response=403,
+     *          description="Forbidden - Warga access required"
+     *      )
+     * )
+     */
     public function index(Request $request)
     {
         try {

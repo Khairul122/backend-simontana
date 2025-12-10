@@ -389,6 +389,63 @@ class MonitoringController extends Controller
     }
 
     /**
+     * @OA\Get(
+     *      path="/api/monitoring/laporan/{id_laporan}",
+     *      tags={"Monitoring Management"},
+     *      summary="Get Monitoring for Specific Laporan",
+     *      description="Endpoint untuk mendapatkan data monitoring terkait laporan tertentu.",
+     *      operationId="getMonitoringByLaporan",
+     *      security={{"bearerAuth":{}}},
+     *      @OA\Parameter(
+     *          name="id_laporan",
+     *          in="path",
+     *          description="ID laporan yang akan dicari monitoringnya",
+     *          required=true,
+     *          @OA\Schema(type="integer", example=1)
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Monitoring untuk laporan berhasil diambil",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example=true),
+     *              @OA\Property(property="message", type="string", example="Monitoring untuk laporan berhasil diambil"),
+     *              @OA\Property(property="data", type="array",
+     *                  @OA\Items(type="object",
+     *                      @OA\Property(property="id_monitoring", type="integer", example=1),
+     *                      @OA\Property(property="id_laporan", type="integer", example=1),
+     *                      @OA\Property(property="id_operator", type="integer", example=2),
+     *                      @OA\Property(property="waktu_monitoring", type="string", example="2024-01-15T10:30:00Z"),
+     *                      @OA\Property(property="hasil_monitoring", type="string", example="Kondisi terkendali, tidak ada kerusakan signifikan"),
+     *                      @OA\Property(property="koordinat_gps", type="string", example="-6.200000,106.816666"),
+     *                      @OA\Property(property="operator", type="object",
+     *                          @OA\Property(property="id", type="integer", example=2),
+     *                          @OA\Property(property="nama", type="string", example="Petugas Operator"),
+     *                          @OA\Property(property="username", type="string", example="operator1")
+     *                      )
+     *                  )
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthorized"
+     *      ),
+     *      @OA\Response(
+     *          response=403,
+     *          description="Forbidden - Akses ditolak"
+     *      ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="Laporan tidak ditemukan"
+     *      ),
+     *      @OA\Response(
+     *          response=500,
+     *          description="Gagal mengambil data monitoring"
+     *      )
+     * )
+     */
+
+    /**
      * Get monitoring for specific laporan.
      */
     public function getByLaporan(string $laporanId)
