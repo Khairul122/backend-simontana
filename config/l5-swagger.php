@@ -6,6 +6,12 @@ return [
         'default' => [
             'api' => [
                 'title' => 'L5 Swagger UI',
+                'default' => [
+                    'headers' => [
+                        'Accept' => 'application/json',
+                        'Content-Type' => 'application/json'
+                    ]
+                ]
             ],
 
             'routes' => [
@@ -13,6 +19,10 @@ return [
                  * Route for accessing api documentation interface
                  */
                 'api' => 'api/documentation',
+                /*
+                 * Middleware for the documentation route
+                 */
+                'middleware' => ['api', 'cors'],
             ],
             'paths' => [
                 /*

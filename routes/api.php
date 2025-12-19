@@ -76,6 +76,15 @@ Route::get('/check-token', function () {
     ], 401);
 })->middleware('jwt.auth')->name('check.token');
 
+// Wilayah Routes (Public - Read Only)
+Route::prefix('wilayah')->group(function () {
+    Route::get('/provinsi', [App\Http\Controllers\ProvinsiController::class, 'index']);
+    Route::get('/provinsi/{id}', [App\Http\Controllers\ProvinsiController::class, 'show']);
+    Route::get('/kabupaten/{provinsi_id}', [App\Http\Controllers\KabupatenController::class, 'getByProvinsi']);
+    Route::get('/kecamatan/{kabupaten_id}', [App\Http\Controllers\KecamatanController::class, 'getByKabupaten']);
+    Route::get('/desa/{kecamatan_id}', [App\Http\Controllers\DesaController::class, 'getByKecamatan']);
+});
+
 // Data Relasi Routes (Public - Read Only)
 Route::prefix('provinsi')->group(function () {
     Route::get('/statistics', [App\Http\Controllers\ProvinsiController::class, 'statistics']);

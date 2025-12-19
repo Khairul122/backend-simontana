@@ -401,6 +401,22 @@ class KabupatenController extends Controller
     }
 
     /**
+     * Get kabupaten by provinsi ID
+     */
+    public function getByProvinsi($provinsi_id): JsonResponse
+    {
+        $kabupaten = Kabupaten::where('id_provinsi', $provinsi_id)
+            ->orderBy('nama')
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Data kabupaten berhasil diambil',
+            'data' => $kabupaten
+        ]);
+    }
+
+    /**
      * @OA\Get(
      *     path="/api/kabupaten/statistics",
      *     tags={"Kabupaten"},

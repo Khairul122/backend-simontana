@@ -401,6 +401,22 @@ class KecamatanController extends Controller
     }
 
     /**
+     * Get kecamatan by kabupaten ID
+     */
+    public function getByKabupaten($kabupaten_id): JsonResponse
+    {
+        $kecamatan = Kecamatan::where('id_kabupaten', $kabupaten_id)
+            ->orderBy('nama')
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Data kecamatan berhasil diambil',
+            'data' => $kecamatan
+        ]);
+    }
+
+    /**
      * @OA\Get(
      *     path="/api/kecamatan/statistics",
      *     tags={"Kecamatan"},

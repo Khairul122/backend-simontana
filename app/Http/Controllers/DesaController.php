@@ -409,6 +409,22 @@ class DesaController extends Controller
     }
 
     /**
+     * Get desa by kecamatan ID
+     */
+    public function getByKecamatan($kecamatan_id): JsonResponse
+    {
+        $desa = Desa::where('id_kecamatan', $kecamatan_id)
+            ->orderBy('nama')
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Data desa berhasil diambil',
+            'data' => $desa
+        ]);
+    }
+
+    /**
      * @OA\Get(
      *     path="/api/desa/statistics",
      *     tags={"Desa"},
