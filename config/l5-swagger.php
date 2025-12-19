@@ -5,13 +5,7 @@ return [
     'documentations' => [
         'default' => [
             'api' => [
-                'title' => 'L5 Swagger UI',
-                'default' => [
-                    'headers' => [
-                        'Accept' => 'application/json',
-                        'Content-Type' => 'application/json'
-                    ]
-                ]
+                'title' => 'SIMONTA BENCANA API Documentation',
             ],
 
             'routes' => [
@@ -22,7 +16,7 @@ return [
                 /*
                  * Middleware for the documentation route
                  */
-                'middleware' => ['api', 'cors'],
+                'middleware' => ['web', 'cors'],
             ],
             'paths' => [
                 /*

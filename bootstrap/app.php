@@ -17,8 +17,8 @@ return Application::configure(basePath: dirname(__DIR__))
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
         ]);
 
-        // Apply simple CORS middleware globally to all routes
-        $middleware->append(\App\Http\Middleware\SimpleCors::class);
+        // Add CORS middleware for API routes
+        $middleware->append(\Illuminate\Http\Middleware\HandleCors::class);
 
         // Add session middleware for API routes (required for CheckSession middleware)
         $middleware->api(prepend: [
