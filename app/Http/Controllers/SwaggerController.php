@@ -31,7 +31,7 @@ use OpenApi\Annotations as OA;
  * )
  *
  * @OA\SecurityScheme(
- *     securityScheme="bearerAuth",
+ *     securityScheme="jwt",
  *     type="http",
  *     scheme="bearer",
  *     bearerFormat="JWT",

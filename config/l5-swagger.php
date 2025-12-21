@@ -174,65 +174,16 @@ return [
         */
         'securityDefinitions' => [
             'securitySchemes' => [
-                /*
-                 * Examples of Security schemes
-                 */
-                /*
-                'api_key_security_example' => [ // Unique name of security
-                    'type' => 'apiKey', // The type of the security scheme. Valid values are "basic", "apiKey" or "oauth2".
-                    'description' => 'A short description for security scheme',
-                    'name' => 'api_key', // The name of the header or query parameter to be used.
-                    'in' => 'header', // The location of the API key. Valid values are "query" or "header".
-                ],
-                'oauth2_security_example' => [ // Unique name of security
-                    'type' => 'oauth2', // The type of the security scheme. Valid values are "basic", "apiKey" or "oauth2".
-                    'description' => 'A short description for oauth2 security scheme.',
-                    'flow' => 'implicit', // The flow used by the OAuth2 security scheme. Valid values are "implicit", "password", "application" or "accessCode".
-                    'authorizationUrl' => 'http://example.com/auth', // The authorization URL to be used for (implicit/accessCode)
-                    //'tokenUrl' => 'http://example.com/auth' // The authorization URL to be used for (password/application/accessCode)
-                    'scopes' => [
-                        'read:projects' => 'read your projects',
-                        'write:projects' => 'modify projects in your account',
-                    ]
-                ],
-                */
-
-                /* Open API 3.0 support
-                'passport' => [ // Unique name of security
-                    'type' => 'oauth2', // The type of the security scheme. Valid values are "basic", "apiKey" or "oauth2".
-                    'description' => 'Laravel passport oauth2 security.',
-                    'in' => 'header',
-                    'scheme' => 'https',
-                    'flows' => [
-                        "password" => [
-                            "authorizationUrl" => config('app.url') . '/oauth/authorize',
-                            "tokenUrl" => config('app.url') . '/oauth/token',
-                            "refreshUrl" => config('app.url') . '/token/refresh',
-                            "scopes" => []
-                        ],
-                    ],
-                ],
-                */
-                'jwt' => [ // Unique name of security
-                    'type' => 'http', // The type of the security scheme. Valid values are "http" or "apiKey"
-                    'scheme' => 'bearer', // For "http" type, valid values are "basic" or "bearer"
-                    'bearerFormat' => 'JWT', // For "bearer" scheme, a hint to the client how the bearer token is formatted
-                    'description' => 'Enter token in format (Bearer <token>)',
+                'jwt' => [ // Skema otentikasi JWT
+                    'type' => 'http', // Tipe skema otentikasi
+                    'scheme' => 'bearer', // Skema otentikasi HTTP (bearer token)
+                    'bearerFormat' => 'JWT', // Format token bearer
+                    'description' => 'Gunakan access token JWT yang didapat dari endpoint login. Format: Bearer {token}',
                 ],
             ],
             'security' => [
-                /*
-                 * Examples of Securities
-                 */
                 [
-                    /*
-                    'oauth2_security_example' => [
-                        'read',
-                        'write'
-                    ],
-
-                    'passport' => []
-                    */
+                    'jwt' => [], // Atur default security ke skema jwt
                 ],
             ],
         ],

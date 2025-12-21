@@ -11,20 +11,13 @@ use Illuminate\Support\Facades\Validator;
 
 class KategoriBencanaController extends Controller
 {
-    public function __construct()
-    {
-        // Semua endpoint memerlukan otentikasi
-        $this->middleware('auth:api');
-        // Hanya endpoint create, update, delete yang memerlukan role Admin
-        $this->middleware('role:Admin')->only(['store', 'update', 'destroy']);
-    }
     /**
      * @OA\Get(
      *     path="/kategori-bencana",
      *     summary="Get all kategori bencana",
      *     description="Mengambil semua data kategori bencana dengan filter dan pagination",
      *     tags={"Kategori Bencana"},
-     *     security={{"bearerAuth": {}}},
+     *     security={{"jwt": {}}},
      *     @OA\Parameter(
      *         name="search",
      *         in="query",
@@ -123,7 +116,7 @@ class KategoriBencanaController extends Controller
      *     summary="Create new kategori bencana",
      *     description="Membuat kategori bencana baru - Hanya Admin yang dapat mengakses endpoint ini",
      *     tags={"Kategori Bencana"},
-     *     security={{"bearerAuth": {}}},
+     *     security={{"jwt": {}}},
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
@@ -213,7 +206,7 @@ class KategoriBencanaController extends Controller
      *     summary="Get kategori bencana by ID",
      *     description="Mengambil detail kategori bencana berdasarkan ID",
      *     tags={"Kategori Bencana"},
-     *     security={{"bearerAuth": {}}},
+     *     security={{"jwt": {}}},
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
@@ -282,7 +275,7 @@ class KategoriBencanaController extends Controller
      *     summary="Update kategori bencana",
      *     description="Memperbarui data kategori bencana berdasarkan ID - Hanya Admin yang dapat mengakses endpoint ini",
      *     tags={"Kategori Bencana"},
-     *     security={{"bearerAuth": {}}},
+     *     security={{"jwt": {}}},
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
@@ -401,7 +394,7 @@ class KategoriBencanaController extends Controller
      *     summary="Delete kategori bencana",
      *     description="Menghapus data kategori bencana berdasarkan ID - Hanya Admin yang dapat mengakses endpoint ini",
      *     tags={"Kategori Bencana"},
-     *     security={{"bearerAuth": {}}},
+     *     security={{"jwt": {}}},
      *     @OA\Parameter(
      *         name="id",
      *         in="path",

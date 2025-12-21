@@ -1,15 +1,12 @@
 <?php
 
-namespace App\Models\Report;
+namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class KategoriBencana extends Model
 {
-    use HasFactory;
-
     protected $table = 'kategori_bencana';
     protected $primaryKey = 'id';
     public $timestamps = true;
@@ -25,8 +22,11 @@ class KategoriBencana extends Model
         'updated_at' => 'datetime',
     ];
 
+    /**
+     * Relasi ke laporan
+     */
     public function laporans(): HasMany
     {
-        return $this->hasMany(\App\Models\Report\Laporan::class, 'id_kategori_bencana');
+        return $this->hasMany(Laporan::class, 'id_kategori_bencana');
     }
 }

@@ -357,14 +357,14 @@
                 }
             }
         },
-        "/api/auth/logout": {
+        "/auth/logout": {
             "post": {
                 "tags": [
                     "Authentication"
                 ],
                 "summary": "Logout pengguna",
                 "description": "Logout pengguna dan revoke token",
-                "operationId": "69281b12abb272c76871f19cb17ca563",
+                "operationId": "0d29c740dc06d77602af8095bf4654cc",
                 "responses": {
                     "200": {
                         "description": "Logout berhasil",
@@ -414,14 +414,14 @@
                 ]
             }
         },
-        "/api/auth/refresh": {
+        "/auth/refresh": {
             "post": {
                 "tags": [
                     "Authentication"
                 ],
                 "summary": "Refresh JWT token",
                 "description": "Refresh token JWT yang sedang aktif",
-                "operationId": "b2eae7a8032954d25b46c7ec6f489c68",
+                "operationId": "f6c9683ed975ace7d035a09e6e2a9332",
                 "responses": {
                     "200": {
                         "description": "Token berhasil diperbarui",
@@ -488,14 +488,14 @@
                 ]
             }
         },
-        "/api/auth/me": {
+        "/auth/me": {
             "get": {
                 "tags": [
                     "Authentication"
                 ],
                 "summary": "Get current user info",
                 "description": "Mendapatkan informasi user yang sedang login berdasarkan token",
-                "operationId": "b9abb1a7a74670a19c215c2c133f14d8",
+                "operationId": "a9c495788506b114956e3f509e5d90a2",
                 "responses": {
                     "200": {
                         "description": "Data user berhasil diambil",
@@ -594,14 +594,14 @@
                 ]
             }
         },
-        "/api/auth/roles": {
+        "/auth/roles": {
             "get": {
                 "tags": [
                     "Authentication"
                 ],
                 "summary": "Get available roles",
                 "description": "Mendapatkan daftar role yang tersedia",
-                "operationId": "3deb717b96e790e236a90b6535d56344",
+                "operationId": "336ed386a5770ca223cc9f33f37bef34",
                 "responses": {
                     "200": {
                         "description": "Daftar role berhasil diambil",
@@ -3000,7 +3000,7 @@
                 },
                 "security": [
                     {
-                        "bearerAuth": []
+                        "jwt": []
                     }
                 ]
             },
@@ -3170,7 +3170,7 @@
                 },
                 "security": [
                     {
-                        "bearerAuth": []
+                        "jwt": []
                     }
                 ]
             }
@@ -3290,7 +3290,7 @@
                 },
                 "security": [
                     {
-                        "bearerAuth": []
+                        "jwt": []
                     }
                 ]
             },
@@ -3489,7 +3489,7 @@
                 },
                 "security": [
                     {
-                        "bearerAuth": []
+                        "jwt": []
                     }
                 ]
             },
@@ -3658,7 +3658,7 @@
                 },
                 "security": [
                     {
-                        "bearerAuth": []
+                        "jwt": []
                     }
                 ]
             }
@@ -6698,17 +6698,11 @@
     },
     "components": {
         "securitySchemes": {
-            "bearerAuth": {
-                "type": "http",
-                "description": "Gunakan access token JWT yang didapat dari login endpoint. Format: Bearer {token}",
-                "bearerFormat": "JWT",
-                "scheme": "bearer"
-            },
             "jwt": {
                 "type": "http",
                 "scheme": "bearer",
                 "bearerFormat": "JWT",
-                "description": "Enter token in format (Bearer <token>)"
+                "description": "Gunakan access token JWT yang didapat dari endpoint login. Format: Bearer {token}"
             }
         }
     },
@@ -6760,6 +6754,11 @@
         {
             "name": "Tindak Lanjut",
             "description": "API endpoints untuk manajemen data Tindak Lanjut Bencana"
+        }
+    ],
+    "security": [
+        {
+            "jwt": []
         }
     ]
 }
