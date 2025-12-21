@@ -21,16 +21,9 @@ class KategoriBencanaSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
-                'nama_kategori' => 'Longsor',
-                'deskripsi' => 'Bencana tanah longsor yang terjadi pada area perbukitan atau pegunungan',
-                'icon' => 'landslide.png',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'nama_kategori' => 'Kekeringan',
-                'deskripsi' => 'Bencana kekeringan atau kurangnya sumber air bersih',
-                'icon' => 'drought.png',
+                'nama_kategori' => 'Gempa Bumi',
+                'deskripsi' => 'Bencana gempa bumi yang disebabkan oleh aktivitas tektonik',
+                'icon' => 'earthquake.png',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -40,35 +33,7 @@ class KategoriBencanaSeeder extends Seeder
                 'icon' => 'forest_fire.png',
                 'created_at' => now(),
                 'updated_at' => now(),
-            ],
-            [
-                'nama_kategori' => 'Gempa Bumi',
-                'deskripsi' => 'Bencana gempa bumi yang disebabkan oleh aktivitas tektonik',
-                'icon' => 'earthquake.png',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'nama_kategori' => 'Tsunami',
-                'deskripsi' => 'Bencana tsunami yang disebabkan oleh gempa bumi bawah laut',
-                'icon' => 'tsunami.png',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'nama_kategori' => 'Angin Puting Beliung',
-                'deskripsi' => 'Bencana angin kencang yang menyebabkan kerusakan',
-                'icon' => 'tornado.png',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'nama_kategori' => 'Letusan Gunung Berapi',
-                'deskripsi' => 'Bencana letusan gunung berapi',
-                'icon' => 'volcano.png',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
+            ]
         ];
 
         \DB::table('kategori_bencana')->insert($kategoriBencana);

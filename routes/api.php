@@ -3,6 +3,16 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\LaporanController;
+use App\Http\Controllers\KategoriBencanaController;
+use App\Http\Controllers\ProvinsiController;
+use App\Http\Controllers\KabupatenController;
+use App\Http\Controllers\KecamatanController;
+use App\Http\Controllers\DesaController;
+use App\Http\Controllers\TindakLanjutController;
+use App\Http\Controllers\RiwayatTindakanController;
+use App\Http\Controllers\MonitoringController;
+use App\Http\Controllers\BmkgController;
 
 /*
 |--------------------------------------------------------------------------
@@ -11,17 +21,16 @@ use App\Http\Controllers\UserController;
 |
 | Here is where you can register API routes for your application. These
 | routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "api" middleware group. Make something great!
+| be assigned to the "api" middleware group.
 |
 */
 
+// Authentication Routes
 Route::prefix('auth')->group(function () {
-    // Public routes (no authentication required)
     Route::post('/login', [AuthController::class, 'login']);
     Route::post('/register', [AuthController::class, 'register']);
     Route::get('/roles', [AuthController::class, 'getRoles']);
 
-    // Protected routes (authentication required)
     Route::middleware('jwt.auth')->group(function () {
         Route::get('/me', [AuthController::class, 'me']);
         Route::post('/refresh', [AuthController::class, 'refresh']);
@@ -29,28 +38,18 @@ Route::prefix('auth')->group(function () {
     });
 });
 
-Route::prefix('users')->group(function () {
-    // Public routes (no authentication required)
-    // None for now - all user operations require authentication
+// User Routes
+Route::middleware('jwt.auth')->prefix('users')->group(function () {
+    Route::get('/profile', [UserController::class, 'profile']);
+    Route::put('/profile', [UserController::class, 'updateProfile']);
 
-    // Protected routes (authentication required)
-    Route::middleware('jwt.auth')->group(function () {
-        // Current user profile routes (all authenticated users)
-        Route::get('/profile', [UserController::class, 'profile']);
-        Route::put('/profile', [UserController::class, 'updateProfile']);
-
-        // Admin only routes
-        Route::middleware('role:Admin')->group(function () {
-            Route::get('/', [UserController::class, 'index']); // List all users
-            Route::post('/', [UserController::class, 'store']); // Create user
-            Route::get('/statistics', [UserController::class, 'statistics']); // User statistics
-            Route::get('/{id}', [UserController::class, 'show']); // Get specific user
-            Route::put('/{id}', [UserController::class, 'update']); // Update user
-            Route::delete('/{id}', [UserController::class, 'destroy']); // Delete user
-        });
-
-        // User can view their own data (optional - depends on your requirements)
-        // Note: This route might need additional logic to verify ownership
+    Route::middleware('role:Admin')->group(function () {
+        Route::get('/', [UserController::class, 'index']);
+        Route::post('/', [UserController::class, 'store']);
+        Route::get('/statistics', [UserController::class, 'statistics']);
+        Route::get('/{id}', [UserController::class, 'show']);
+        Route::put('/{id}', [UserController::class, 'update']);
+        Route::delete('/{id}', [UserController::class, 'destroy']);
     });
 });
 
@@ -78,157 +77,73 @@ Route::get('/check-token', function () {
 
 // Wilayah Routes (Public - Read Only)
 Route::prefix('wilayah')->group(function () {
-    Route::get('/provinsi', [App\Http\Controllers\ProvinsiController::class, 'index']);
-    Route::get('/provinsi/{id}', [App\Http\Controllers\ProvinsiController::class, 'show']);
-    Route::get('/kabupaten/{provinsi_id}', [App\Http\Controllers\KabupatenController::class, 'getByProvinsi']);
-    Route::get('/kecamatan/{kabupaten_id}', [App\Http\Controllers\KecamatanController::class, 'getByKabupaten']);
-    Route::get('/desa/{kecamatan_id}', [App\Http\Controllers\DesaController::class, 'getByKecamatan']);
+    Route::get('/provinsi', [ProvinsiController::class, 'index']);
+    Route::get('/provinsi/{id}', [ProvinsiController::class, 'show']);
+    Route::get('/kabupaten/{provinsi_id}', [KabupatenController::class, 'getByProvinsi']);
+    Route::get('/kecamatan/{kabupaten_id}', [KecamatanController::class, 'getByKabupaten']);
+    Route::get('/desa/{kecamatan_id}', [DesaController::class, 'getByKecamatan']);
 });
 
-// Data Relasi Routes (Public - Read Only)
-Route::prefix('provinsi')->group(function () {
-    Route::get('/statistics', [App\Http\Controllers\ProvinsiController::class, 'statistics']);
-    Route::get('/', [App\Http\Controllers\ProvinsiController::class, 'index']);
-    Route::get('/{id}', [App\Http\Controllers\ProvinsiController::class, 'show']);
+// Wilayah Management Routes (Protected - Admin only)
+Route::middleware('jwt.auth')->group(function () {
+    // Data Relasi Routes (CRUD Operations - Admin only)
+    Route::middleware('role:Admin')->group(function () {
+        Route::apiResource('provinsi', ProvinsiController::class);
+        Route::apiResource('kabupaten', KabupatenController::class);
+        Route::apiResource('kecamatan', KecamatanController::class);
+        Route::apiResource('desa', DesaController::class);
+    });
 });
 
-Route::prefix('kabupaten')->group(function () {
-    Route::get('/statistics', [App\Http\Controllers\KabupatenController::class, 'statistics']);
-    Route::get('/', [App\Http\Controllers\KabupatenController::class, 'index']);
-    Route::get('/{id}', [App\Http\Controllers\KabupatenController::class, 'show']);
-});
-
-Route::prefix('kecamatan')->group(function () {
-    Route::get('/statistics', [App\Http\Controllers\KecamatanController::class, 'statistics']);
-    Route::get('/', [App\Http\Controllers\KecamatanController::class, 'index']);
-    Route::get('/{id}', [App\Http\Controllers\KecamatanController::class, 'show']);
-});
-
-Route::prefix('desa')->group(function () {
-    Route::get('/statistics', [App\Http\Controllers\DesaController::class, 'statistics']);
-    Route::get('/', [App\Http\Controllers\DesaController::class, 'index']);
-    Route::get('/{id}', [App\Http\Controllers\DesaController::class, 'show']);
-});
-
-// BMKG Test Routes (Temporarily Public for Testing)
+// BMKG Routes (Public & Protected)
 Route::prefix('bmkg')->group(function () {
-    // New BMKG format routes (temporary public for testing)
+    // Public routes for BMKG earthquake data (no authentication required)
     Route::prefix('gempa')->group(function () {
-        Route::get('/terbaru', [App\Http\Controllers\BmkgController::class, 'getLatestEarthquakeBmkg']); // autogempa.xml format
-        Route::get('/terkini', [App\Http\Controllers\BmkgController::class, 'getLatestEarthquakesBmkg']); // gempaterkini.xml format
-        Route::get('/dirasakan', [App\Http\Controllers\BmkgController::class, 'getEarthquakeFeltBmkg']); // gempadirasakan.xml format
+        Route::get('/terbaru', [BmkgController::class, 'getGempaTerbaru']);
+        Route::get('/terkini', [BmkgController::class, 'getDaftarGempa']);
+        Route::get('/dirasakan', [BmkgController::class, 'getGempaDirasakan']);
+    });
+
+    // Public route for tsunami warnings (critical safety information)
+    Route::get('/peringatan-tsunami', [BmkgController::class, 'getPeringatanTsunami']);
+
+    // Protected routes for BMKG management (require authentication)
+    Route::middleware('jwt.auth')->group(function () {
+        Route::get('/', [BmkgController::class, 'index']);
+        Route::get('/cache/status', [BmkgController::class, 'getCacheStatus']);
+        Route::post('/cache/clear', [BmkgController::class, 'clearCache']);
+
+        // Weather forecast (requires authentication)
+        Route::get('/prakiraan-cuaca', [BmkgController::class, 'getPrakiraanCuaca']);
     });
 });
 
-// BMKG Integration Routes (Protected - Sync and View data)
+// Main Application Routes (Protected)
 Route::middleware('jwt.auth')->group(function () {
-    Route::prefix('bmkg')->group(function () {
-        // Original routes
-        Route::get('/', [App\Http\Controllers\BmkgController::class, 'index']);
-        Route::get('/latest/{jenis?}', [App\Http\Controllers\BmkgController::class, 'showLatest']);
-        Route::get('/{jenis}/{id}', [App\Http\Controllers\BmkgController::class, 'show']);
-        Route::post('/sync-autogempa', [App\Http\Controllers\BmkgController::class, 'syncAutoEarthquakeData']);
-        Route::post('/sync-gempa-terkini', [App\Http\Controllers\BmkgController::class, 'syncLatestEarthquakeData']);
-        Route::post('/sync-gempa-dirasakan', [App\Http\Controllers\BmkgController::class, 'syncEarthquakeFeltData']);
-        Route::post('/sync-cuaca', [App\Http\Controllers\BmkgController::class, 'syncWeatherData']);
-        Route::post('/sync-prakiraan-cuaca', [App\Http\Controllers\BmkgController::class, 'syncWeatherForecastData']);
-        Route::post('/sync-peringatan-dini', [App\Http\Controllers\BmkgController::class, 'syncNowcastRssData']);
-        Route::post('/sync-detail-peringatan', [App\Http\Controllers\BmkgController::class, 'syncNowcastCapDetail']);
-        Route::post('/sync-cap', [App\Http\Controllers\BmkgController::class, 'syncCapData']);
-        Route::post('/sync-all', [App\Http\Controllers\BmkgController::class, 'syncAllData']);
-        Route::post('/sync-gempa', [App\Http\Controllers\BmkgController::class, 'syncEarthquakeData']); // Alias
-        Route::get('/prakiraan-cuaca', [App\Http\Controllers\BmkgController::class, 'getWeatherForecast']);
-        Route::get('/peringatan-dini', [App\Http\Controllers\BmkgController::class, 'getNowcastRssFeed']);
-        Route::get('/detail-peringatan/{alert_code}', [App\Http\Controllers\BmkgController::class, 'getNowcastCapDetail']);
-    });
-});
+    // Laporan Routes
+    Route::apiResource('laporans', LaporanController::class);
+    Route::patch('/laporans/{id}/verifikasi', [LaporanController::class, 'verifikasi']);
+    Route::patch('/laporans/{id}/proses', [LaporanController::class, 'proses']);
+    Route::get('/laporans/{id}/riwayat', [LaporanController::class, 'riwayat']);
+    Route::get('/laporans/statistics', [LaporanController::class, 'statistics']);
 
-// Monitoring Routes (Protected - Create, Update, Delete)
-Route::middleware('jwt.auth')->group(function () {
-    Route::prefix('monitoring')->group(function () {
-        Route::get('/', [App\Http\Controllers\MonitoringController::class, 'index']);
-        Route::post('/', [App\Http\Controllers\MonitoringController::class, 'store']);
-        Route::get('/{id}', [App\Http\Controllers\MonitoringController::class, 'show']);
-        Route::put('/{id}', [App\Http\Controllers\MonitoringController::class, 'update']);
-        Route::delete('/{id}', [App\Http\Controllers\MonitoringController::class, 'destroy']);
-    });
-});
+    // Kategori Bencana Routes (Read - all authenticated users, Write - Admin only)
+    Route::get('/kategori-bencana', [KategoriBencanaController::class, 'index']);
+    Route::get('/kategori-bencana/{id}', [KategoriBencanaController::class, 'show']);
 
-// Riwayat Tindakan Routes (Protected - Create, Update, Delete)
-Route::middleware('jwt.auth')->group(function () {
-    Route::prefix('riwayat-tindakan')->group(function () {
-        Route::get('/', [App\Http\Controllers\RiwayatTindakanController::class, 'index']);
-        Route::post('/', [App\Http\Controllers\RiwayatTindakanController::class, 'store']);
-        Route::get('/{id}', [App\Http\Controllers\RiwayatTindakanController::class, 'show']);
-        Route::put('/{id}', [App\Http\Controllers\RiwayatTindakanController::class, 'update']);
-        Route::delete('/{id}', [App\Http\Controllers\RiwayatTindakanController::class, 'destroy']);
-    });
-});
-
-// Tindak Lanjut Routes (Protected - Create, Update, Delete)
-Route::middleware('jwt.auth')->group(function () {
-    Route::prefix('tindak-lanjut')->group(function () {
-        Route::get('/', [App\Http\Controllers\TindakLanjutController::class, 'index']);
-        Route::post('/', [App\Http\Controllers\TindakLanjutController::class, 'store']);
-        Route::get('/{id}', [App\Http\Controllers\TindakLanjutController::class, 'show']);
-        Route::put('/{id}', [App\Http\Controllers\TindakLanjutController::class, 'update']);
-        Route::delete('/{id}', [App\Http\Controllers\TindakLanjutController::class, 'destroy']);
-    });
-});
-
-// Laporan Routes (Protected - Create, Update, Delete)
-Route::middleware('jwt.auth')->group(function () {
-    Route::prefix('laporan')->group(function () {
-        Route::get('/', [App\Http\Controllers\LaporanController::class, 'index']);
-        Route::post('/', [App\Http\Controllers\LaporanController::class, 'store']);
-        Route::get('/{id}', [App\Http\Controllers\LaporanController::class, 'show']);
-        Route::put('/{id}', [App\Http\Controllers\LaporanController::class, 'update']);
-        Route::delete('/{id}', [App\Http\Controllers\LaporanController::class, 'destroy']);
-        Route::post('/{id}/verifikasi', [App\Http\Controllers\LaporanController::class, 'verifikasi']);
-        Route::post('/{id}/proses', [App\Http\Controllers\LaporanController::class, 'proses']);
-        Route::get('/statistics', [App\Http\Controllers\LaporanController::class, 'statistics']);
-    });
-});
-
-// Kategori Bencana Routes (Read - accessible to all authenticated users, Write - Admin only)
-Route::middleware('jwt.auth')->group(function () {
-    Route::prefix('kategori-bencana')->group(function () {
-        // Endpoint yang bisa diakses oleh semua user terotentikasi
-        Route::get('/', [App\Http\Controllers\KategoriBencanaController::class, 'index']);
-        Route::get('/{id}', [App\Http\Controllers\KategoriBencanaController::class, 'show']);
-
-        // Hanya Admin yang bisa mengakses endpoint CRUD (create, update, delete)
-        Route::middleware('role:Admin')->group(function () {
-            Route::post('/', [App\Http\Controllers\KategoriBencanaController::class, 'store']);
-            Route::put('/{id}', [App\Http\Controllers\KategoriBencanaController::class, 'update']);
-            Route::delete('/{id}', [App\Http\Controllers\KategoriBencanaController::class, 'destroy']);
-        });
-    });
-});
-
-// Data Relasi Routes (Protected - Create, Update, Delete)
-Route::middleware('jwt.auth')->group(function () {
-    Route::prefix('provinsi')->group(function () {
-        Route::post('/', [App\Http\Controllers\ProvinsiController::class, 'store']);
-        Route::put('/{id}', [App\Http\Controllers\ProvinsiController::class, 'update']);
-        Route::delete('/{id}', [App\Http\Controllers\ProvinsiController::class, 'destroy']);
+    Route::middleware('role:Admin')->group(function () {
+        Route::post('/kategori-bencana', [KategoriBencanaController::class, 'store']);
+        Route::put('/kategori-bencana/{id}', [KategoriBencanaController::class, 'update']);
+        Route::patch('/kategori-bencana/{id}', [KategoriBencanaController::class, 'update']);
+        Route::delete('/kategori-bencana/{id}', [KategoriBencanaController::class, 'destroy']);
     });
 
-    Route::prefix('kabupaten')->group(function () {
-        Route::post('/', [App\Http\Controllers\KabupatenController::class, 'store']);
-        Route::put('/{id}', [App\Http\Controllers\KabupatenController::class, 'update']);
-        Route::delete('/{id}', [App\Http\Controllers\KabupatenController::class, 'destroy']);
-    });
+    // Tindak Lanjut Routes
+    Route::apiResource('tindak-lanjut', TindakLanjutController::class);
 
-    Route::prefix('kecamatan')->group(function () {
-        Route::post('/', [App\Http\Controllers\KecamatanController::class, 'store']);
-        Route::put('/{id}', [App\Http\Controllers\KecamatanController::class, 'update']);
-        Route::delete('/{id}', [App\Http\Controllers\KecamatanController::class, 'destroy']);
-    });
+    // Riwayat Tindakan Routes
+    Route::apiResource('riwayat-tindakan', RiwayatTindakanController::class);
 
-    Route::prefix('desa')->group(function () {
-        Route::post('/', [App\Http\Controllers\DesaController::class, 'store']);
-        Route::put('/{id}', [App\Http\Controllers\DesaController::class, 'update']);
-        Route::delete('/{id}', [App\Http\Controllers\DesaController::class, 'destroy']);
-    });
+    // Monitoring Routes
+    Route::apiResource('monitoring', MonitoringController::class);
 });

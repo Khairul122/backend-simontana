@@ -52,6 +52,11 @@ use OpenApi\Annotations as OA;
  *     name="Kategori Bencana",
  *     description="Kategori bencana management endpoints untuk CRUD operations"
  * )
+ *
+ * @OA\Tag(
+ *     name="BMKG Integration",
+ *     description="BMKG real-time data integration endpoints untuk gempa, cuaca, dan peringatan tsunami"
+ * )
  */
 class SwaggerController extends Controller
 {

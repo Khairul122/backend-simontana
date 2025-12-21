@@ -15,8 +15,8 @@ class PenggunaSeeder extends Seeder
         $users = [
             [
                 'nama' => 'Administrator SIMONTA',
-                'username' => 'admin',
-                'password' => bcrypt('admin123'),
+                'username' => 'admin_pusat',
+                'password' => \Hash::make('password'),
                 'role' => 'Admin',
                 'email' => 'admin@simonta.id',
                 'no_telepon' => '081234567890',
@@ -28,7 +28,7 @@ class PenggunaSeeder extends Seeder
             [
                 'nama' => 'Petugas BPBD Demo',
                 'username' => 'petugas_bpbd',
-                'password' => bcrypt('petugas123'),
+                'password' => \Hash::make('password'),
                 'role' => 'PetugasBPBD',
                 'email' => 'petugas@bpbd.go.id',
                 'no_telepon' => '082345678901',
@@ -40,24 +40,24 @@ class PenggunaSeeder extends Seeder
             [
                 'nama' => 'Operator Desa Demo',
                 'username' => 'operator_desa',
-                'password' => bcrypt('operator123'),
+                'password' => \Hash::make('password'),
                 'role' => 'OperatorDesa',
                 'email' => 'operator@desa.go.id',
                 'no_telepon' => '083456789012',
                 'alamat' => 'Kantor Desa',
-                'id_desa' => 1, // Akan disesuaikan setelah data desa ada
+                'id_desa' => 1,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
                 'nama' => 'Warga Demo',
-                'username' => 'warga_demo',
-                'password' => bcrypt('warga123'),
+                'username' => 'warga01',
+                'password' => \Hash::make('password'),
                 'role' => 'Warga',
                 'email' => 'warga@example.com',
                 'no_telepon' => '084567890123',
                 'alamat' => 'Alamat warga demo',
-                'id_desa' => 1, // Akan disesuaikan setelah data desa ada
+                'id_desa' => 1,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],

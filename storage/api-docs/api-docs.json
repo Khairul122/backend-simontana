@@ -647,52 +647,17 @@
                 }
             }
         },
-        "/api/bmkg": {
+        "/bmkg": {
             "get": {
                 "tags": [
                     "BMKG Integration"
                 ],
-                "summary": "Get all BMKG data",
-                "description": "Mengambil semua data dari BMKG dengan filter dan pagination",
-                "operationId": "13af300b1b32fe2c83007c7152490c96",
-                "parameters": [
-                    {
-                        "name": "jenis_bencana",
-                        "in": "query",
-                        "description": "Filter by jenis bencana (gempa_bumi, cuaca_ekstrem, peringatan_dini)",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "enum": [
-                                "gempa_bumi",
-                                "cuaca_ekstrem",
-                                "peringatan_dini"
-                            ]
-                        }
-                    },
-                    {
-                        "name": "lokasi",
-                        "in": "query",
-                        "description": "Filter by lokasi",
-                        "required": false,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "per_page",
-                        "in": "query",
-                        "description": "Items per page",
-                        "required": false,
-                        "schema": {
-                            "type": "integer",
-                            "default": 20
-                        }
-                    }
-                ],
+                "summary": "Get all BMKG data summary",
+                "description": "Retrieve summary of all BMKG data including latest earthquakes, felt earthquakes, and cache status",
+                "operationId": "a2f798fe7ca20a892b8434a552a85d30",
                 "responses": {
                     "200": {
-                        "description": "Success",
+                        "description": "BMKG data retrieved successfully",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -703,1361 +668,20 @@
                                         },
                                         "message": {
                                             "type": "string",
-                                            "example": "Data BMKG berhasil diambil"
+                                            "example": "BMKG data retrieved successfully"
                                         },
                                         "data": {
                                             "properties": {
-                                                "data": {
-                                                    "type": "array",
-                                                    "items": {
-                                                        "type": "object"
-                                                    }
-                                                },
-                                                "current_page": {
-                                                    "type": "integer",
-                                                    "example": 1
-                                                },
-                                                "per_page": {
-                                                    "type": "integer",
-                                                    "example": 20
-                                                },
-                                                "total": {
-                                                    "type": "integer",
-                                                    "example": 100
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "jwt": []
-                    }
-                ]
-            }
-        },
-        "/api/bmkg/sync-autogempa": {
-            "post": {
-                "tags": [
-                    "BMKG Integration"
-                ],
-                "summary": "Sync autogempa data from BMKG",
-                "description": "Sinkronisasi data autogempa dari server BMKG",
-                "operationId": "1da815e9b3fdc80e3081f2ba9a641612",
-                "responses": {
-                    "200": {
-                        "description": "Success",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Sinkronisasi data autogempa berhasil"
-                                        },
-                                        "data": {
-                                            "properties": {
-                                                "jumlah_data_baru": {
-                                                    "type": "integer",
-                                                    "example": 1
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "jwt": []
-                    }
-                ]
-            }
-        },
-        "/api/bmkg/sync-gempa-terkini": {
-            "post": {
-                "tags": [
-                    "BMKG Integration"
-                ],
-                "summary": "Sync latest earthquake data from BMKG",
-                "description": "Sinkronisasi data gempa M 5.0+ terkini dari server BMKG",
-                "operationId": "b4a7287aa7d61a25f65c4845d1f8de77",
-                "responses": {
-                    "200": {
-                        "description": "Success",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Sinkronisasi data gempa terkini berhasil"
-                                        },
-                                        "data": {
-                                            "properties": {
-                                                "jumlah_data_baru": {
-                                                    "type": "integer",
-                                                    "example": 5
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "jwt": []
-                    }
-                ]
-            }
-        },
-        "/api/bmkg/sync-gempa-dirasakan": {
-            "post": {
-                "tags": [
-                    "BMKG Integration"
-                ],
-                "summary": "Sync felt earthquake data from BMKG",
-                "description": "Sinkronisasi data gempa dirasakan dari server BMKG",
-                "operationId": "3e39a7d0cf243df537813e893cd56cfa",
-                "responses": {
-                    "200": {
-                        "description": "Success",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Sinkronisasi data gempa dirasakan berhasil"
-                                        },
-                                        "data": {
-                                            "properties": {
-                                                "jumlah_data_baru": {
-                                                    "type": "integer",
-                                                    "example": 5
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "jwt": []
-                    }
-                ]
-            }
-        },
-        "/api/bmkg/sync-cuaca": {
-            "post": {
-                "tags": [
-                    "BMKG Integration"
-                ],
-                "summary": "Sync weather data from BMKG",
-                "description": "Sinkronisasi data cuaca dari server BMKG",
-                "operationId": "c9747508258d316dfa0e2ed507d5611d",
-                "responses": {
-                    "200": {
-                        "description": "Success",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Sinkronisasi data cuaca berhasil"
-                                        },
-                                        "data": {
-                                            "properties": {
-                                                "jumlah_data_baru": {
-                                                    "type": "integer",
-                                                    "example": 2
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "jwt": []
-                    }
-                ]
-            }
-        },
-        "/api/bmkg/sync-cap": {
-            "post": {
-                "tags": [
-                    "BMKG Integration"
-                ],
-                "summary": "Sync CAP data from BMKG",
-                "description": "Sinkronisasi data Cuaca Awan Potensial dari server BMKG",
-                "operationId": "0e4d517466edc77dd0bedb54b1c7ed0a",
-                "responses": {
-                    "200": {
-                        "description": "Success",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Sinkronisasi data CAP berhasil"
-                                        },
-                                        "data": {
-                                            "properties": {
-                                                "jumlah_data_baru": {
-                                                    "type": "integer",
-                                                    "example": 2
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "jwt": []
-                    }
-                ]
-            }
-        },
-        "/api/bmkg/sync-all": {
-            "post": {
-                "tags": [
-                    "BMKG Integration"
-                ],
-                "summary": "Sync all BMKG data",
-                "description": "Sinkronisasi semua data dari server BMKG (gempa, cuaca, dan CAP)",
-                "operationId": "7a258131390bc93c0df911722f37941c",
-                "responses": {
-                    "200": {
-                        "description": "Success",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Sinkronisasi semua data BMKG berhasil"
-                                        },
-                                        "data": {
-                                            "properties": {
-                                                "sync_result": {
-                                                    "properties": {
-                                                        "gempa": {
-                                                            "type": "integer",
-                                                            "example": 2
-                                                        },
-                                                        "cuaca": {
-                                                            "type": "integer",
-                                                            "example": 5
-                                                        },
-                                                        "cap": {
-                                                            "type": "integer",
-                                                            "example": 1
-                                                        }
-                                                    },
-                                                    "type": "object"
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "jwt": []
-                    }
-                ]
-            }
-        },
-        "/api/bmkg/{jenis}/{id}": {
-            "get": {
-                "tags": [
-                    "BMKG Integration"
-                ],
-                "summary": "Get specific BMKG data by type and ID",
-                "description": "Mengambil data BMKG spesifik berdasarkan jenis dan ID",
-                "operationId": "4fc9514f615bd1d990692242366e1dd6",
-                "parameters": [
-                    {
-                        "name": "jenis",
-                        "in": "path",
-                        "description": "Jenis bencana (gempa_bumi, cuaca_ekstrem, peringatan_dini)",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "enum": [
-                                "gempa_bumi",
-                                "cuaca_ekstrem",
-                                "peringatan_dini"
-                            ]
-                        }
-                    },
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "ID data",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Success",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Data BMKG berhasil diambil"
-                                        },
-                                        "data": {
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Data not found"
-                    }
-                },
-                "security": [
-                    {
-                        "jwt": []
-                    }
-                ]
-            }
-        },
-        "/api/bmkg/latest/{jenis?}": {
-            "get": {
-                "tags": [
-                    "BMKG Integration"
-                ],
-                "summary": "Get latest BMKG data by type",
-                "description": "Mengambil data BMKG terbaru berdasarkan jenis (semua jika jenis tidak disertakan)",
-                "operationId": "9d08f48380a1dd6ba53a9975e6844094",
-                "parameters": [
-                    {
-                        "name": "jenis",
-                        "in": "path",
-                        "description": "Jenis bencana (gempa_bumi, cuaca_ekstrem, peringatan_dini), opsional",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "enum": [
-                                "gempa_bumi",
-                                "cuaca_ekstrem",
-                                "peringatan_dini"
-                            ]
-                        }
-                    },
-                    {
-                        "name": "limit",
-                        "in": "query",
-                        "description": "Jumlah data yang dikembalikan",
-                        "required": false,
-                        "schema": {
-                            "type": "integer",
-                            "default": 5
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Success",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Data BMKG terbaru berhasil diambil"
-                                        },
-                                        "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "type": "object"
-                                            }
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "jwt": []
-                    }
-                ]
-            }
-        },
-        "/api/bmkg/sync-gempa": {
-            "post": {
-                "tags": [
-                    "BMKG Integration"
-                ],
-                "summary": "Sync latest earthquake data from BMKG (alias to sync-gempa-terkini)",
-                "description": "Sinkronisasi data gempa terkini dari server BMKG (alias untuk sync-gempa-terkini)",
-                "operationId": "21dbc2d203352462630997ea70e55be1",
-                "responses": {
-                    "200": {
-                        "description": "Success",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Sinkronisasi data gempa berhasil"
-                                        },
-                                        "data": {
-                                            "properties": {
-                                                "jumlah_data_baru": {
-                                                    "type": "integer",
-                                                    "example": 5
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "jwt": []
-                    }
-                ]
-            }
-        },
-        "/api/bmkg/sync-prakiraan-cuaca": {
-            "post": {
-                "tags": [
-                    "BMKG Integration"
-                ],
-                "summary": "Sync weather forecast data from BMKG API",
-                "description": "Sinkronisasi data prakiraan cuaca dari BMKG API berdasarkan kode administrasi",
-                "operationId": "4259d964ccfe3778f0c9b3d448790fd7",
-                "parameters": [
-                    {
-                        "name": "adm4_code",
-                        "in": "query",
-                        "description": "Kode administrasi level 4 (desa/kelurahan)",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "example": "31.71.01.1001"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Success",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Sinkronisasi data prakiraan cuaca berhasil"
-                                        },
-                                        "data": {
-                                            "properties": {
-                                                "jumlah_data_baru": {
-                                                    "type": "integer",
-                                                    "example": 24
-                                                },
-                                                "lokasi": {
-                                                    "type": "string",
-                                                    "example": "Desa Example, Kecamatan Example"
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "jwt": []
-                    }
-                ]
-            }
-        },
-        "/api/bmkg/prakiraan-cuaca": {
-            "get": {
-                "tags": [
-                    "BMKG Integration"
-                ],
-                "summary": "Get weather forecast data",
-                "description": "Mengambil data prakiraan cuaca dari database atau live API",
-                "operationId": "1fd261cf865e566f2132b58c1d1875f3",
-                "parameters": [
-                    {
-                        "name": "lokasi",
-                        "in": "query",
-                        "description": "Filter berdasarkan nama lokasi (desa/kecamatan)",
-                        "required": false,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "adm4_code",
-                        "in": "query",
-                        "description": "Kode administrasi level 4 untuk data live dari BMKG",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "example": "31.71.01.1001"
-                        }
-                    },
-                    {
-                        "name": "limit",
-                        "in": "query",
-                        "description": "Jumlah data yang dikembalikan",
-                        "required": false,
-                        "schema": {
-                            "type": "integer",
-                            "default": 20
-                        }
-                    },
-                    {
-                        "name": "source",
-                        "in": "query",
-                        "description": "Sumber data: database atau live",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "default": "database",
-                            "enum": [
-                                "database",
-                                "live"
-                            ]
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Success",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Data prakiraan cuaca berhasil diambil"
-                                        },
-                                        "data": {
-                                            "properties": {
-                                                "lokasi": {
-                                                    "properties": {
-                                                        "desa": {
-                                                            "type": "string"
-                                                        },
-                                                        "kecamatan": {
-                                                            "type": "string"
-                                                        },
-                                                        "kotkab": {
-                                                            "type": "string"
-                                                        },
-                                                        "provinsi": {
-                                                            "type": "string"
-                                                        },
-                                                        "lat": {
-                                                            "type": "number"
-                                                        },
-                                                        "lon": {
-                                                            "type": "number"
-                                                        },
-                                                        "timezone": {
-                                                            "type": "string"
-                                                        }
-                                                    },
+                                                "gempa_terbaru": {
                                                     "type": "object"
                                                 },
-                                                "prakiraan": {
-                                                    "type": "array",
-                                                    "items": {
-                                                        "properties": {
-                                                            "local_datetime": {
-                                                                "type": "string"
-                                                            },
-                                                            "weather_desc": {
-                                                                "type": "string"
-                                                            },
-                                                            "temperature": {
-                                                                "type": "number"
-                                                            },
-                                                            "humidity": {
-                                                                "type": "integer"
-                                                            },
-                                                            "wind_speed": {
-                                                                "type": "number"
-                                                            },
-                                                            "wind_direction": {
-                                                                "type": "string"
-                                                            },
-                                                            "visibility": {
-                                                                "type": "string"
-                                                            },
-                                                            "image_url": {
-                                                                "type": "string"
-                                                            }
-                                                        },
-                                                        "type": "object"
-                                                    }
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "jwt": []
-                    }
-                ]
-            }
-        },
-        "/api/bmkg/gempa/terbaru": {
-            "get": {
-                "tags": [
-                    "BMKG Integration"
-                ],
-                "summary": "Get latest earthquake data in BMKG format",
-                "description": "Mengambil data gempa terbaru dalam format yang sesuai dengan dokumentasi BMKG",
-                "operationId": "68585a926f0b6596cac095d0987b2476",
-                "responses": {
-                    "200": {
-                        "description": "Success",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Data gempa terbaru berhasil diambil"
-                                        },
-                                        "data": {
-                                            "properties": {
-                                                "Tanggal": {
-                                                    "type": "string",
-                                                    "example": "16 Des 2024"
-                                                },
-                                                "Jam": {
-                                                    "type": "string",
-                                                    "example": "13:44:55 WIB"
-                                                },
-                                                "DateTime": {
-                                                    "type": "string",
-                                                    "example": "2024-12-16T13:44:55+00:00"
-                                                },
-                                                "Magnitude": {
-                                                    "type": "number",
-                                                    "example": 5.2
-                                                },
-                                                "Kedalaman": {
-                                                    "type": "string",
-                                                    "example": "10 km"
-                                                },
-                                                "point": {
-                                                    "properties": {
-                                                        "coordinates": {
-                                                            "type": "string",
-                                                            "example": "106.45,-6.19"
-                                                        }
-                                                    },
+                                                "daftar_gempa": {
                                                     "type": "object"
                                                 },
-                                                "Lintang": {
-                                                    "type": "string",
-                                                    "example": "6.19 LS"
-                                                },
-                                                "Bujur": {
-                                                    "type": "string",
-                                                    "example": "106.45 BT"
-                                                },
-                                                "Wilayah": {
-                                                    "type": "string",
-                                                    "example": "Jawa Barat"
-                                                },
-                                                "Potensi": {
-                                                    "type": "string",
-                                                    "example": "Tidak berpotensi tsunami"
-                                                },
-                                                "Dirasakan": {
-                                                    "type": "string",
-                                                    "example": "II-III Bogor"
-                                                },
-                                                "Shakemap": {
-                                                    "type": "string",
-                                                    "example": "20241216134455.mmi.png"
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "jwt": []
-                    }
-                ]
-            }
-        },
-        "/api/bmkg/gempa/terkini": {
-            "get": {
-                "tags": [
-                    "BMKG Integration"
-                ],
-                "summary": "Get latest M 5.0+ earthquake data in BMKG format",
-                "description": "Mengambil data gempa M 5.0+ terkini dalam format yang sesuai dengan dokumentasi BMKG",
-                "operationId": "8ace30542837e04dbc94e24e45699be8",
-                "parameters": [
-                    {
-                        "name": "limit",
-                        "in": "query",
-                        "description": "Jumlah data yang dikembalikan (maksimal 15)",
-                        "required": false,
-                        "schema": {
-                            "type": "integer",
-                            "default": 15
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Success",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Data gempa terkini berhasil diambil"
-                                        },
-                                        "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "properties": {
-                                                    "Tanggal": {
-                                                        "type": "string",
-                                                        "example": "16 Des 2024"
-                                                    },
-                                                    "Jam": {
-                                                        "type": "string",
-                                                        "example": "13:44:55 WIB"
-                                                    },
-                                                    "DateTime": {
-                                                        "type": "string",
-                                                        "example": "2024-12-16T13:44:55+00:00"
-                                                    },
-                                                    "Magnitude": {
-                                                        "type": "number",
-                                                        "example": 5.2
-                                                    },
-                                                    "Kedalaman": {
-                                                        "type": "string",
-                                                        "example": "10 km"
-                                                    },
-                                                    "point": {
-                                                        "properties": {
-                                                            "coordinates": {
-                                                                "type": "string",
-                                                                "example": "106.45,-6.19"
-                                                            }
-                                                        },
-                                                        "type": "object"
-                                                    },
-                                                    "Lintang": {
-                                                        "type": "string",
-                                                        "example": "6.19 LS"
-                                                    },
-                                                    "Bujur": {
-                                                        "type": "string",
-                                                        "example": "106.45 BT"
-                                                    },
-                                                    "Wilayah": {
-                                                        "type": "string",
-                                                        "example": "Jawa Barat"
-                                                    },
-                                                    "Potensi": {
-                                                        "type": "string",
-                                                        "example": "Tidak berpotensi tsunami"
-                                                    }
-                                                },
-                                                "type": "object"
-                                            }
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "jwt": []
-                    }
-                ]
-            }
-        },
-        "/api/bmkg/gempa/dirasakan": {
-            "get": {
-                "tags": [
-                    "BMKG Integration"
-                ],
-                "summary": "Get felt earthquake data in BMKG format",
-                "description": "Mengambil data gempa dirasakan dalam format yang sesuai dengan dokumentasi BMKG",
-                "operationId": "597b25dce5d7c27de1d2dd095535114f",
-                "parameters": [
-                    {
-                        "name": "limit",
-                        "in": "query",
-                        "description": "Jumlah data yang dikembalikan (maksimal 15)",
-                        "required": false,
-                        "schema": {
-                            "type": "integer",
-                            "default": 15
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Success",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Data gempa dirasakan berhasil diambil"
-                                        },
-                                        "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "properties": {
-                                                    "Tanggal": {
-                                                        "type": "string",
-                                                        "example": "16 Des 2024"
-                                                    },
-                                                    "Jam": {
-                                                        "type": "string",
-                                                        "example": "13:44:55 WIB"
-                                                    },
-                                                    "DateTime": {
-                                                        "type": "string",
-                                                        "example": "2024-12-16T13:44:55+00:00"
-                                                    },
-                                                    "Magnitude": {
-                                                        "type": "number",
-                                                        "example": 3.5
-                                                    },
-                                                    "Kedalaman": {
-                                                        "type": "string",
-                                                        "example": "10 km"
-                                                    },
-                                                    "point": {
-                                                        "properties": {
-                                                            "coordinates": {
-                                                                "type": "string",
-                                                                "example": "106.45,-6.19"
-                                                            }
-                                                        },
-                                                        "type": "object"
-                                                    },
-                                                    "Lintang": {
-                                                        "type": "string",
-                                                        "example": "6.19 LS"
-                                                    },
-                                                    "Bujur": {
-                                                        "type": "string",
-                                                        "example": "106.45 BT"
-                                                    },
-                                                    "Wilayah": {
-                                                        "type": "string",
-                                                        "example": "Jawa Barat"
-                                                    },
-                                                    "Dirasakan": {
-                                                        "type": "string",
-                                                        "example": "II-III Bogor"
-                                                    }
-                                                },
-                                                "type": "object"
-                                            }
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "jwt": []
-                    }
-                ]
-            }
-        },
-        "/api/bmkg/sync-peringatan-dini": {
-            "post": {
-                "tags": [
-                    "BMKG Integration"
-                ],
-                "summary": "Sync weather warning RSS data from BMKG",
-                "description": "Sinkronisasi data peringatan dini cuaca (RSS Feed) dari BMKG",
-                "operationId": "24730721d48dbc32f4de21bf057a30f1",
-                "parameters": [
-                    {
-                        "name": "language",
-                        "in": "query",
-                        "description": "Bahasa (id/en)",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "default": "id",
-                            "enum": [
-                                "id",
-                                "en"
-                            ]
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Success",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Sinkronisasi data peringatan dini cuaca berhasil"
-                                        },
-                                        "data": {
-                                            "properties": {
-                                                "jumlah_data_baru": {
-                                                    "type": "integer",
-                                                    "example": 5
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "jwt": []
-                    }
-                ]
-            }
-        },
-        "/api/bmkg/sync-detail-peringatan": {
-            "post": {
-                "tags": [
-                    "BMKG Integration"
-                ],
-                "summary": "Sync CAP detail alert data from BMKG",
-                "description": "Sinkronisasi data detail peringatan dini cuaca (CAP) dari BMKG",
-                "operationId": "22bcb87e8a9022089e287fa8cf631e8d",
-                "parameters": [
-                    {
-                        "name": "alert_code",
-                        "in": "query",
-                        "description": "Kode alert CAP (contoh: CJB20251013001)",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "example": "CJB20251013001"
-                        }
-                    },
-                    {
-                        "name": "language",
-                        "in": "query",
-                        "description": "Bahasa (id/en)",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "default": "id",
-                            "enum": [
-                                "id",
-                                "en"
-                            ]
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Success",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Sinkronisasi data detail peringatan berhasil"
-                                        },
-                                        "data": {
-                                            "properties": {
-                                                "jumlah_data_baru": {
-                                                    "type": "integer",
-                                                    "example": 1
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "jwt": []
-                    }
-                ]
-            }
-        },
-        "/api/bmkg/peringatan-dini": {
-            "get": {
-                "tags": [
-                    "BMKG Integration"
-                ],
-                "summary": "Get weather warning RSS data",
-                "description": "Mengambil data peringatan dini cuaca dari RSS feed BMKG atau database",
-                "operationId": "42e936be857f7194cbaf3a8b7facd158",
-                "parameters": [
-                    {
-                        "name": "language",
-                        "in": "query",
-                        "description": "Bahasa (id/en)",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "default": "id",
-                            "enum": [
-                                "id",
-                                "en"
-                            ]
-                        }
-                    },
-                    {
-                        "name": "source",
-                        "in": "query",
-                        "description": "Sumber data: live atau database",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "default": "database",
-                            "enum": [
-                                "live",
-                                "database"
-                            ]
-                        }
-                    },
-                    {
-                        "name": "limit",
-                        "in": "query",
-                        "description": "Jumlah data yang dikembalikan",
-                        "required": false,
-                        "schema": {
-                            "type": "integer",
-                            "default": 20
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Success",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Data peringatan dini cuaca berhasil diambil"
-                                        },
-                                        "data": {
-                                            "properties": {
-                                                "channel": {
+                                                "gempa_dirasakan": {
                                                     "type": "object"
                                                 },
-                                                "items": {
-                                                    "type": "array",
-                                                    "items": {
-                                                        "type": "object"
-                                                    }
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "jwt": []
-                    }
-                ]
-            }
-        },
-        "/api/bmkg/detail-peringatan/{alert_code}": {
-            "get": {
-                "tags": [
-                    "BMKG Integration"
-                ],
-                "summary": "Get CAP detail alert data",
-                "description": "Mengambil data detail peringatan dini cuaca (CAP) dari BMKG",
-                "operationId": "d090dc6988ef0292789b58c3b5388ab6",
-                "parameters": [
-                    {
-                        "name": "alert_code",
-                        "in": "path",
-                        "description": "Kode alert CAP (contoh: CJB20251013001)",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "example": "CJB20251013001"
-                        }
-                    },
-                    {
-                        "name": "language",
-                        "in": "query",
-                        "description": "Bahasa (id/en)",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "default": "id",
-                            "enum": [
-                                "id",
-                                "en"
-                            ]
-                        }
-                    },
-                    {
-                        "name": "source",
-                        "in": "query",
-                        "description": "Sumber data: live atau database",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "default": "live",
-                            "enum": [
-                                "live",
-                                "database"
-                            ]
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Success",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Data detail peringatan berhasil diambil"
-                                        },
-                                        "data": {
-                                            "properties": {
-                                                "alert_code": {
-                                                    "type": "string"
-                                                },
-                                                "headline": {
-                                                    "type": "string"
-                                                },
-                                                "event": {
-                                                    "type": "string"
-                                                },
-                                                "urgency": {
-                                                    "type": "string"
-                                                },
-                                                "severity": {
-                                                    "type": "string"
-                                                },
-                                                "certainty": {
-                                                    "type": "string"
-                                                },
-                                                "effective": {
-                                                    "type": "string"
-                                                },
-                                                "expires": {
-                                                    "type": "string"
-                                                },
-                                                "senderName": {
-                                                    "type": "string"
-                                                },
-                                                "description": {
-                                                    "type": "string"
-                                                },
-                                                "web": {
-                                                    "type": "string"
-                                                },
-                                                "area": {
-                                                    "properties": {
-                                                        "areaDesc": {
-                                                            "type": "string"
-                                                        },
-                                                        "polygons": {
-                                                            "type": "array",
-                                                            "items": {
-                                                                "type": "array",
-                                                                "items": {
-                                                                    "type": "number"
-                                                                }
-                                                            }
-                                                        }
-                                                    },
+                                                "cache_status": {
                                                     "type": "object"
                                                 }
                                             },
@@ -2069,15 +693,250 @@
                             }
                         }
                     },
-                    "404": {
-                        "description": "Alert not found"
+                    "500": {
+                        "description": "Failed to retrieve BMKG data"
                     }
-                },
-                "security": [
+                }
+            }
+        },
+        "/bmkg/gempa/terbaru": {
+            "get": {
+                "tags": [
+                    "BMKG Integration"
+                ],
+                "summary": "Get latest earthquake data from BMKG",
+                "description": "Retrieve the most recent earthquake data from BMKG Open API",
+                "operationId": "985ee093deda0bef009bd1f85848591e",
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/bmkg/gempa/terkini": {
+            "get": {
+                "tags": [
+                    "BMKG Integration"
+                ],
+                "summary": "Get earthquake list from BMKG",
+                "description": "Retrieve list of recent earthquakes from BMKG Open API",
+                "operationId": "b7845a37e290a710ff4ae82f329929a2",
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/bmkg/gempa/dirasakan": {
+            "get": {
+                "tags": [
+                    "BMKG Integration"
+                ],
+                "summary": "Get felt earthquakes from BMKG",
+                "description": "Retrieve felt earthquake data from BMKG Open API",
+                "operationId": "8049176da31ee8976b645c5880f374f5",
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/bmkg/prakiraan-cuaca": {
+            "get": {
+                "tags": [
+                    "BMKG Integration"
+                ],
+                "summary": "Get weather forecast for specific region",
+                "description": "Retrieve weather forecast data for a specific region by wilayah_id",
+                "operationId": "059e58b54f7bae7b304020a76cf4a6f7",
+                "parameters": [
                     {
-                        "jwt": []
+                        "name": "wilayah_id",
+                        "in": "query",
+                        "description": "Region identifier for weather forecast",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "JawaBarat"
+                        }
                     }
-                ]
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/bmkg/peringatan-tsunami": {
+            "get": {
+                "tags": [
+                    "BMKG Integration"
+                ],
+                "summary": "Get tsunami warning data from BMKG",
+                "description": "Retrieve tsunami warning and alert data from BMKG (public endpoint for critical safety information)",
+                "operationId": "72f1beb53c613ad73b11021bfe144d08",
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/bmkg/cache/clear": {
+            "post": {
+                "tags": [
+                    "BMKG Integration"
+                ],
+                "summary": "Clear BMKG cache",
+                "description": "Clear all BMKG cache data to force fresh data retrieval",
+                "operationId": "27cbc0e5501362097f148de6b6d12b61",
+                "responses": {
+                    "200": {
+                        "description": "Cache cleared successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/bmkg/cache/status": {
+            "get": {
+                "tags": [
+                    "BMKG Integration"
+                ],
+                "summary": "Get BMKG cache status information",
+                "description": "Retrieve cache status information including duration and cached endpoints",
+                "operationId": "1b0f0c82f41e8d937b24754d7f966ea3",
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
             }
         },
         "/api/desa": {
@@ -4044,730 +2903,6 @@
                 }
             }
         },
-        "/api/laporan": {
-            "get": {
-                "tags": [
-                    "Laporan"
-                ],
-                "summary": "Get all laporan",
-                "description": "Mengambil semua data laporan dengan filter dan pagination",
-                "operationId": "50a73a12a1dd9b19550a543e8aa1e9b6",
-                "parameters": [
-                    {
-                        "name": "status",
-                        "in": "query",
-                        "description": "Filter by status",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "enum": [
-                                "Draft",
-                                "Menunggu Verifikasi",
-                                "Diverifikasi",
-                                "Diproses",
-                                "Selesai",
-                                "Ditolak"
-                            ]
-                        }
-                    },
-                    {
-                        "name": "id_kategori_bencana",
-                        "in": "query",
-                        "description": "Filter by kategori bencana",
-                        "required": false,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    },
-                    {
-                        "name": "id_desa",
-                        "in": "query",
-                        "description": "Filter by desa",
-                        "required": false,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    },
-                    {
-                        "name": "tingkat_keparahan",
-                        "in": "query",
-                        "description": "Filter by tingkat keparahan",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "enum": [
-                                "Rendah",
-                                "Sedang",
-                                "Tinggi",
-                                "Kritis"
-                            ]
-                        }
-                    },
-                    {
-                        "name": "is_prioritas",
-                        "in": "query",
-                        "description": "Filter laporan prioritas",
-                        "required": false,
-                        "schema": {
-                            "type": "boolean"
-                        }
-                    },
-                    {
-                        "name": "search",
-                        "in": "query",
-                        "description": "Search laporan",
-                        "required": false,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "include",
-                        "in": "query",
-                        "description": "Include relasi data",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "enum": [
-                                "pelapor",
-                                "kategoriBencana",
-                                "desa",
-                                "verifikator",
-                                "penanggungJawab"
-                            ]
-                        }
-                    },
-                    {
-                        "name": "per_page",
-                        "in": "query",
-                        "description": "Items per page",
-                        "required": false,
-                        "schema": {
-                            "type": "integer",
-                            "default": 20
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Success",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Data laporan berhasil diambil"
-                                        },
-                                        "data": {
-                                            "properties": {
-                                                "data": {
-                                                    "type": "array",
-                                                    "items": {
-                                                        "type": "object"
-                                                    }
-                                                },
-                                                "current_page": {
-                                                    "type": "integer",
-                                                    "example": 1
-                                                },
-                                                "per_page": {
-                                                    "type": "integer",
-                                                    "example": 20
-                                                },
-                                                "total": {
-                                                    "type": "integer",
-                                                    "example": 100
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "jwt": []
-                    }
-                ]
-            },
-            "post": {
-                "tags": [
-                    "Laporan"
-                ],
-                "summary": "Create new laporan",
-                "description": "Membuat laporan bencana baru dengan upload foto/video",
-                "operationId": "aa284963348f74431c0ce64feddc402d",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "multipart/form-data": {
-                            "schema": {
-                                "required": [
-                                    "judul_laporan",
-                                    "deskripsi",
-                                    "tingkat_keparahan",
-                                    "latitude",
-                                    "longitude",
-                                    "waktu_laporan"
-                                ],
-                                "properties": {
-                                    "judul_laporan": {
-                                        "type": "string",
-                                        "maxLength": 200,
-                                        "example": "Kebakaran di Rumah Warga"
-                                    },
-                                    "deskripsi": {
-                                        "type": "string",
-                                        "example": "Terjadi kebakaran di rumah warga yang menghanguskan 1 rumah"
-                                    },
-                                    "id_kategori_bencana": {
-                                        "type": "integer",
-                                        "example": 1
-                                    },
-                                    "id_desa": {
-                                        "type": "integer",
-                                        "example": 1
-                                    },
-                                    "tingkat_keparahan": {
-                                        "type": "string",
-                                        "enum": [
-                                            "Rendah",
-                                            "Sedang",
-                                            "Tinggi",
-                                            "Kritis"
-                                        ]
-                                    },
-                                    "latitude": {
-                                        "type": "number",
-                                        "format": "float",
-                                        "example": -6.2088
-                                    },
-                                    "longitude": {
-                                        "type": "number",
-                                        "format": "float",
-                                        "example": 106.8456
-                                    },
-                                    "alamat_lengkap": {
-                                        "type": "string",
-                                        "example": "Jl. Merdeka No. 123"
-                                    },
-                                    "foto_bukti_1": {
-                                        "type": "string",
-                                        "format": "binary"
-                                    },
-                                    "foto_bukti_2": {
-                                        "type": "string",
-                                        "format": "binary"
-                                    },
-                                    "foto_bukti_3": {
-                                        "type": "string",
-                                        "format": "binary"
-                                    },
-                                    "video_bukti": {
-                                        "type": "string",
-                                        "format": "binary"
-                                    },
-                                    "jumlah_korban": {
-                                        "type": "integer",
-                                        "default": 0
-                                    },
-                                    "jumlah_rumah_rusak": {
-                                        "type": "integer",
-                                        "default": 0
-                                    },
-                                    "data_tambahan": {
-                                        "type": "object"
-                                    },
-                                    "waktu_laporan": {
-                                        "type": "string",
-                                        "format": "date-time"
-                                    },
-                                    "is_prioritas": {
-                                        "type": "boolean",
-                                        "default": false
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "201": {
-                        "description": "Success",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Laporan berhasil dibuat"
-                                        },
-                                        "data": {
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "jwt": []
-                    }
-                ]
-            }
-        },
-        "/api/laporan/{id}": {
-            "get": {
-                "tags": [
-                    "Laporan"
-                ],
-                "summary": "Get specific laporan",
-                "description": "Mengambil data laporan berdasarkan ID",
-                "operationId": "2cd73106042bbd4997fc20bb9fc74ebf",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "ID laporan",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    },
-                    {
-                        "name": "include",
-                        "in": "query",
-                        "description": "Include relasi data",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "enum": [
-                                "pelapor",
-                                "kategoriBencana",
-                                "desa",
-                                "verifikator",
-                                "penanggungJawab",
-                                "riwayatTindakans",
-                                "tindakLanjuts",
-                                "monitorings"
-                            ]
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Success",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Data laporan berhasil diambil"
-                                        },
-                                        "data": {
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Laporan not found"
-                    }
-                },
-                "security": [
-                    {
-                        "jwt": []
-                    }
-                ]
-            },
-            "put": {
-                "tags": [
-                    "Laporan"
-                ],
-                "summary": "Update laporan",
-                "description": "Mengupdate data laporan",
-                "operationId": "f0cdafd666964eb856e4c2674e11c128",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "ID laporan",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "properties": {
-                                    "judul_laporan": {
-                                        "type": "string",
-                                        "maxLength": 200
-                                    },
-                                    "deskripsi": {
-                                        "type": "string",
-                                        "maxLength": 2000
-                                    },
-                                    "id_kategori_bencana": {
-                                        "type": "integer"
-                                    },
-                                    "id_desa": {
-                                        "type": "integer"
-                                    },
-                                    "tingkat_keparahan": {
-                                        "type": "string",
-                                        "enum": [
-                                            "Rendah",
-                                            "Sedang",
-                                            "Tinggi",
-                                            "Kritis"
-                                        ]
-                                    },
-                                    "latitude": {
-                                        "type": "number",
-                                        "format": "float"
-                                    },
-                                    "longitude": {
-                                        "type": "number",
-                                        "format": "float"
-                                    },
-                                    "alamat_lengkap": {
-                                        "type": "string",
-                                        "maxLength": 500
-                                    },
-                                    "jumlah_korban": {
-                                        "type": "integer",
-                                        "minimum": 0
-                                    },
-                                    "jumlah_rumah_rusak": {
-                                        "type": "integer",
-                                        "minimum": 0
-                                    },
-                                    "data_tambahan": {
-                                        "type": "object"
-                                    },
-                                    "is_prioritas": {
-                                        "type": "boolean"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Success",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Laporan berhasil diupdate"
-                                        },
-                                        "data": {
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "jwt": []
-                    }
-                ]
-            },
-            "delete": {
-                "tags": [
-                    "Laporan"
-                ],
-                "summary": "Delete laporan",
-                "description": "Menghapus data laporan",
-                "operationId": "03350de3e8f2106e275aa72f88033df3",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "ID laporan",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Success",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Laporan berhasil dihapus"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "jwt": []
-                    }
-                ]
-            }
-        },
-        "/api/laporan/{id}/verifikasi": {
-            "post": {
-                "tags": [
-                    "Laporan"
-                ],
-                "summary": "Verifikasi laporan",
-                "description": "Verifikasi atau tolak laporan",
-                "operationId": "0867da726f0e14e1f7eb845a31d6e8da",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "ID laporan",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "action"
-                                ],
-                                "properties": {
-                                    "action": {
-                                        "type": "string",
-                                        "enum": [
-                                            "verifikasi",
-                                            "tolak"
-                                        ]
-                                    },
-                                    "catatan": {
-                                        "type": "string",
-                                        "example": "Laporan telah diverifikasi dan valid"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Success",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Laporan berhasil diverifikasi"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "jwt": []
-                    }
-                ]
-            }
-        },
-        "/api/laporan/{id}/proses": {
-            "post": {
-                "tags": [
-                    "Laporan"
-                ],
-                "summary": "Proses laporan",
-                "description": "Memproses atau menyelesaikan laporan",
-                "operationId": "c05f867cc08899de793c230a4a4591c2",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "ID laporan",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "action"
-                                ],
-                                "properties": {
-                                    "action": {
-                                        "type": "string",
-                                        "enum": [
-                                            "proses",
-                                            "selesai"
-                                        ]
-                                    },
-                                    "catatan": {
-                                        "type": "string",
-                                        "example": "Penanganan sedang dilakukan"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Success",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Laporan berhasil diproses"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "jwt": []
-                    }
-                ]
-            }
-        },
-        "/api/laporan/statistics": {
-            "get": {
-                "tags": [
-                    "Laporan"
-                ],
-                "summary": "Get laporan statistics",
-                "description": "Mengambil statistik data laporan",
-                "operationId": "f45af4ba58c7c868f6c451b5298646b0",
-                "responses": {
-                    "200": {
-                        "description": "Success",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Statistik laporan berhasil diambil"
-                                        },
-                                        "data": {
-                                            "properties": {
-                                                "total_laporan": {
-                                                    "type": "integer",
-                                                    "example": 100
-                                                },
-                                                "by_status": {
-                                                    "type": "object"
-                                                },
-                                                "by_keparahan": {
-                                                    "type": "object"
-                                                },
-                                                "by_kategori": {
-                                                    "type": "object"
-                                                },
-                                                "by_bulan": {
-                                                    "type": "object"
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "jwt": []
-                    }
-                ]
-            }
-        },
         "/api/monitoring": {
             "get": {
                 "tags": [
@@ -6709,7 +4844,7 @@
     "tags": [
         {
             "name": "BMKG Integration",
-            "description": "API endpoints untuk integrasi data dari Badan Meteorologi, Klimatologi, dan Geofisika"
+            "description": "BMKG real-time data integration endpoints untuk gempa, cuaca, dan peringatan tsunami"
         },
         {
             "name": "Desa",
@@ -6722,10 +4857,6 @@
         {
             "name": "Kecamatan",
             "description": "API endpoints untuk manajemen data Kecamatan"
-        },
-        {
-            "name": "Laporan",
-            "description": "API endpoints untuk manajemen data Laporan Bencana"
         },
         {
             "name": "Monitoring",

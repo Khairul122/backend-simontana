@@ -12,9 +12,9 @@ return new class extends Migration
             $table->id();
 
             // Foreign key relations
-            $table->foreignId('id_pelapor')->constrained('penggunas')->onDelete('cascade');
-            $table->foreignId('id_kategori_bencana')->nullable()->constrained('kategori_bencanas')->onDelete('set null');
-            $table->foreignId('id_desa')->nullable()->constrained('desas')->onDelete('set null');
+            $table->foreignId('id_pelapor')->constrained('pengguna')->onDelete('cascade');
+            $table->foreignId('id_kategori_bencana')->nullable()->constrained('kategori_bencana')->onDelete('set null');
+            $table->foreignId('id_desa')->nullable()->constrained('desa')->onDelete('set null');
 
             // Laporan information
             $table->string('judul_laporan');
@@ -34,8 +34,8 @@ return new class extends Migration
             $table->string('video_bukti')->nullable();
 
             // Verification and processing
-            $table->foreignId('id_verifikator')->nullable()->constrained('penggunas')->onDelete('set null');
-            $table->foreignId('id_penanggung_jawab')->nullable()->constrained('penggunas')->onDelete('set null');
+            $table->foreignId('id_verifikator')->nullable()->constrained('pengguna')->onDelete('set null');
+            $table->foreignId('id_penanggung_jawab')->nullable()->constrained('pengguna')->onDelete('set null');
             $table->timestamp('waktu_verifikasi')->nullable();
             $table->timestamp('waktu_selesai')->nullable();
             $table->text('catatan_verifikasi')->nullable();

@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('koordinat_gps')->nullable();
             $table->timestamps();
 
-            $table->foreign('id_laporan')->references('id_laporan')->on('laporan')->onDelete('cascade');
+            $table->foreign('id_laporan')->references('id')->on('laporans')->onDelete('cascade');
             $table->foreign('id_operator')->references('id')->on('pengguna')->onDelete('cascade');
         });
     }

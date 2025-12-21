@@ -19,7 +19,7 @@ return new class extends Migration
             $table->enum('status', ['Menuju Lokasi', 'Selesai'])->default('Menuju Lokasi');
             $table->timestamps();
 
-            $table->foreign('laporan_id')->references('id_laporan')->on('laporan')->onDelete('cascade');
+            $table->foreign('laporan_id')->references('id')->on('laporans')->onDelete('cascade');
             $table->foreign('id_petugas')->references('id')->on('pengguna')->onDelete('cascade');
         });
     }

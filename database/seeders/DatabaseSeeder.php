@@ -15,17 +15,20 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
-            ProvinsiSeeder::class,
-            KabupatenSeeder::class,
-            KecamatanSeeder::class,
-            DesaSeeder::class,
+            // Master Data (Parent)
+            WilayahSeeder::class, // Includes Provinsi, Kabupaten, Kecamatan, Desa
             KategoriBencanaSeeder::class,
+
+            // Users (Parent for transactional data)
             PenggunaSeeder::class,
+
+            // Transactional Data (Child)
             LaporanSeeder::class,
             TindaklanjutSeeder::class,
-            RiwayatTindakanSeeder::class,
+
+            // Additional Transactional Data
             MonitoringSeeder::class,
-            LogActivitySeeder::class,
+            RiwayatTindakanSeeder::class,
         ]);
     }
 }

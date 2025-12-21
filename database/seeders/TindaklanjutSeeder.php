@@ -14,26 +14,18 @@ class TindaklanjutSeeder extends Seeder
     {
         $tindaklanjut = [
             [
-                'laporan_id' => 1, // Laporan banjir
-                'id_petugas' => 2, // Petugas BPBD Demo
+                'laporan_id' => 1, // Banjir di Perumahan Sukajadi
+                'id_petugas' => 2, // Petugas BPBD
                 'tanggal_tanggapan' => '2024-12-15 11:00:00',
                 'status' => 'Menuju Lokasi',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
-                'laporan_id' => 2, // Laporan longsor
-                'id_petugas' => 2, // Petugas BPBD Demo
-                'tanggal_tanggapan' => '2024-12-14 16:30:00',
+                'laporan_id' => 3, // Kebakaran Hutan Kecil
+                'id_petugas' => 2, // Petugas BPBD
+                'tanggal_tanggapan' => '2024-12-13 17:00:00',
                 'status' => 'Selesai',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'laporan_id' => 3, // Laporan kekeringan
-                'id_petugas' => 2, // Petugas BPBD Demo
-                'tanggal_tanggapan' => '2024-12-13 09:45:00',
-                'status' => 'Menuju Lokasi',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
