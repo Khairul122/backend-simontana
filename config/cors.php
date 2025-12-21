@@ -19,6 +19,8 @@ return [
         'api/*',
         'sanctum/csrf-cookie',
         'api/documentation',
+        'docs',
+        'l5-swagger'
     ],
 
     'allowed_methods' => ['*'],

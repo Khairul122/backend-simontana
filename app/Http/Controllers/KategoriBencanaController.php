@@ -13,8 +13,10 @@ class KategoriBencanaController extends Controller
 {
     public function __construct()
     {
+        // Semua endpoint memerlukan otentikasi
         $this->middleware('auth:api');
-        $this->middleware('role:Admin')->except(['index', 'show']); // Hanya Admin yang bisa create, update, delete
+        // Hanya endpoint create, update, delete yang memerlukan role Admin
+        $this->middleware('role:Admin')->only(['store', 'update', 'destroy']);
     }
     /**
      * @OA\Get(
@@ -181,6 +183,15 @@ class KategoriBencanaController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
+        // Melakukan pengecekan tambahan bahwa hanya Admin yang dapat mengakses fungsi ini
+        $user = $request->user();
+        if (!$user || $user->role !== 'Admin') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Akses ditolak: Hanya Admin yang dapat menambahkan kategori bencana'
+            ], 403);
+        }
+
         $validatedData = $request->validate([
             'nama_kategori' => 'required|string|max:255|unique:kategori_bencana,nama_kategori',
             'deskripsi' => 'nullable|string',
@@ -345,6 +356,15 @@ class KategoriBencanaController extends Controller
      */
     public function update(Request $request, int $id): JsonResponse
     {
+        // Pengecekan tambahan bahwa hanya Admin yang bisa mengupdate
+        $user = $request->user();
+        if (!$user || $user->role !== 'Admin') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Akses ditolak: Hanya Admin yang dapat mengupdate kategori bencana'
+            ], 403);
+        }
+
         $kategoriBencana = KategoriBencana::find($id);
 
         if (!$kategoriBencana) {
@@ -446,6 +466,15 @@ class KategoriBencanaController extends Controller
      */
     public function destroy(int $id): JsonResponse
     {
+        // Pengecekan tambahan bahwa hanya Admin yang bisa menghapus
+        $user = request()->user();
+        if (!$user || $user->role !== 'Admin') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Akses ditolak: Hanya Admin yang dapat menghapus kategori bencana'
+            ], 403);
+        }
+
         $kategoriBencana = KategoriBencana::find($id);
 
         if (!$kategoriBencana) {

@@ -16,16 +16,26 @@ use OpenApi\Annotations as OA;
  * )
  *
  * @OA\Server(
- *     url="http://localhost:8000",
- *     description="SIMONTA BENCANA API Server"
+ *     url="{protocol}://{host}/api",
+ *     description="SIMONTA BENCANA API Server",
+ *     @OA\ServerVariable(
+ *         serverVariable="protocol",
+ *         default="http",
+ *         enum={"http", "https"}
+ *     ),
+ *     @OA\ServerVariable(
+ *         serverVariable="host",
+ *         default="localhost:8000",
+ *         description="Alamat host API server"
+ *     )
  * )
  *
  * @OA\SecurityScheme(
- *     securityScheme="jwt",
+ *     securityScheme="bearerAuth",
  *     type="http",
  *     scheme="bearer",
- *     bearerFormat="token",
- *     description="Gunakan access token yang didapat dari login endpoint. Format: Bearer {token}"
+ *     bearerFormat="JWT",
+ *     description="Gunakan access token JWT yang didapat dari login endpoint. Format: Bearer {token}"
  * )
  *
  * @OA\Tag(

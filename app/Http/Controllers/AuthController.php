@@ -21,7 +21,7 @@ class AuthController extends Controller
 
     /**
      * @OA\Post(
-     *     path="/api/auth/register",
+     *     path="/auth/register",
      *     summary="Registrasi pengguna baru",
      *     description="Mendaftarkan pengguna baru dengan access token",
      *     tags={"Authentication"},
@@ -93,7 +93,7 @@ class AuthController extends Controller
 
     /**
      * @OA\Post(
-     *     path="/api/auth/login",
+     *     path="/auth/login",
      *     summary="Login pengguna",
      *     description="Login pengguna dan mendapatkan access token",
      *     tags={"Authentication"},
@@ -171,7 +171,7 @@ class AuthController extends Controller
 
     /**
      * @OA\Post(
-     *     path="/api/auth/logout",
+     *     path="/auth/logout",
      *     summary="Logout pengguna",
      *     description="Logout pengguna dan revoke token",
      *     tags={"Authentication"},
@@ -218,7 +218,7 @@ class AuthController extends Controller
 
     /**
      * @OA\Post(
-     *     path="/api/auth/refresh",
+     *     path="/auth/refresh",
      *     summary="Refresh JWT token",
      *     description="Refresh token JWT yang sedang aktif",
      *     tags={"Authentication"},
@@ -277,7 +277,7 @@ class AuthController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/api/auth/me",
+     *     path="/auth/me",
      *     summary="Get current user info",
      *     description="Mendapatkan informasi user yang sedang login berdasarkan token",
      *     tags={"Authentication"},
@@ -333,7 +333,7 @@ class AuthController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/api/auth/roles",
+     *     path="/auth/roles",
      *     summary="Get available roles",
      *     description="Mendapatkan daftar role yang tersedia",
      *     tags={"Authentication"},

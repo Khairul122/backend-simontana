@@ -190,14 +190,19 @@ Route::middleware('jwt.auth')->group(function () {
     });
 });
 
-// Kategori Bencana Routes (Protected - Create, Update, Delete)
+// Kategori Bencana Routes (Read - accessible to all authenticated users, Write - Admin only)
 Route::middleware('jwt.auth')->group(function () {
     Route::prefix('kategori-bencana')->group(function () {
+        // Endpoint yang bisa diakses oleh semua user terotentikasi
         Route::get('/', [App\Http\Controllers\KategoriBencanaController::class, 'index']);
-        Route::post('/', [App\Http\Controllers\KategoriBencanaController::class, 'store']);
         Route::get('/{id}', [App\Http\Controllers\KategoriBencanaController::class, 'show']);
-        Route::put('/{id}', [App\Http\Controllers\KategoriBencanaController::class, 'update']);
-        Route::delete('/{id}', [App\Http\Controllers\KategoriBencanaController::class, 'destroy']);
+
+        // Hanya Admin yang bisa mengakses endpoint CRUD (create, update, delete)
+        Route::middleware('role:Admin')->group(function () {
+            Route::post('/', [App\Http\Controllers\KategoriBencanaController::class, 'store']);
+            Route::put('/{id}', [App\Http\Controllers\KategoriBencanaController::class, 'update']);
+            Route::delete('/{id}', [App\Http\Controllers\KategoriBencanaController::class, 'destroy']);
+        });
     });
 });
 

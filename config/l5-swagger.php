@@ -214,10 +214,10 @@ return [
                 ],
                 */
                 'jwt' => [ // Unique name of security
-                    'type' => 'apiKey', // Valid values are "basic", "apiKey" or "oauth2".
+                    'type' => 'http', // The type of the security scheme. Valid values are "http" or "apiKey"
+                    'scheme' => 'bearer', // For "http" type, valid values are "basic" or "bearer"
+                    'bearerFormat' => 'JWT', // For "bearer" scheme, a hint to the client how the bearer token is formatted
                     'description' => 'Enter token in format (Bearer <token>)',
-                    'name' => 'Authorization', // The name of the header or query parameter to be used.
-                    'in' => 'header', // The location of the API key. Valid values are "query" or "header".
                 ],
             ],
             'security' => [
@@ -316,7 +316,7 @@ return [
          * Constants which can be used in annotations
          */
         'constants' => [
-            'L5_SWAGGER_CONST_HOST' => env('L5_SWAGGER_CONST_HOST', 'http://my-default-host.com'),
+            'L5_SWAGGER_CONST_HOST' => env('L5_SWAGGER_CONST_HOST', env('APP_URL', 'http://localhost') . '/api'),
         ],
     ],
 ];

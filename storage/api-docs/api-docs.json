@@ -11,19 +11,32 @@
     },
     "servers": [
         {
-            "url": "http://localhost:8000",
-            "description": "SIMONTA BENCANA API Server"
+            "url": "{protocol}://{host}/api",
+            "description": "SIMONTA BENCANA API Server",
+            "variables": {
+                "protocol": {
+                    "enum": [
+                        "http",
+                        "https"
+                    ],
+                    "default": "http"
+                },
+                "host": {
+                    "default": "localhost:8000",
+                    "description": "Alamat host API server"
+                }
+            }
         }
     ],
     "paths": {
-        "/api/auth/register": {
+        "/auth/register": {
             "post": {
                 "tags": [
                     "Authentication"
                 ],
                 "summary": "Registrasi pengguna baru",
                 "description": "Mendaftarkan pengguna baru dengan access token",
-                "operationId": "d764dd091cc4494ae0baf360b03319f3",
+                "operationId": "ed42f392010c301892e640067141676e",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -181,14 +194,14 @@
                 }
             }
         },
-        "/api/auth/login": {
+        "/auth/login": {
             "post": {
                 "tags": [
                     "Authentication"
                 ],
                 "summary": "Login pengguna",
                 "description": "Login pengguna dan mendapatkan access token",
-                "operationId": "8dcb70df1020986038d098cc08d05dae",
+                "operationId": "8cb7742ae98d0990acb2907c4e00bf24",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -2996,7 +3009,7 @@
                     "Kategori Bencana"
                 ],
                 "summary": "Create new kategori bencana",
-                "description": "Membuat kategori bencana baru",
+                "description": "Membuat kategori bencana baru - Hanya Admin yang dapat mengakses endpoint ini",
                 "operationId": "3d91b40b4eca528ad310d2669ec3a7ca",
                 "requestBody": {
                     "required": true,
@@ -3104,7 +3117,7 @@
                         }
                     },
                     "401": {
-                        "description": "Unauthorized",
+                        "description": "Unauthorized - Token tidak valid",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -3116,6 +3129,37 @@
                                         "message": {
                                             "type": "string",
                                             "example": "Unauthenticated."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - Hanya Admin yang dapat mengakses",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Anda tidak memiliki izin untuk mengakses resource ini"
+                                        },
+                                        "required_roles": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string",
+                                                "example": "Admin"
+                                            }
+                                        },
+                                        "user_role": {
+                                            "type": "string",
+                                            "example": "Warga"
                                         }
                                     },
                                     "type": "object"
@@ -3255,7 +3299,7 @@
                     "Kategori Bencana"
                 ],
                 "summary": "Update kategori bencana",
-                "description": "Memperbarui data kategori bencana berdasarkan ID",
+                "description": "Memperbarui data kategori bencana berdasarkan ID - Hanya Admin yang dapat mengakses endpoint ini",
                 "operationId": "d445e28df2192c153a6811ed9c2b848d",
                 "parameters": [
                     {
@@ -3372,7 +3416,7 @@
                         }
                     },
                     "401": {
-                        "description": "Unauthorized",
+                        "description": "Unauthorized - Token tidak valid",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -3384,6 +3428,37 @@
                                         "message": {
                                             "type": "string",
                                             "example": "Unauthenticated."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - Hanya Admin yang dapat mengakses",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Anda tidak memiliki izin untuk mengakses resource ini"
+                                        },
+                                        "required_roles": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string",
+                                                "example": "Admin"
+                                            }
+                                        },
+                                        "user_role": {
+                                            "type": "string",
+                                            "example": "Warga"
                                         }
                                     },
                                     "type": "object"
@@ -3423,7 +3498,7 @@
                     "Kategori Bencana"
                 ],
                 "summary": "Delete kategori bencana",
-                "description": "Menghapus data kategori bencana berdasarkan ID",
+                "description": "Menghapus data kategori bencana berdasarkan ID - Hanya Admin yang dapat mengakses endpoint ini",
                 "operationId": "ea7aab99a3d2a8cf3dc9d56b5201d542",
                 "parameters": [
                     {
@@ -3490,7 +3565,7 @@
                         }
                     },
                     "401": {
-                        "description": "Unauthorized",
+                        "description": "Unauthorized - Token tidak valid",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -3502,6 +3577,37 @@
                                         "message": {
                                             "type": "string",
                                             "example": "Unauthenticated."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - Hanya Admin yang dapat mengakses",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Anda tidak memiliki izin untuk mengakses resource ini"
+                                        },
+                                        "required_roles": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string",
+                                                "example": "Admin"
+                                            }
+                                        },
+                                        "user_role": {
+                                            "type": "string",
+                                            "example": "Warga"
                                         }
                                     },
                                     "type": "object"
@@ -6592,11 +6698,17 @@
     },
     "components": {
         "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "description": "Gunakan access token JWT yang didapat dari login endpoint. Format: Bearer {token}",
+                "bearerFormat": "JWT",
+                "scheme": "bearer"
+            },
             "jwt": {
-                "type": "apiKey",
-                "description": "Enter token in format (Bearer <token>)",
-                "name": "Authorization",
-                "in": "header"
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT",
+                "description": "Enter token in format (Bearer <token>)"
             }
         }
     },
