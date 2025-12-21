@@ -37,6 +37,11 @@ use OpenApi\Annotations as OA;
  *     name="User Management",
  *     description="User management endpoints untuk CRUD operations dan user statistics"
  * )
+ *
+ * @OA\Tag(
+ *     name="Kategori Bencana",
+ *     description="Kategori bencana management endpoints untuk CRUD operations"
+ * )
  */
 class SwaggerController extends Controller
 {

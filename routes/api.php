@@ -190,6 +190,17 @@ Route::middleware('jwt.auth')->group(function () {
     });
 });
 
+// Kategori Bencana Routes (Protected - Create, Update, Delete)
+Route::middleware('jwt.auth')->group(function () {
+    Route::prefix('kategori-bencana')->group(function () {
+        Route::get('/', [App\Http\Controllers\KategoriBencanaController::class, 'index']);
+        Route::post('/', [App\Http\Controllers\KategoriBencanaController::class, 'store']);
+        Route::get('/{id}', [App\Http\Controllers\KategoriBencanaController::class, 'show']);
+        Route::put('/{id}', [App\Http\Controllers\KategoriBencanaController::class, 'update']);
+        Route::delete('/{id}', [App\Http\Controllers\KategoriBencanaController::class, 'destroy']);
+    });
+});
+
 // Data Relasi Routes (Protected - Create, Update, Delete)
 Route::middleware('jwt.auth')->group(function () {
     Route::prefix('provinsi')->group(function () {
