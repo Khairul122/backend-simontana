@@ -191,13 +191,24 @@ class KategoriBencanaController extends Controller
             'icon' => 'nullable|string|max:255'
         ]);
 
-        $kategoriBencana = KategoriBencana::create($validatedData);
+        try {
+            $kategoriBencana = KategoriBencana::create($validatedData);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Kategori bencana berhasil ditambahkan',
-            'data' => $kategoriBencana
-        ], 201);
+            // Log aktivitas
+            $this->logActivity($user->id, $user->role, "Menambahkan kategori bencana: {$kategoriBencana->nama_kategori}",
+                             request()->ip(), request()->userAgent());
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Kategori bencana berhasil ditambahkan',
+                'data' => $kategoriBencana
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal menambahkan kategori bencana: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
@@ -379,13 +390,25 @@ class KategoriBencanaController extends Controller
             'icon' => 'nullable|string|max:255'
         ]);
 
-        $kategoriBencana->update($validatedData);
+        try {
+            $oldNamaKategori = $kategoriBencana->nama_kategori;
+            $kategoriBencana->update($validatedData);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Kategori bencana berhasil diperbarui',
-            'data' => $kategoriBencana
-        ]);
+            // Log aktivitas
+            $this->logActivity($user->id, $user->role, "Memperbarui kategori bencana: {$oldNamaKategori} -> {$kategoriBencana->nama_kategori}",
+                             request()->ip(), request()->userAgent());
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Kategori bencana berhasil diperbarui',
+                'data' => $kategoriBencana
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal memperbarui kategori bencana: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
@@ -485,12 +508,45 @@ class KategoriBencanaController extends Controller
             ], 400);
         }
 
-        $kategoriBencana->delete();
+        try {
+            $namaKategori = $kategoriBencana->nama_kategori;
+            $kategoriBencana->delete();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Kategori bencana berhasil dihapus',
-            'data' => $kategoriBencana
-        ]);
+            // Log aktivitas
+            $this->logActivity($user->id, $user->role, "Menghapus kategori bencana: {$namaKategori}",
+                             request()->ip(), request()->userAgent());
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Kategori bencana berhasil dihapus',
+                'data' => $kategoriBencana
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal menghapus kategori bencana: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Helper function untuk log activity
+     */
+    private function logActivity($userId, $role, $aktivitas, $ipAddress, $deviceInfo): void
+    {
+        try {
+            \DB::table('log_activity')->insert([
+                'user_id' => $userId,
+                'role' => $role,
+                'aktivitas' => $aktivitas,
+                'endpoint' => request()->path(),
+                'ip_address' => $ipAddress,
+                'device_info' => $deviceInfo,
+                'created_at' => now(),
+            ]);
+        } catch (\Exception $e) {
+            // Silent fail untuk logging
+            \Log::warning('Failed to log activity: ' . $e->getMessage());
+        }
     }
 }
