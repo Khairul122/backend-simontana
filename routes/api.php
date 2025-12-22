@@ -77,22 +77,24 @@ Route::get('/check-token', function () {
 
 // Wilayah Routes (Public - Read Only)
 Route::prefix('wilayah')->group(function () {
-    Route::get('/provinsi', [ProvinsiController::class, 'index']);
-    Route::get('/provinsi/{id}', [ProvinsiController::class, 'show']);
-    Route::get('/kabupaten/{provinsi_id}', [KabupatenController::class, 'getByProvinsi']);
-    Route::get('/kecamatan/{kabupaten_id}', [KecamatanController::class, 'getByKabupaten']);
-    Route::get('/desa/{kecamatan_id}', [DesaController::class, 'getByKecamatan']);
-});
+    // Old wilayah routes (for backward compatibility)
+    Route::get('/provinsi', [WilayahController::class, 'getAllProvinsi']);
+    Route::get('/provinsi/{id}', [WilayahController::class, 'getProvinsiById']);
+    Route::get('/kabupaten/{provinsi_id}', [WilayahController::class, 'getKabupatenByProvinsi']);
+    Route::get('/kecamatan/{kabupaten_id}', [WilayahController::class, 'getKecamatanByKabupaten']);
+    Route::get('/desa/{kecamatan_id}', [WilayahController::class, 'getDesaByKecamatan']);
 
-// Wilayah Management Routes (Protected - Admin only)
-Route::middleware('jwt.auth')->group(function () {
-    // Data Relasi Routes (CRUD Operations - Admin only)
-    Route::middleware('role:Admin')->group(function () {
-        Route::apiResource('provinsi', ProvinsiController::class);
-        Route::apiResource('kabupaten', KabupatenController::class);
-        Route::apiResource('kecamatan', KecamatanController::class);
-        Route::apiResource('desa', DesaController::class);
-    });
+    // Additional routes for detailed hierarchy
+    Route::get('/detail/{desa_id}', [WilayahController::class, 'getWilayahDetailByDesaId']);
+    Route::get('/hierarchy/{desa_id}', [WilayahController::class, 'getWilayahHierarchyByDesaId']);
+    Route::get('/search', [WilayahController::class, 'search']);
+
+    // New unified routes using single endpoint with jenis parameter
+    Route::get('/', [WilayahController::class, 'index']);
+    Route::get('/{id}', [WilayahController::class, 'showById']);
+    Route::post('/', [WilayahController::class, 'store'])->middleware('role:Admin');
+    Route::put('/{id}', [WilayahController::class, 'update'])->middleware('role:Admin');
+    Route::delete('/{id}', [WilayahController::class, 'destroy'])->middleware('role:Admin');
 });
 
 // BMKG Routes (Public & Protected)

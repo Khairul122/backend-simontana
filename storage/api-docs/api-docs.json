@@ -939,778 +939,6 @@
                 }
             }
         },
-        "/api/desa": {
-            "get": {
-                "tags": [
-                    "Desa"
-                ],
-                "summary": "Get all desa",
-                "description": "Mengambil semua data desa dengan opsi include relasi",
-                "operationId": "2a6d81d58a9c51eb4e1f26acda8b9b19",
-                "parameters": [
-                    {
-                        "name": "include",
-                        "in": "query",
-                        "description": "Include relasi (kecamatan,pengguna,laporan)",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "enum": [
-                                "kecamatan",
-                                "pengguna",
-                                "laporan"
-                            ]
-                        }
-                    },
-                    {
-                        "name": "id_kecamatan",
-                        "in": "query",
-                        "description": "Filter by kecamatan ID",
-                        "required": false,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Success",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Data desa berhasil diambil"
-                                        },
-                                        "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "properties": {
-                                                    "id": {
-                                                        "type": "integer",
-                                                        "example": 1
-                                                    },
-                                                    "nama": {
-                                                        "type": "string",
-                                                        "example": "Ie Meule"
-                                                    },
-                                                    "id_kecamatan": {
-                                                        "type": "integer",
-                                                        "example": 1
-                                                    },
-                                                    "kecamatan": {
-                                                        "type": "object"
-                                                    },
-                                                    "pengguna": {
-                                                        "type": "array",
-                                                        "items": {}
-                                                    },
-                                                    "laporan": {
-                                                        "type": "array",
-                                                        "items": {}
-                                                    }
-                                                },
-                                                "type": "object"
-                                            }
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                }
-            },
-            "post": {
-                "tags": [
-                    "Desa"
-                ],
-                "summary": "Create new desa",
-                "description": "Membuat data desa baru",
-                "operationId": "e5bf3d8443c87bc9d6d2df7b564f6fae",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "nama",
-                                    "id_kecamatan"
-                                ],
-                                "properties": {
-                                    "nama": {
-                                        "type": "string",
-                                        "maxLength": 100,
-                                        "example": "Ie Meulee"
-                                    },
-                                    "id_kecamatan": {
-                                        "type": "integer",
-                                        "example": 1
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "201": {
-                        "description": "Success",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Desa berhasil ditambahkan"
-                                        },
-                                        "data": {
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "jwt": []
-                    }
-                ]
-            }
-        },
-        "/api/desa/{id}": {
-            "get": {
-                "tags": [
-                    "Desa"
-                ],
-                "summary": "Get specific desa",
-                "description": "Mengambil data desa berdasarkan ID",
-                "operationId": "99423acddbd579e420505a5c1fe6761e",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "ID desa",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    },
-                    {
-                        "name": "include",
-                        "in": "query",
-                        "description": "Include relasi (kecamatan,pengguna,laporan)",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "enum": [
-                                "kecamatan",
-                                "pengguna",
-                                "laporan"
-                            ]
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Success",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Data desa berhasil diambil"
-                                        },
-                                        "data": {
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Desa not found"
-                    }
-                }
-            },
-            "put": {
-                "tags": [
-                    "Desa"
-                ],
-                "summary": "Update desa",
-                "description": "Mengupdate data desa",
-                "operationId": "a5c24853c9c4a3face64164562c3fa97",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "ID desa",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "nama",
-                                    "id_kecamatan"
-                                ],
-                                "properties": {
-                                    "nama": {
-                                        "type": "string",
-                                        "maxLength": 100,
-                                        "example": "Ie Meulee"
-                                    },
-                                    "id_kecamatan": {
-                                        "type": "integer",
-                                        "example": 1
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Success",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Desa berhasil diupdate"
-                                        },
-                                        "data": {
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "jwt": []
-                    }
-                ]
-            },
-            "delete": {
-                "tags": [
-                    "Desa"
-                ],
-                "summary": "Delete desa",
-                "description": "Menghapus data desa",
-                "operationId": "924d61b29d1b0c18d35f3733cad9751a",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "ID desa",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Success",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Desa berhasil dihapus"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "jwt": []
-                    }
-                ]
-            }
-        },
-        "/api/desa/statistics": {
-            "get": {
-                "tags": [
-                    "Desa"
-                ],
-                "summary": "Get desa statistics",
-                "description": "Mengambil statistik data desa",
-                "operationId": "8c9829fdc2bc9a6e72266fec6152766f",
-                "responses": {
-                    "200": {
-                        "description": "Success",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Statistik desa berhasil diambil"
-                                        },
-                                        "data": {
-                                            "properties": {
-                                                "total_desa": {
-                                                    "type": "integer",
-                                                    "example": 83273
-                                                },
-                                                "total_pengguna": {
-                                                    "type": "integer",
-                                                    "example": 1250
-                                                },
-                                                "total_laporan": {
-                                                    "type": "integer",
-                                                    "example": 340
-                                                },
-                                                "desa_terbanyak": {
-                                                    "type": "string",
-                                                    "example": "Bandung"
-                                                },
-                                                "kecamatan_terbanyak": {
-                                                    "type": "string",
-                                                    "example": "Bogor"
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/api/kabupaten": {
-            "get": {
-                "tags": [
-                    "Kabupaten"
-                ],
-                "summary": "Get all kabupaten",
-                "description": "Mengambil semua data kabupaten dengan opsi include relasi",
-                "operationId": "44098242d5f4cd8c6af921b2e77d3a57",
-                "parameters": [
-                    {
-                        "name": "include",
-                        "in": "query",
-                        "description": "Include relasi (provinsi,kecamatans)",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "enum": [
-                                "provinsi",
-                                "kecamatans"
-                            ]
-                        }
-                    },
-                    {
-                        "name": "id_provinsi",
-                        "in": "query",
-                        "description": "Filter by provinsi ID",
-                        "required": false,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Success",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Data kabupaten berhasil diambil"
-                                        },
-                                        "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "properties": {
-                                                    "id": {
-                                                        "type": "integer",
-                                                        "example": 1
-                                                    },
-                                                    "nama": {
-                                                        "type": "string",
-                                                        "example": "Aceh Barat"
-                                                    },
-                                                    "id_provinsi": {
-                                                        "type": "integer",
-                                                        "example": 1
-                                                    },
-                                                    "provinsi": {
-                                                        "type": "object"
-                                                    },
-                                                    "kecamatans": {
-                                                        "type": "array",
-                                                        "items": {}
-                                                    }
-                                                },
-                                                "type": "object"
-                                            }
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                }
-            },
-            "post": {
-                "tags": [
-                    "Kabupaten"
-                ],
-                "summary": "Create new kabupaten",
-                "description": "Membuat data kabupaten baru",
-                "operationId": "e2886cd93b8c99a18f1d61494b1d77c2",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "nama",
-                                    "id_provinsi"
-                                ],
-                                "properties": {
-                                    "nama": {
-                                        "type": "string",
-                                        "maxLength": 100,
-                                        "example": "Aceh Barat Daya"
-                                    },
-                                    "id_provinsi": {
-                                        "type": "integer",
-                                        "example": 1
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "201": {
-                        "description": "Success",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Kabupaten berhasil ditambahkan"
-                                        },
-                                        "data": {
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "jwt": []
-                    }
-                ]
-            }
-        },
-        "/api/kabupaten/{id}": {
-            "get": {
-                "tags": [
-                    "Kabupaten"
-                ],
-                "summary": "Get specific kabupaten",
-                "description": "Mengambil data kabupaten berdasarkan ID",
-                "operationId": "d2d59ee5b92f2c7d8d7e948ff829cec3",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "ID kabupaten",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    },
-                    {
-                        "name": "include",
-                        "in": "query",
-                        "description": "Include relasi (provinsi,kecamatans)",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "enum": [
-                                "provinsi",
-                                "kecamatans"
-                            ]
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Success",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Data kabupaten berhasil diambil"
-                                        },
-                                        "data": {
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Kabupaten not found"
-                    }
-                }
-            },
-            "put": {
-                "tags": [
-                    "Kabupaten"
-                ],
-                "summary": "Update kabupaten",
-                "description": "Mengupdate data kabupaten",
-                "operationId": "f057577261cc167836d0304cdb75bb9f",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "ID kabupaten",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "nama",
-                                    "id_provinsi"
-                                ],
-                                "properties": {
-                                    "nama": {
-                                        "type": "string",
-                                        "maxLength": 100,
-                                        "example": "Aceh Barat Daya"
-                                    },
-                                    "id_provinsi": {
-                                        "type": "integer",
-                                        "example": 1
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Success",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Kabupaten berhasil diupdate"
-                                        },
-                                        "data": {
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "jwt": []
-                    }
-                ]
-            },
-            "delete": {
-                "tags": [
-                    "Kabupaten"
-                ],
-                "summary": "Delete kabupaten",
-                "description": "Menghapus data kabupaten",
-                "operationId": "9a6d1cf3ea27e1523e5865c1323839e1",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "ID kabupaten",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Success",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Kabupaten berhasil dihapus"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "jwt": []
-                    }
-                ]
-            }
-        },
-        "/api/kabupaten/statistics": {
-            "get": {
-                "tags": [
-                    "Kabupaten"
-                ],
-                "summary": "Get kabupaten statistics",
-                "description": "Mengambil statistik data kabupaten",
-                "operationId": "80e88175c1481b380cf2b46fcb98953e",
-                "responses": {
-                    "200": {
-                        "description": "Success",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Statistik kabupaten berhasil diambil"
-                                        },
-                                        "data": {
-                                            "properties": {
-                                                "total_kabupaten": {
-                                                    "type": "integer",
-                                                    "example": 514
-                                                },
-                                                "total_kecamatan": {
-                                                    "type": "integer",
-                                                    "example": 7247
-                                                },
-                                                "kabupaten_terbanyak": {
-                                                    "type": "string",
-                                                    "example": "Papua"
-                                                },
-                                                "provinsi_terbanyak": {
-                                                    "type": "string",
-                                                    "example": "Jawa Barat"
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
         "/kategori-bencana": {
             "get": {
                 "tags": [
@@ -2522,387 +1750,6 @@
                 ]
             }
         },
-        "/api/kecamatan": {
-            "get": {
-                "tags": [
-                    "Kecamatan"
-                ],
-                "summary": "Get all kecamatan",
-                "description": "Mengambil semua data kecamatan dengan opsi include relasi",
-                "operationId": "aa0c7ade75fcb8520598daa801b3661c",
-                "parameters": [
-                    {
-                        "name": "include",
-                        "in": "query",
-                        "description": "Include relasi (kabupaten,desas)",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "enum": [
-                                "kabupaten",
-                                "desas"
-                            ]
-                        }
-                    },
-                    {
-                        "name": "id_kabupaten",
-                        "in": "query",
-                        "description": "Filter by kabupaten ID",
-                        "required": false,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Success",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Data kecamatan berhasil diambil"
-                                        },
-                                        "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "properties": {
-                                                    "id": {
-                                                        "type": "integer",
-                                                        "example": 1
-                                                    },
-                                                    "nama": {
-                                                        "type": "string",
-                                                        "example": "Bakongan"
-                                                    },
-                                                    "id_kabupaten": {
-                                                        "type": "integer",
-                                                        "example": 1
-                                                    },
-                                                    "kabupaten": {
-                                                        "type": "object"
-                                                    },
-                                                    "desas": {
-                                                        "type": "array",
-                                                        "items": {}
-                                                    }
-                                                },
-                                                "type": "object"
-                                            }
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                }
-            },
-            "post": {
-                "tags": [
-                    "Kecamatan"
-                ],
-                "summary": "Create new kecamatan",
-                "description": "Membuat data kecamatan baru",
-                "operationId": "7183457a0efc5531208ecb2864b50dd9",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "nama",
-                                    "id_kabupaten"
-                                ],
-                                "properties": {
-                                    "nama": {
-                                        "type": "string",
-                                        "maxLength": 100,
-                                        "example": "Bakongan Timur"
-                                    },
-                                    "id_kabupaten": {
-                                        "type": "integer",
-                                        "example": 1
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "201": {
-                        "description": "Success",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Kecamatan berhasil ditambahkan"
-                                        },
-                                        "data": {
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "jwt": []
-                    }
-                ]
-            }
-        },
-        "/api/kecamatan/{id}": {
-            "get": {
-                "tags": [
-                    "Kecamatan"
-                ],
-                "summary": "Get specific kecamatan",
-                "description": "Mengambil data kecamatan berdasarkan ID",
-                "operationId": "763384390d7fa810765721d6cdf18530",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "ID kecamatan",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    },
-                    {
-                        "name": "include",
-                        "in": "query",
-                        "description": "Include relasi (kabupaten,desas)",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "enum": [
-                                "kabupaten",
-                                "desas"
-                            ]
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Success",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Data kecamatan berhasil diambil"
-                                        },
-                                        "data": {
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Kecamatan not found"
-                    }
-                }
-            },
-            "put": {
-                "tags": [
-                    "Kecamatan"
-                ],
-                "summary": "Update kecamatan",
-                "description": "Mengupdate data kecamatan",
-                "operationId": "de62ddb313b0e3c3e1ed4cbc2a526982",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "ID kecamatan",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "nama",
-                                    "id_kabupaten"
-                                ],
-                                "properties": {
-                                    "nama": {
-                                        "type": "string",
-                                        "maxLength": 100,
-                                        "example": "Bakongan Timur"
-                                    },
-                                    "id_kabupaten": {
-                                        "type": "integer",
-                                        "example": 1
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Success",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Kecamatan berhasil diupdate"
-                                        },
-                                        "data": {
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "jwt": []
-                    }
-                ]
-            },
-            "delete": {
-                "tags": [
-                    "Kecamatan"
-                ],
-                "summary": "Delete kecamatan",
-                "description": "Menghapus data kecamatan",
-                "operationId": "0a3ce5f4f968d29bdd33117157a46da8",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "ID kecamatan",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Success",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Kecamatan berhasil dihapus"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "jwt": []
-                    }
-                ]
-            }
-        },
-        "/api/kecamatan/statistics": {
-            "get": {
-                "tags": [
-                    "Kecamatan"
-                ],
-                "summary": "Get kecamatan statistics",
-                "description": "Mengambil statistik data kecamatan",
-                "operationId": "a9f99679af34370efef5c2f63ad8ccad",
-                "responses": {
-                    "200": {
-                        "description": "Success",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Statistik kecamatan berhasil diambil"
-                                        },
-                                        "data": {
-                                            "properties": {
-                                                "total_kecamatan": {
-                                                    "type": "integer",
-                                                    "example": 7247
-                                                },
-                                                "total_desa": {
-                                                    "type": "integer",
-                                                    "example": 83273
-                                                },
-                                                "kecamatan_terbanyak": {
-                                                    "type": "string",
-                                                    "example": "Papua"
-                                                },
-                                                "kabupaten_terbanyak": {
-                                                    "type": "string",
-                                                    "example": "Bogor"
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
         "/laporans": {
             "get": {
                 "tags": [
@@ -3428,355 +2275,6 @@
                         "jwt": []
                     }
                 ]
-            }
-        },
-        "/api/provinsi": {
-            "get": {
-                "tags": [
-                    "Provinsi"
-                ],
-                "summary": "Get all provinsi",
-                "description": "Mengambil semua data provinsi dengan opsi include relasi",
-                "operationId": "9997292fe05aade9f4b5c03fbb5e6433",
-                "parameters": [
-                    {
-                        "name": "include",
-                        "in": "query",
-                        "description": "Include relasi (kabupatens)",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "enum": [
-                                "kabupatens"
-                            ]
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Success",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Data provinsi berhasil diambil"
-                                        },
-                                        "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "properties": {
-                                                    "id": {
-                                                        "type": "integer",
-                                                        "example": 1
-                                                    },
-                                                    "nama": {
-                                                        "type": "string",
-                                                        "example": "Aceh"
-                                                    },
-                                                    "kabupatens": {
-                                                        "type": "array",
-                                                        "items": {}
-                                                    }
-                                                },
-                                                "type": "object"
-                                            }
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                }
-            },
-            "post": {
-                "tags": [
-                    "Provinsi"
-                ],
-                "summary": "Create new provinsi",
-                "description": "Membuat data provinsi baru",
-                "operationId": "e6cbda82c27b24873ffc4c41863430d5",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "nama"
-                                ],
-                                "properties": {
-                                    "nama": {
-                                        "type": "string",
-                                        "maxLength": 100,
-                                        "example": "Papua Barat Daya"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "201": {
-                        "description": "Success",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Provinsi berhasil ditambahkan"
-                                        },
-                                        "data": {
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "jwt": []
-                    }
-                ]
-            }
-        },
-        "/api/provinsi/{id}": {
-            "get": {
-                "tags": [
-                    "Provinsi"
-                ],
-                "summary": "Get specific provinsi",
-                "description": "Mengambil data provinsi berdasarkan ID",
-                "operationId": "5631bb7e2e10565ee7c72c9f50f2703f",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "ID provinsi",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    },
-                    {
-                        "name": "include",
-                        "in": "query",
-                        "description": "Include relasi (kabupatens)",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "enum": [
-                                "kabupatens"
-                            ]
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Success",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Data provinsi berhasil diambil"
-                                        },
-                                        "data": {
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Provinsi not found"
-                    }
-                }
-            },
-            "put": {
-                "tags": [
-                    "Provinsi"
-                ],
-                "summary": "Update provinsi",
-                "description": "Mengupdate data provinsi",
-                "operationId": "009a5c96ee96d0295608dcf192c0fc13",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "ID provinsi",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "nama"
-                                ],
-                                "properties": {
-                                    "nama": {
-                                        "type": "string",
-                                        "maxLength": 100,
-                                        "example": "Daerah Khusus Jakarta"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Success",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Provinsi berhasil diupdate"
-                                        },
-                                        "data": {
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "jwt": []
-                    }
-                ]
-            },
-            "delete": {
-                "tags": [
-                    "Provinsi"
-                ],
-                "summary": "Delete provinsi",
-                "description": "Menghapus data provinsi",
-                "operationId": "05cfd3ee895217eae876d1301f9a47bf",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "ID provinsi",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Success",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Provinsi berhasil dihapus"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "jwt": []
-                    }
-                ]
-            }
-        },
-        "/api/provinsi/statistics": {
-            "get": {
-                "tags": [
-                    "Provinsi"
-                ],
-                "summary": "Get provinsi statistics",
-                "description": "Mengambil statistik data provinsi",
-                "operationId": "d29fe1a3f23fdca16825d3fb99996e43",
-                "responses": {
-                    "200": {
-                        "description": "Success",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Statistik provinsi berhasil diambil"
-                                        },
-                                        "data": {
-                                            "properties": {
-                                                "total_provinsi": {
-                                                    "type": "integer",
-                                                    "example": 38
-                                                },
-                                                "total_kabupaten": {
-                                                    "type": "integer",
-                                                    "example": 514
-                                                },
-                                                "provinsi_terbanyak": {
-                                                    "type": "string",
-                                                    "example": "Jawa Barat"
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                }
             }
         },
         "/api/riwayat-tindakan": {
@@ -5015,6 +3513,1449 @@
                     }
                 ]
             }
+        },
+        "/api/wilayah": {
+            "get": {
+                "tags": [
+                    "Wilayah"
+                ],
+                "summary": "Get all wilayah",
+                "description": "Mengambil semua data wilayah dengan filter jenis dan pagination",
+                "operationId": "8e2b40f16cbcfba941e047a8ffb19e8d",
+                "parameters": [
+                    {
+                        "name": "jenis",
+                        "in": "query",
+                        "description": "Filter berdasarkan jenis wilayah (provinsi, kabupaten, kecamatan, desa)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "provinsi",
+                                "kabupaten",
+                                "kecamatan",
+                                "desa"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "include",
+                        "in": "query",
+                        "description": "Include relasi (parent,children)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "parent",
+                                "children"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Jumlah item per halaman",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 15
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Data wilayah berhasil diambil"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "nama": {
+                                                                "type": "string",
+                                                                "example": "Aceh"
+                                                            },
+                                                            "jenis": {
+                                                                "type": "string",
+                                                                "example": "provinsi"
+                                                            },
+                                                            "parent": {
+                                                                "type": "object"
+                                                            },
+                                                            "children": {
+                                                                "type": "array",
+                                                                "items": {}
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "example": 5
+                                                },
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "example": 15
+                                                },
+                                                "total": {
+                                                    "type": "integer",
+                                                    "example": 75
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthenticated."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Wilayah"
+                ],
+                "summary": "Create new wilayah",
+                "description": "Membuat wilayah baru berdasarkan jenis - Hanya Admin yang dapat mengakses endpoint ini",
+                "operationId": "05e449ddff0aa8cee628d061bcd79eca",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "jenis",
+                                    "nama"
+                                ],
+                                "properties": {
+                                    "jenis": {
+                                        "description": "Jenis wilayah",
+                                        "type": "string",
+                                        "enum": [
+                                            "provinsi",
+                                            "kabupaten",
+                                            "kecamatan",
+                                            "desa"
+                                        ],
+                                        "example": "kabupaten"
+                                    },
+                                    "nama": {
+                                        "description": "Nama wilayah",
+                                        "type": "string",
+                                        "example": "Aceh Barat"
+                                    },
+                                    "id_parent": {
+                                        "description": "ID parent sesuai jenis (wajib untuk kabupaten, kecamatan, desa)",
+                                        "type": "integer",
+                                        "example": 1
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Wilayah berhasil ditambahkan",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Wilayah berhasil ditambahkan"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "nama": {
+                                                    "type": "string",
+                                                    "example": "Aceh Barat"
+                                                },
+                                                "jenis": {
+                                                    "type": "string",
+                                                    "example": "kabupaten"
+                                                },
+                                                "id_parent": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Data tidak valid",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Validasi gagal"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - Token tidak valid",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthenticated."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - Hanya Admin yang dapat mengakses",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Akses ditolak: Hanya Admin yang dapat mengakses endpoint ini"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            }
+        },
+        "/api/wilayah/{id}": {
+            "get": {
+                "tags": [
+                    "Wilayah"
+                ],
+                "summary": "Get specific wilayah by ID",
+                "description": "Mengambil data wilayah berdasarkan ID - parameter jenis wajib untuk menentukan tabel",
+                "operationId": "61bf93456c3aa837b6001dad3f1851c5",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID wilayah",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "jenis",
+                        "in": "query",
+                        "description": "Jenis wilayah (provinsi, kabupaten, kecamatan, desa)",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "provinsi",
+                                "kabupaten",
+                                "kecamatan",
+                                "desa"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "include",
+                        "in": "query",
+                        "description": "Include relasi (parent, children)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "parent",
+                                "children"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Detail wilayah berhasil diambil"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "nama": {
+                                                    "type": "string",
+                                                    "example": "Aceh"
+                                                },
+                                                "jenis": {
+                                                    "type": "string",
+                                                    "example": "provinsi"
+                                                },
+                                                "parent": {
+                                                    "type": "object"
+                                                },
+                                                "children": {
+                                                    "type": "array",
+                                                    "items": {}
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthenticated."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Wilayah not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Wilayah tidak ditemukan"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Wilayah"
+                ],
+                "summary": "Update wilayah",
+                "description": "Memperbarui data wilayah berdasarkan ID - parameter jenis wajib untuk menentukan tabel",
+                "operationId": "7303ba13b52aab3ebe54bfcdb6a47495",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID wilayah",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "jenis",
+                                    "nama"
+                                ],
+                                "properties": {
+                                    "jenis": {
+                                        "description": "Jenis wilayah",
+                                        "type": "string",
+                                        "enum": [
+                                            "provinsi",
+                                            "kabupaten",
+                                            "kecamatan",
+                                            "desa"
+                                        ],
+                                        "example": "kabupaten"
+                                    },
+                                    "nama": {
+                                        "description": "Nama wilayah yang baru",
+                                        "type": "string",
+                                        "example": "Aceh Barat Baru"
+                                    },
+                                    "id_parent": {
+                                        "description": "ID parent sesuai jenis (wajib untuk kabupaten, kecamatan, desa)",
+                                        "type": "integer",
+                                        "example": 1
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Wilayah berhasil diperbarui",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Wilayah berhasil diperbarui"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "nama": {
+                                                    "type": "string",
+                                                    "example": "Aceh Barat Baru"
+                                                },
+                                                "jenis": {
+                                                    "type": "string",
+                                                    "example": "kabupaten"
+                                                },
+                                                "id_parent": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Data tidak valid",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Validasi gagal"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - Token tidak valid",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthenticated."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - Hanya Admin yang dapat mengakses",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Akses ditolak: Hanya Admin yang dapat mengakses endpoint ini"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Wilayah tidak ditemukan",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Wilayah tidak ditemukan"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Wilayah"
+                ],
+                "summary": "Delete wilayah",
+                "description": "Menghapus data wilayah berdasarkan ID - parameter jenis wajib untuk menentukan tabel",
+                "operationId": "34532250e9324caf52afab1729175e3f",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID wilayah",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Wilayah berhasil dihapus",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Wilayah berhasil dihapus"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Jenis tidak valid",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Jenis wilayah tidak valid"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - Token tidak valid",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthenticated."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - Hanya Admin yang dapat mengakses",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Akses ditolak: Hanya Admin yang dapat mengakses endpoint ini"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Wilayah tidak ditemukan",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Wilayah tidak ditemukan"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            }
+        },
+        "/api/wilayah/provinsi": {
+            "get": {
+                "tags": [
+                    "Wilayah"
+                ],
+                "summary": "Get all provinsi",
+                "description": "Mengambil semua data provinsi dengan opsi include relasi",
+                "operationId": "639109c19ff5953848a49c714e6e2168",
+                "parameters": [
+                    {
+                        "name": "include",
+                        "in": "query",
+                        "description": "Include relasi (children untuk include kabupaten)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "children"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Data provinsi berhasil diambil"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "nama": {
+                                                        "type": "string",
+                                                        "example": "Aceh"
+                                                    },
+                                                    "kabupatens": {
+                                                        "type": "array",
+                                                        "items": {}
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            }
+        },
+        "/api/wilayah/provinsi/{id}": {
+            "get": {
+                "tags": [
+                    "Wilayah"
+                ],
+                "summary": "Get provinsi by ID",
+                "description": "Mengambil data provinsi berdasarkan ID dengan opsi include relasi",
+                "operationId": "823fd80028c21b85387e740b68b0ebb7",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID provinsi",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "include",
+                        "in": "query",
+                        "description": "Include relasi (children untuk include kabupaten)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "children"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Data provinsi berhasil diambil"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "nama": {
+                                                    "type": "string",
+                                                    "example": "Aceh"
+                                                },
+                                                "kabupatens": {
+                                                    "type": "array",
+                                                    "items": {}
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Provinsi not found"
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            }
+        },
+        "/api/wilayah/kabupaten/{provinsi_id}": {
+            "get": {
+                "tags": [
+                    "Wilayah"
+                ],
+                "summary": "Get kabupaten by provinsi",
+                "description": "Mengambil semua data kabupaten/kota berdasarkan ID provinsi",
+                "operationId": "feb1b9e2b479125a425df6746e817e55",
+                "parameters": [
+                    {
+                        "name": "provinsi_id",
+                        "in": "path",
+                        "description": "ID provinsi",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "include",
+                        "in": "query",
+                        "description": "Include relasi (parent untuk provinsi, children untuk kecamatan)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "parent",
+                                "children"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Data kabupaten berhasil diambil"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "nama": {
+                                                        "type": "string",
+                                                        "example": "Aceh Barat"
+                                                    },
+                                                    "id_provinsi": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "provinsi": {
+                                                        "type": "object"
+                                                    },
+                                                    "kecamatans": {
+                                                        "type": "array",
+                                                        "items": {}
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Provinsi not found"
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            }
+        },
+        "/api/wilayah/kecamatan/{kabupaten_id}": {
+            "get": {
+                "tags": [
+                    "Wilayah"
+                ],
+                "summary": "Get kecamatan by kabupaten",
+                "description": "Mengambil semua data kecamatan berdasarkan ID kabupaten",
+                "operationId": "e45136d5bf95aca0b6fe90dbca6fbe38",
+                "parameters": [
+                    {
+                        "name": "kabupaten_id",
+                        "in": "path",
+                        "description": "ID kabupaten",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "include",
+                        "in": "query",
+                        "description": "Include relasi (parent untuk kabupaten, children untuk desa)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "parent",
+                                "children"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Data kecamatan berhasil diambil"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "nama": {
+                                                        "type": "string",
+                                                        "example": "Bakongan"
+                                                    },
+                                                    "id_kabupaten": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "kabupaten": {
+                                                        "type": "object"
+                                                    },
+                                                    "desas": {
+                                                        "type": "array",
+                                                        "items": {}
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Kabupaten not found"
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            }
+        },
+        "/api/wilayah/desa/{kecamatan_id}": {
+            "get": {
+                "tags": [
+                    "Wilayah"
+                ],
+                "summary": "Get desa by kecamatan",
+                "description": "Mengambil semua data desa/kelurahan berdasarkan ID kecamatan",
+                "operationId": "4850d1e44f09d8a0d5a3b5bbd761c4f9",
+                "parameters": [
+                    {
+                        "name": "kecamatan_id",
+                        "in": "path",
+                        "description": "ID kecamatan",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "include",
+                        "in": "query",
+                        "description": "Include relasi (parent untuk kecamatan)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "parent"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Data desa berhasil diambil"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "nama": {
+                                                        "type": "string",
+                                                        "example": "Ie Meule"
+                                                    },
+                                                    "id_kecamatan": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "kecamatan": {
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Kecamatan not found"
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            }
+        },
+        "/api/wilayah/detail/{desa_id}": {
+            "get": {
+                "tags": [
+                    "Wilayah"
+                ],
+                "summary": "Get wilayah detail by desa ID",
+                "description": "Mengambil data wilayah lengkap berdasarkan ID desa (desa -> kecamatan -> kabupaten -> provinsi)",
+                "operationId": "bc4a95137b72306987ebe6bcc9241fa3",
+                "parameters": [
+                    {
+                        "name": "desa_id",
+                        "in": "path",
+                        "description": "ID desa",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Detail wilayah berhasil diambil"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "nama": {
+                                                    "type": "string",
+                                                    "example": "Ie Meule"
+                                                },
+                                                "id_kecamatan": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "kecamatan": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "nama": {
+                                                            "type": "string",
+                                                            "example": "Bakongan"
+                                                        },
+                                                        "id_kabupaten": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "kabupaten": {
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "integer",
+                                                                    "example": 1
+                                                                },
+                                                                "nama": {
+                                                                    "type": "string",
+                                                                    "example": "Aceh Selatan"
+                                                                },
+                                                                "id_provinsi": {
+                                                                    "type": "integer",
+                                                                    "example": 1
+                                                                },
+                                                                "provinsi": {
+                                                                    "properties": {
+                                                                        "id": {
+                                                                            "type": "integer",
+                                                                            "example": 1
+                                                                        },
+                                                                        "nama": {
+                                                                            "type": "string",
+                                                                            "example": "Aceh"
+                                                                        }
+                                                                    },
+                                                                    "type": "object"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Desa not found"
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            }
+        },
+        "/api/wilayah/hierarchy/{desa_id}": {
+            "get": {
+                "tags": [
+                    "Wilayah"
+                ],
+                "summary": "Get wilayah hierarchy by desa ID",
+                "description": "Mengambil hirarki wilayah lengkap berdasarkan ID desa (desa, kecamatan, kabupaten, provinsi dalam format terstruktur)",
+                "operationId": "29282323da55f4a1d6f5a7e274534c6b",
+                "parameters": [
+                    {
+                        "name": "desa_id",
+                        "in": "path",
+                        "description": "ID desa",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Hirarki wilayah berhasil diambil"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "desa": {
+                                                    "type": "object"
+                                                },
+                                                "kecamatan": {
+                                                    "type": "object"
+                                                },
+                                                "kabupaten": {
+                                                    "type": "object"
+                                                },
+                                                "provinsi": {
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Desa not found"
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            }
+        },
+        "/api/wilayah/search": {
+            "get": {
+                "tags": [
+                    "Wilayah"
+                ],
+                "summary": "Search wilayah",
+                "description": "Mencari data wilayah berdasarkan nama",
+                "operationId": "d4d97b3890f112dccfd7f66a801c47ed",
+                "parameters": [
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "description": "Kata kunci pencarian",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "jenis",
+                        "in": "query",
+                        "description": "Filter berdasarkan jenis wilayah (provinsi, kabupaten, kecamatan, desa)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "provinsi",
+                                "kabupaten",
+                                "kecamatan",
+                                "desa"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Hasil pencarian wilayah"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "provinsi": {
+                                                    "type": "array",
+                                                    "items": {}
+                                                },
+                                                "kabupaten": {
+                                                    "type": "array",
+                                                    "items": {}
+                                                },
+                                                "kecamatan": {
+                                                    "type": "array",
+                                                    "items": {}
+                                                },
+                                                "desa": {
+                                                    "type": "array",
+                                                    "items": {}
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Parameter pencarian (q) wajib disertakan"
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            }
         }
     },
     "components": {
@@ -5533,24 +5474,8 @@
             "description": "BMKG real-time data integration endpoints untuk gempa, cuaca, dan peringatan tsunami"
         },
         {
-            "name": "Desa",
-            "description": "API endpoints untuk manajemen data Desa"
-        },
-        {
-            "name": "Kabupaten",
-            "description": "API endpoints untuk manajemen data Kabupaten"
-        },
-        {
-            "name": "Kecamatan",
-            "description": "API endpoints untuk manajemen data Kecamatan"
-        },
-        {
             "name": "Monitoring",
             "description": "API endpoints untuk manajemen data Monitoring Bencana"
-        },
-        {
-            "name": "Provinsi",
-            "description": "API endpoints untuk manajemen data Provinsi"
         },
         {
             "name": "Riwayat Tindakan",
@@ -5575,6 +5500,10 @@
         {
             "name": "Tindak Lanjut",
             "description": "API endpoints untuk manajemen data Tindak Lanjut Bencana"
+        },
+        {
+            "name": "Wilayah",
+            "description": "API endpoints untuk manajemen data Wilayah Administratif Indonesia"
         }
     ],
     "security": [

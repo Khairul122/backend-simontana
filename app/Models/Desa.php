@@ -11,6 +11,7 @@ class Desa extends Model
 
     protected $table = 'desa';
     protected $primaryKey = 'id';
+    public $timestamps = true;
 
     protected $fillable = [
         'nama',
@@ -23,7 +24,7 @@ class Desa extends Model
     ];
 
     /**
-     * Relasi ke tabel kecamatan
+     * Relasi ke kecamatan
      */
     public function kecamatan()
     {
@@ -31,7 +32,7 @@ class Desa extends Model
     }
 
     /**
-     * Relasi ke tabel pengguna
+     * Relasi ke pengguna
      */
     public function pengguna()
     {
@@ -39,7 +40,7 @@ class Desa extends Model
     }
 
     /**
-     * Relasi ke tabel laporan
+     * Relasi ke laporan
      */
     public function laporan()
     {

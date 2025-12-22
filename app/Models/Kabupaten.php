@@ -11,6 +11,7 @@ class Kabupaten extends Model
 
     protected $table = 'kabupaten';
     protected $primaryKey = 'id';
+    public $timestamps = true;
 
     protected $fillable = [
         'nama',
@@ -23,7 +24,7 @@ class Kabupaten extends Model
     ];
 
     /**
-     * Relasi ke tabel provinsi
+     * Relasi ke provinsi
      */
     public function provinsi()
     {
@@ -31,7 +32,7 @@ class Kabupaten extends Model
     }
 
     /**
-     * Relasi ke tabel kecamatan
+     * Relasi ke kecamatan
      */
     public function kecamatans()
     {
