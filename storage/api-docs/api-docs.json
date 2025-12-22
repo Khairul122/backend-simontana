@@ -2908,14 +2908,14 @@
                 "tags": [
                     "Laporan Management"
                 ],
-                "summary": "Get all laporan",
-                "description": "Retrieve list of laporan with optional filtering",
+                "summary": "Get all laporan dengan filter dan pagination",
+                "description": "Mendapatkan daftar laporan bencana dengan opsi filter, search, dan pagination",
                 "operationId": "7f00722b3a58df1e1b3915fdd8745449",
                 "parameters": [
                     {
                         "name": "status",
                         "in": "query",
-                        "description": "Filter by status",
+                        "description": "Filter berdasarkan status laporan",
                         "schema": {
                             "type": "string",
                             "enum": [
@@ -2923,234 +2923,148 @@
                                 "Menunggu Verifikasi",
                                 "Diverifikasi",
                                 "Diproses",
+                                "Tindak Lanjut",
                                 "Selesai",
                                 "Ditolak"
                             ]
                         }
                     },
                     {
+                        "name": "kategori_id",
+                        "in": "query",
+                        "description": "Filter berdasarkan ID kategori bencana",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "user_id",
+                        "in": "query",
+                        "description": "Filter berdasarkan ID pelapor",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "prioritas",
+                        "in": "query",
+                        "description": "Filter laporan prioritas saja",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Search di judul, deskripsi, atau alamat",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "lat",
+                        "in": "query",
+                        "description": "Latitude untuk filter lokasi radius",
+                        "schema": {
+                            "type": "number",
+                            "format": "double"
+                        }
+                    },
+                    {
+                        "name": "lng",
+                        "in": "query",
+                        "description": "Longitude untuk filter lokasi radius",
+                        "schema": {
+                            "type": "number",
+                            "format": "double"
+                        }
+                    },
+                    {
+                        "name": "radius",
+                        "in": "query",
+                        "description": "Radius dalam km untuk filter lokasi",
+                        "schema": {
+                            "type": "number"
+                        }
+                    },
+                    {
                         "name": "limit",
                         "in": "query",
-                        "description": "Limit results",
+                        "description": "Jumlah data per halaman",
                         "schema": {
                             "type": "integer",
-                            "default": 10
+                            "default": 15
                         }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Successful operation",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean"
-                                        },
-                                        "message": {
-                                            "type": "string"
-                                        },
-                                        "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "properties": {
-                                                    "id": {
-                                                        "type": "integer"
-                                                    },
-                                                    "judul_laporan": {
-                                                        "type": "string"
-                                                    },
-                                                    "deskripsi": {
-                                                        "type": "string"
-                                                    },
-                                                    "status": {
-                                                        "type": "string"
-                                                    },
-                                                    "created_at": {
-                                                        "type": "string",
-                                                        "format": "date-time"
-                                                    }
-                                                },
-                                                "type": "object"
-                                            }
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
+                    },
                     {
-                        "jwt": []
-                    }
-                ]
-            },
-            "post": {
-                "tags": [
-                    "Laporan Management"
-                ],
-                "summary": "Create new laporan",
-                "description": "Create a new laporan with validated data",
-                "operationId": "fbec0c1946c9622c9690ecbd866f9a6a",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "id_pelapor",
-                                    "id_kategori_bencana",
-                                    "judul_laporan",
-                                    "deskripsi"
-                                ],
-                                "properties": {
-                                    "id_pelapor": {
-                                        "type": "integer"
-                                    },
-                                    "id_kategori_bencana": {
-                                        "type": "integer"
-                                    },
-                                    "judul_laporan": {
-                                        "type": "string"
-                                    },
-                                    "deskripsi": {
-                                        "type": "string"
-                                    },
-                                    "alamat": {
-                                        "type": "string"
-                                    },
-                                    "id_desa": {
-                                        "type": "integer"
-                                    },
-                                    "latitude": {
-                                        "type": "number"
-                                    },
-                                    "longitude": {
-                                        "type": "number"
-                                    },
-                                    "tanggal_kejadian": {
-                                        "type": "string",
-                                        "format": "date"
-                                    },
-                                    "waktu_kejadian": {
-                                        "type": "string",
-                                        "format": "datetime"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "201": {
-                        "description": "Laporan created successfully",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean"
-                                        },
-                                        "message": {
-                                            "type": "string"
-                                        },
-                                        "data": {
-                                            "properties": {
-                                                "id": {
-                                                    "type": "integer"
-                                                },
-                                                "judul_laporan": {
-                                                    "type": "string"
-                                                },
-                                                "deskripsi": {
-                                                    "type": "string"
-                                                },
-                                                "status": {
-                                                    "type": "string"
-                                                },
-                                                "created_at": {
-                                                    "type": "string",
-                                                    "format": "date-time"
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "jwt": []
-                    }
-                ]
-            }
-        },
-        "/laporans/statistics": {
-            "get": {
-                "tags": [
-                    "Laporan Management"
-                ],
-                "summary": "Get laporan statistics",
-                "description": "Retrieve comprehensive statistics for dashboard",
-                "operationId": "928752aa5d0b5502ac63f44701b7024d",
-                "parameters": [
-                    {
-                        "name": "period",
+                        "name": "order_by",
                         "in": "query",
-                        "description": "Filter by period (weekly, monthly, yearly)",
+                        "description": "Kolom untuk ordering",
                         "schema": {
                             "type": "string",
+                            "default": "created_at"
+                        }
+                    },
+                    {
+                        "name": "order_direction",
+                        "in": "query",
+                        "description": "Arah ordering",
+                        "schema": {
+                            "type": "string",
+                            "default": "desc",
                             "enum": [
-                                "weekly",
-                                "monthly",
-                                "yearly"
+                                "asc",
+                                "desc"
                             ]
                         }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Successful operation",
+                        "description": "Successfully retrieved laporan list",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
                                         "success": {
-                                            "type": "boolean"
+                                            "type": "boolean",
+                                            "example": true
                                         },
                                         "message": {
-                                            "type": "string"
+                                            "type": "string",
+                                            "example": "Data laporan berhasil diambil"
                                         },
                                         "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Laporan"
+                                            }
+                                        },
+                                        "pagination": {
                                             "properties": {
-                                                "total_laporan": {
-                                                    "type": "integer"
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "example": 1
                                                 },
-                                                "laporan_perlu_verifikasi": {
-                                                    "type": "integer"
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "example": 5
                                                 },
-                                                "laporan_ditindak": {
-                                                    "type": "integer"
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "example": 15
                                                 },
-                                                "laporan_selesai": {
-                                                    "type": "integer"
+                                                "total": {
+                                                    "type": "integer",
+                                                    "example": 75
                                                 },
-                                                "laporan_ditolak": {
-                                                    "type": "integer"
+                                                "from": {
+                                                    "type": "integer",
+                                                    "example": 1
                                                 },
-                                                "weekly_stats": {
-                                                    "type": "object"
-                                                },
-                                                "categories_stats": {
-                                                    "type": "object"
+                                                "to": {
+                                                    "type": "integer",
+                                                    "example": 15
                                                 }
                                             },
                                             "type": "object"
@@ -3160,241 +3074,12 @@
                                 }
                             }
                         }
-                    }
-                },
-                "security": [
-                    {
-                        "jwt": []
-                    }
-                ]
-            }
-        },
-        "/laporans/{id}": {
-            "get": {
-                "tags": [
-                    "Laporan Management"
-                ],
-                "summary": "Get specific laporan",
-                "description": "Retrieve a specific laporan by ID",
-                "operationId": "316ba1df793b371776d28612bd3ed994",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Successful operation",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean"
-                                        },
-                                        "message": {
-                                            "type": "string"
-                                        },
-                                        "data": {
-                                            "properties": {
-                                                "id": {
-                                                    "type": "integer"
-                                                },
-                                                "judul_laporan": {
-                                                    "type": "string"
-                                                },
-                                                "deskripsi": {
-                                                    "type": "string"
-                                                },
-                                                "status": {
-                                                    "type": "string"
-                                                },
-                                                "created_at": {
-                                                    "type": "string",
-                                                    "format": "date-time"
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "jwt": []
-                    }
-                ]
-            },
-            "put": {
-                "tags": [
-                    "Laporan Management"
-                ],
-                "summary": "Update laporan",
-                "description": "Update an existing laporan",
-                "operationId": "4189ae1cd554b4961907afeb0de31275",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "properties": {
-                                    "judul_laporan": {
-                                        "type": "string"
-                                    },
-                                    "deskripsi": {
-                                        "type": "string"
-                                    },
-                                    "alamat": {
-                                        "type": "string"
-                                    },
-                                    "tingkat_keparahan": {
-                                        "type": "string"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Laporan updated successfully"
-                    }
-                },
-                "security": [
-                    {
-                        "jwt": []
-                    }
-                ]
-            },
-            "delete": {
-                "tags": [
-                    "Laporan Management"
-                ],
-                "summary": "Delete laporan",
-                "description": "Delete a specific laporan",
-                "operationId": "2767fb577becbed2bd18ad18dbc61ef4",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Laporan deleted successfully"
-                    }
-                },
-                "security": [
-                    {
-                        "jwt": []
-                    }
-                ]
-            }
-        },
-        "/laporans/{id}/verifikasi": {
-            "post": {
-                "tags": [
-                    "Laporan Management"
-                ],
-                "summary": "Verify laporan",
-                "description": "Change laporan status to verified",
-                "operationId": "6025bcf27f59d6f197af1f030389c24d",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Laporan verified successfully"
-                    }
-                },
-                "security": [
-                    {
-                        "jwt": []
-                    }
-                ]
-            }
-        },
-        "/laporans/{id}/proses": {
-            "post": {
-                "tags": [
-                    "Laporan Management"
-                ],
-                "summary": "Process laporan",
-                "description": "Change laporan status to being processed",
-                "operationId": "5471ca56382fa0668469bb059d46f115",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Laporan processed successfully"
-                    }
-                },
-                "security": [
-                    {
-                        "jwt": []
-                    }
-                ]
-            }
-        },
-        "/laporans/{id}/riwayat": {
-            "get": {
-                "tags": [
-                    "Laporan Management"
-                ],
-                "summary": "Get laporan riwayat",
-                "description": "Get history of actions for a specific laporan",
-                "operationId": "7deda471cfd178f5fd74b74170183925",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Riwayat retrieved successfully"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "500": {
+                        "description": "Internal server error"
                     }
                 },
                 "security": [
@@ -5333,6 +5018,506 @@
         }
     },
     "components": {
+        "schemas": {
+            "Laporan": {
+                "title": "Laporan",
+                "description": "Model laporan bencana",
+                "properties": {
+                    "id": {
+                        "description": "ID unique laporan",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "judul_laporan": {
+                        "description": "Judul laporan",
+                        "type": "string",
+                        "example": "Kebakaran Hutan di Desa Sukamaju"
+                    },
+                    "deskripsi": {
+                        "description": "Deskripsi detail kejadian",
+                        "type": "string",
+                        "example": "Kebakaran terjadi di area perbukitan dengan luas sekitar 5 hektar"
+                    },
+                    "tingkat_keparahan": {
+                        "description": "Tingkat keparahan bencana",
+                        "type": "string",
+                        "enum": [
+                            "Rendah",
+                            "Sedang",
+                            "Tinggi",
+                            "Sangat Tinggi"
+                        ],
+                        "example": "Tinggi"
+                    },
+                    "latitude": {
+                        "description": "Koordinat latitude",
+                        "type": "number",
+                        "format": "double",
+                        "example": -6.2088
+                    },
+                    "longitude": {
+                        "description": "Koordinat longitude",
+                        "type": "number",
+                        "format": "double",
+                        "example": 106.8456
+                    },
+                    "alamat": {
+                        "description": "Alamat lengkap kejadian",
+                        "type": "string",
+                        "example": "Jl. Sudirman No. 123"
+                    },
+                    "jumlah_korban": {
+                        "description": "Jumlah korban jiwa",
+                        "type": "integer",
+                        "example": 5
+                    },
+                    "jumlah_rumah_rusak": {
+                        "description": "Jumlah rumah rusak",
+                        "type": "integer",
+                        "example": 12
+                    },
+                    "is_prioritas": {
+                        "description": "Status prioritas laporan",
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "view_count": {
+                        "description": "Jumlah view laporan",
+                        "type": "integer",
+                        "example": 25
+                    },
+                    "status": {
+                        "description": "Status laporan",
+                        "type": "string",
+                        "enum": [
+                            "Draft",
+                            "Menunggu Verifikasi",
+                            "Diverifikasi",
+                            "Diproses",
+                            "Tindak Lanjut",
+                            "Selesai",
+                            "Ditolak"
+                        ],
+                        "example": "Menunggu Verifikasi"
+                    },
+                    "waktu_laporan": {
+                        "description": "Waktu laporan dibuat",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-12-22T10:30:00Z"
+                    },
+                    "waktu_verifikasi": {
+                        "description": "Waktu verifikasi",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-12-22T11:00:00Z"
+                    },
+                    "waktu_selesai": {
+                        "description": "Waktu selesai penanganan",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-12-22T15:00:00Z"
+                    },
+                    "catatan_verifikasi": {
+                        "description": "Catatan verifikasi",
+                        "type": "string",
+                        "example": "Laporan valid dan perlu ditindak lanjuti"
+                    },
+                    "catatan_proses": {
+                        "description": "Catatan proses",
+                        "type": "string",
+                        "example": "Tim SAR sudah diterjunkan ke lokasi"
+                    },
+                    "data_tambahan": {
+                        "description": "Data tambahan dalam format JSON",
+                        "type": "object",
+                        "example": {
+                            "cuaca": "hujan",
+                            "akses": "sulit"
+                        }
+                    },
+                    "foto_bukti_1": {
+                        "description": "Path foto bukti 1",
+                        "type": "string",
+                        "example": "storage/laporans/2024/12/foto1.jpg"
+                    },
+                    "foto_bukti_2": {
+                        "description": "Path foto bukti 2",
+                        "type": "string",
+                        "example": "storage/laporans/2024/12/foto2.jpg"
+                    },
+                    "foto_bukti_3": {
+                        "description": "Path foto bukti 3",
+                        "type": "string",
+                        "example": "storage/laporans/2024/12/foto3.jpg"
+                    },
+                    "video_bukti": {
+                        "description": "Path video bukti",
+                        "type": "string",
+                        "example": "storage/laporans/2024/12/video.mp4"
+                    },
+                    "id_pelapor": {
+                        "description": "ID pelapor",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "id_kategori_bencana": {
+                        "description": "ID kategori bencana",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "id_desa": {
+                        "description": "ID desa lokasi",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "pelapor": {
+                        "$ref": "#/components/schemas/Pelapor"
+                    },
+                    "kategori": {
+                        "$ref": "#/components/schemas/KategoriBencana"
+                    },
+                    "desa": {
+                        "$ref": "#/components/schemas/Desa"
+                    },
+                    "alamat_lengkap": {
+                        "description": "Alamat lengkap otomatis",
+                        "type": "string",
+                        "example": "Desa Sukamaju, Kecamatan Makmur, Kabupaten Sejahtera"
+                    },
+                    "coordinates": {
+                        "description": "Koordinat untuk mapping",
+                        "type": "object",
+                        "example": {
+                            "lat": -6.2088,
+                            "lng": 106.8456
+                        }
+                    },
+                    "time_ago": {
+                        "description": "Waktu relatif",
+                        "type": "string",
+                        "example": "2 jam yang lalu"
+                    }
+                },
+                "type": "object"
+            },
+            "Pelapor": {
+                "title": "Pelapor",
+                "description": "Data pelapor laporan",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "nama": {
+                        "type": "string",
+                        "example": "Ahmad Wijaya"
+                    },
+                    "email": {
+                        "type": "string",
+                        "example": "ahmad@example.com"
+                    }
+                },
+                "type": "object"
+            },
+            "KategoriBencana": {
+                "title": "Kategori Bencana",
+                "description": "Data kategori bencana",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "nama_kategori": {
+                        "type": "string",
+                        "example": "Kebakaran"
+                    },
+                    "deskripsi": {
+                        "type": "string",
+                        "example": "Kategori untuk kejadian kebakaran hutan dan permukiman"
+                    }
+                },
+                "type": "object"
+            },
+            "Desa": {
+                "title": "Desa",
+                "description": "Data desa lokasi",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "nama": {
+                        "type": "string",
+                        "example": "Sukamaju"
+                    }
+                },
+                "type": "object"
+            },
+            "LaporanStatistics": {
+                "title": "Laporan Statistics",
+                "description": "Statistik laporan bencana",
+                "properties": {
+                    "total_laporan": {
+                        "type": "integer",
+                        "example": 150
+                    },
+                    "laporan_perlu_verifikasi": {
+                        "type": "integer",
+                        "example": 25
+                    },
+                    "laporan_ditindak": {
+                        "type": "integer",
+                        "example": 45
+                    },
+                    "laporan_selesai": {
+                        "type": "integer",
+                        "example": 60
+                    },
+                    "laporan_ditolak": {
+                        "type": "integer",
+                        "example": 5
+                    },
+                    "weekly_stats": {
+                        "type": "object",
+                        "example": {
+                            "mon": 10,
+                            "tue": 15,
+                            "wed": 8
+                        }
+                    },
+                    "categories_stats": {
+                        "type": "object",
+                        "example": {
+                            "Kebakaran": 30,
+                            "Banjir": 25,
+                            "Gempa": 15
+                        }
+                    },
+                    "monthly_trend": {
+                        "type": "object",
+                        "example": {
+                            "2024-12": 120,
+                            "2024-11": 95
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "LaporanStoreRequest": {
+                "title": "Laporan Store Request",
+                "description": "Request body untuk membuat laporan baru",
+                "required": [
+                    "judul_laporan",
+                    "deskripsi",
+                    "tingkat_keparahan",
+                    "latitude",
+                    "longitude",
+                    "id_kategori_bencana",
+                    "id_desa"
+                ],
+                "properties": {
+                    "judul_laporan": {
+                        "type": "string",
+                        "maxLength": 255,
+                        "example": "Kebakaran Hutan di Desa Sukamaju"
+                    },
+                    "deskripsi": {
+                        "type": "string",
+                        "example": "Kebakaran terjadi di area perbukitan dengan luas sekitar 5 hektar"
+                    },
+                    "tingkat_keparahan": {
+                        "type": "string",
+                        "enum": [
+                            "Rendah",
+                            "Sedang",
+                            "Tinggi",
+                            "Sangat Tinggi"
+                        ],
+                        "example": "Tinggi"
+                    },
+                    "latitude": {
+                        "type": "number",
+                        "format": "double",
+                        "maximum": 90,
+                        "minimum": -90,
+                        "example": -6.2088
+                    },
+                    "longitude": {
+                        "type": "number",
+                        "format": "double",
+                        "maximum": 180,
+                        "minimum": -180,
+                        "example": 106.8456
+                    },
+                    "id_kategori_bencana": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "id_desa": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "alamat": {
+                        "type": "string",
+                        "maxLength": 500,
+                        "example": "Jl. Sudirman No. 123"
+                    },
+                    "jumlah_korban": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "example": 5
+                    },
+                    "jumlah_rumah_rusak": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "example": 12
+                    },
+                    "is_prioritas": {
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "data_tambahan": {
+                        "type": "object",
+                        "example": {
+                            "cuaca": "hujan",
+                            "akses": "sulit"
+                        }
+                    },
+                    "waktu_laporan": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "2024-12-22"
+                    },
+                    "foto_bukti_1": {
+                        "description": "Upload foto bukti 1 (JPG/PNG max 5MB)",
+                        "type": "string",
+                        "format": "binary"
+                    },
+                    "foto_bukti_2": {
+                        "description": "Upload foto bukti 2 (JPG/PNG max 5MB)",
+                        "type": "string",
+                        "format": "binary"
+                    },
+                    "foto_bukti_3": {
+                        "description": "Upload foto bukti 3 (JPG/PNG max 5MB)",
+                        "type": "string",
+                        "format": "binary"
+                    },
+                    "video_bukti": {
+                        "description": "Upload video bukti (MP4/AVI/MOV max 10MB)",
+                        "type": "string",
+                        "format": "binary"
+                    }
+                },
+                "type": "object"
+            },
+            "LaporanUpdateRequest": {
+                "title": "Laporan Update Request",
+                "description": "Request body untuk update laporan",
+                "properties": {
+                    "judul_laporan": {
+                        "type": "string",
+                        "maxLength": 255,
+                        "example": "Kebakaran Hutan - Update"
+                    },
+                    "deskripsi": {
+                        "type": "string",
+                        "example": "Deskripsi update kejadian"
+                    },
+                    "tingkat_keparahan": {
+                        "type": "string",
+                        "enum": [
+                            "Rendah",
+                            "Sedang",
+                            "Tinggi",
+                            "Sangat Tinggi"
+                        ]
+                    },
+                    "latitude": {
+                        "type": "number",
+                        "format": "double",
+                        "maximum": 90,
+                        "minimum": -90
+                    },
+                    "longitude": {
+                        "type": "number",
+                        "format": "double",
+                        "maximum": 180,
+                        "minimum": -180
+                    },
+                    "id_kategori_bencana": {
+                        "type": "integer"
+                    },
+                    "id_desa": {
+                        "type": "integer"
+                    },
+                    "alamat": {
+                        "type": "string",
+                        "maxLength": 500
+                    },
+                    "jumlah_korban": {
+                        "type": "integer",
+                        "minimum": 0
+                    },
+                    "jumlah_rumah_rusak": {
+                        "type": "integer",
+                        "minimum": 0
+                    },
+                    "is_prioritas": {
+                        "type": "boolean"
+                    },
+                    "data_tambahan": {
+                        "type": "object"
+                    },
+                    "foto_bukti_1": {
+                        "type": "string",
+                        "format": "binary"
+                    },
+                    "foto_bukti_2": {
+                        "type": "string",
+                        "format": "binary"
+                    },
+                    "foto_bukti_3": {
+                        "type": "string",
+                        "format": "binary"
+                    },
+                    "video_bukti": {
+                        "type": "string",
+                        "format": "binary"
+                    },
+                    "waktu_laporan": {
+                        "type": "string",
+                        "format": "date"
+                    }
+                },
+                "type": "object"
+            }
+        },
+        "requestBodies": {
+            "LaporanStoreRequest": {
+                "description": "Data laporan baru",
+                "required": true,
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/LaporanStoreRequest"
+                        }
+                    }
+                }
+            },
+            "LaporanUpdateRequest": {
+                "description": "Data update laporan",
+                "required": true,
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/LaporanUpdateRequest"
+                        }
+                    }
+                }
+            }
+        },
         "securitySchemes": {
             "jwt": {
                 "type": "http",
@@ -5360,10 +5545,6 @@
             "description": "API endpoints untuk manajemen data Kecamatan"
         },
         {
-            "name": "Laporan Management",
-            "description": "CRUD operations dan statistik untuk laporan bencana"
-        },
-        {
             "name": "Monitoring",
             "description": "API endpoints untuk manajemen data Monitoring Bencana"
         },
@@ -5386,6 +5567,10 @@
         {
             "name": "Kategori Bencana",
             "description": "Kategori bencana management endpoints untuk CRUD operations"
+        },
+        {
+            "name": "Laporan Management",
+            "description": "CRUD operations dan statistik untuk laporan bencana"
         },
         {
             "name": "Tindak Lanjut",

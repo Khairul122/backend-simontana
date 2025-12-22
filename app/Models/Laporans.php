@@ -4,36 +4,56 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Laporans extends Model
 {
     use HasFactory;
 
+    /**
+     * Table name
+     */
     protected $table = 'laporans';
 
+    /**
+     * Mass assignment - guarded approach for security
+     */
     protected $guarded = ['id'];
 
+    /**
+     * Hidden fields from API responses
+     */
+    protected $hidden = ['created_at', 'updated_at'];
+
+    /**
+     * Strict type casting for data consistency and JSON serialization
+     */
     protected $casts = [
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
-        'tanggal_kejadian' => 'date',
-        'waktu_kejadian' => 'datetime',
-        'latitude' => 'float',
-        'longitude' => 'float',
+        'latitude' => 'double',
+        'longitude' => 'double',
+        'waktu_laporan' => 'datetime',
+        'waktu_verifikasi' => 'datetime',
+        'waktu_selesai' => 'datetime',
+        'data_tambahan' => 'array',
+        'is_prioritas' => 'boolean',
+        'view_count' => 'integer',
+        'jumlah_korban' => 'integer',
+        'jumlah_rumah_rusak' => 'integer',
     ];
 
     /**
-     * Get the pelapor that owns the laporan.
+     * Get the pelapor (user who reported) that owns the laporan.
      */
-    public function pelapor()
+    public function pelapor(): BelongsTo
     {
         return $this->belongsTo(Pengguna::class, 'id_pelapor');
     }
 
     /**
-     * Get the kategori that owns the laporan.
+     * Get the kategori bencana that owns the laporan.
      */
-    public function kategori()
+    public function kategori(): BelongsTo
     {
         return $this->belongsTo(KategoriBencana::class, 'id_kategori_bencana');
     }
@@ -41,31 +61,31 @@ class Laporans extends Model
     /**
      * Get the desa that owns the laporan.
      */
-    public function desa()
+    public function desa(): BelongsTo
     {
         return $this->belongsTo(Desa::class, 'id_desa');
     }
 
     /**
-     * Get the tindakLanjut for the laporan.
+     * Get the tindak lanjut records for the laporan.
      */
-    public function tindakLanjut()
+    public function tindakLanjut(): HasMany
     {
         return $this->hasMany(TindakLanjut::class, 'laporan_id');
     }
 
     /**
-     * Get the monitoring for the laporan.
+     * Get the monitoring records for the laporan.
      */
-    public function monitoring()
+    public function monitoring(): HasMany
     {
-        return $this->hasMany(Monitoring::class, 'id_laporan');
+        return $this->hasMany(Monitoring::class, 'laporan_id');
     }
 
     /**
-     * Get the riwayatTindakan for the laporan.
+     * Get the riwayat tindakan records for the laporan.
      */
-    public function riwayatTindakan()
+    public function riwayatTindakan(): HasMany
     {
         return $this->hasMany(RiwayatTindakan::class, 'id_laporan');
     }
@@ -95,9 +115,17 @@ class Laporans extends Model
     }
 
     /**
+     * Scope a query to only include priority reports.
+     */
+    public function scopePrioritas($query)
+    {
+        return $query->where('is_prioritas', true);
+    }
+
+    /**
      * Get the alamat lengkap attribute.
      */
-    public function getAlamatLengkapAttribute()
+    public function getAlamatLengkapAttribute(): string
     {
         $alamat = [];
 
@@ -127,7 +155,7 @@ class Laporans extends Model
     /**
      * Check if laporan needs verification.
      */
-    public function needsVerification()
+    public function needsVerification(): bool
     {
         return in_array($this->status, ['Draft', 'Menunggu Verifikasi']);
     }
@@ -135,7 +163,7 @@ class Laporans extends Model
     /**
      * Check if laporan is being processed.
      */
-    public function isBeingProcessed()
+    public function isBeingProcessed(): bool
     {
         return in_array($this->status, ['Diverifikasi', 'Diproses']);
     }
@@ -143,15 +171,23 @@ class Laporans extends Model
     /**
      * Check if laporan is completed.
      */
-    public function isCompleted()
+    public function isCompleted(): bool
     {
         return $this->status === 'Selesai';
     }
 
     /**
-     * Get status badge class.
+     * Check if laporan is rejected.
      */
-    public function getStatusBadgeClass()
+    public function isRejected(): bool
+    {
+        return $this->status === 'Ditolak';
+    }
+
+    /**
+     * Get status badge class for UI.
+     */
+    public function getStatusBadgeClass(): string
     {
         return match($this->status) {
             'Draft' => 'secondary',
@@ -162,5 +198,61 @@ class Laporans extends Model
             'Ditolak' => 'danger',
             default => 'secondary',
         };
+    }
+
+    /**
+     * Get formatted coordinates for mapping.
+     */
+    public function getCoordinatesAttribute(): array
+    {
+        return [
+            'lat' => (float) $this->latitude,
+            'lng' => (float) $this->longitude,
+        ];
+    }
+
+    /**
+     * Increment view count safely.
+     */
+    public function incrementViewCount(): int
+    {
+        $this->increment('view_count');
+        return $this->view_count;
+    }
+
+    /**
+     * Get human readable time difference.
+     */
+    public function getTimeAgoAttribute(): string
+    {
+        return $this->waktu_laporan->diffForHumans();
+    }
+
+    /**
+     * Query scope for reports by user.
+     */
+    public function scopeByUser($query, $userId)
+    {
+        return $query->where('id_pelapor', $userId);
+    }
+
+    /**
+     * Query scope for reports by category.
+     */
+    public function scopeByCategory($query, $categoryId)
+    {
+        return $query->where('id_kategori_bencana', $categoryId);
+    }
+
+    /**
+     * Query scope for reports by location radius.
+     */
+    public function scopeByLocationRadius($query, $lat, $lng, $radiusKm = 10)
+    {
+        return $query->selectRaw('*,
+            (6371 * acos(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude)))) AS distance
+        ', [$lat, $lng, $lat])
+        ->having('distance', '<=', $radiusKm)
+        ->orderBy('distance');
     }
 }

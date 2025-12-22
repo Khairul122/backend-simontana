@@ -27,6 +27,6 @@ class KategoriBencana extends Model
      */
     public function laporans(): HasMany
     {
-        return $this->hasMany(Laporan::class, 'id_kategori_bencana');
+        return $this->hasMany(Laporans::class, 'id_kategori_bencana');
     }
 }
