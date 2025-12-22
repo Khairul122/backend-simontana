@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\LaporanController;
+use App\Http\Controllers\LaporansController;
 use App\Http\Controllers\KategoriBencanaController;
 use App\Http\Controllers\ProvinsiController;
 use App\Http\Controllers\KabupatenController;
@@ -121,11 +121,14 @@ Route::prefix('bmkg')->group(function () {
 // Main Application Routes (Protected)
 Route::middleware('jwt.auth')->group(function () {
     // Laporan Routes
-    Route::apiResource('laporans', LaporanController::class);
-    Route::patch('/laporans/{id}/verifikasi', [LaporanController::class, 'verifikasi']);
-    Route::patch('/laporans/{id}/proses', [LaporanController::class, 'proses']);
-    Route::get('/laporans/{id}/riwayat', [LaporanController::class, 'riwayat']);
-    Route::get('/laporans/statistics', [LaporanController::class, 'statistics']);
+    Route::controller(LaporansController::class)->prefix('laporans')->group(function () {
+        Route::get('statistics', 'statistics'); // Statistics harus di atas {id}
+        Route::post('{id}/verifikasi', 'verifikasi');
+        Route::post('{id}/proses', 'proses');
+        Route::get('{id}/riwayat', 'riwayat');
+    });
+
+    Route::apiResource('laporans', LaporansController::class);
 
     // Kategori Bencana Routes (Read - all authenticated users, Write - Admin only)
     Route::get('/kategori-bencana', [KategoriBencanaController::class, 'index']);

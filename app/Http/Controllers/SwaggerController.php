@@ -54,6 +54,11 @@ use OpenApi\Annotations as OA;
  * )
  *
  * @OA\Tag(
+ *     name="Laporan Management",
+ *     description="CRUD operations dan statistik untuk laporan bencana"
+ * )
+ *
+ * @OA\Tag(
  *     name="BMKG Integration",
  *     description="BMKG real-time data integration endpoints untuk gempa, cuaca, dan peringatan tsunami"
  * )
