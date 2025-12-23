@@ -3341,14 +3341,14 @@
                 ]
             }
         },
-        "/api/tindak-lanjut": {
+        "/tindak-lanjut": {
             "get": {
                 "tags": [
                     "Tindak Lanjut"
                 ],
                 "summary": "Get all tindak lanjut",
                 "description": "Mengambil semua data tindak lanjut dengan filter dan pagination",
-                "operationId": "181c8564e3d28c5f3d9fa71b7e216769",
+                "operationId": "51bd7964e96d0f5eb0cffb1934cda133",
                 "parameters": [
                     {
                         "name": "laporan_id",
@@ -3449,7 +3449,7 @@
                 ],
                 "summary": "Create new tindak lanjut",
                 "description": "Membuat data tindak lanjut baru",
-                "operationId": "c495a92e6e0f8d8224d8bfd9ad01db3e",
+                "operationId": "2a0261cce1fb46360f673de2e825512a",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -3520,14 +3520,14 @@
                 ]
             }
         },
-        "/api/tindak-lanjut/{id}": {
+        "/tindak-lanjut/{id}": {
             "get": {
                 "tags": [
                     "Tindak Lanjut"
                 ],
                 "summary": "Get specific tindak lanjut",
                 "description": "Mengambil data tindak lanjut berdasarkan ID",
-                "operationId": "c46ae0328d637d777e59d8750755b7d8",
+                "operationId": "1d18e845bbf47c050d73700cf0d5cb5e",
                 "parameters": [
                     {
                         "name": "id",
@@ -3579,7 +3579,7 @@
                 ],
                 "summary": "Update tindak lanjut",
                 "description": "Mengupdate data tindak lanjut",
-                "operationId": "d7ec87a7849a007657b83d2eecd4a7b0",
+                "operationId": "eb586b31f37cf89f46dc9a5335466528",
                 "parameters": [
                     {
                         "name": "id",
@@ -3652,7 +3652,7 @@
                 ],
                 "summary": "Delete tindak lanjut",
                 "description": "Menghapus data tindak lanjut",
-                "operationId": "b68ccaedc19ec711900d6bc9e7c7b074",
+                "operationId": "6d9e531e3d5b97b88190e99341fa2114",
                 "parameters": [
                     {
                         "name": "id",
@@ -3693,14 +3693,14 @@
                 ]
             }
         },
-        "/api/users": {
+        "/users": {
             "get": {
                 "tags": [
                     "User Management"
                 ],
                 "summary": "Get all users with pagination",
                 "description": "Mendapatkan daftar semua pengguna dengan pagination (Admin only)",
-                "operationId": "c457726701591d1183b53aa71fc13441",
+                "operationId": "7e2f5799553ec93c9c43e2a58490d447",
                 "parameters": [
                     {
                         "name": "per_page",
@@ -3810,7 +3810,7 @@
                 ],
                 "summary": "Create new user",
                 "description": "Menambah pengguna baru (Admin only)",
-                "operationId": "592819a0265360b2014512d6dbfaf0e7",
+                "operationId": "a1fce870c566eb5fc0cf3178ec5d2fed",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -3891,14 +3891,14 @@
                 ]
             }
         },
-        "/api/users/statistics": {
+        "/users/statistics": {
             "get": {
                 "tags": [
                     "User Management"
                 ],
                 "summary": "Get user statistics",
                 "description": "Mendapatkan statistik pengguna (Admin only)",
-                "operationId": "d7f3655122d7be08fbc00d573ec7254f",
+                "operationId": "a505e37c3ca2c73d127960e633df3365",
                 "responses": {
                     "200": {
                         "description": "Statistik pengguna berhasil diambil",
@@ -3953,14 +3953,14 @@
                 ]
             }
         },
-        "/api/users/profile": {
+        "/users/profile": {
             "get": {
                 "tags": [
                     "User Management"
                 ],
                 "summary": "Get user profile",
                 "description": "Mendapatkan profil pengguna yang sedang login",
-                "operationId": "75270b17cd590b047d7fa1305b10f64c",
+                "operationId": "c478ac7528255232c445adcd37615e93",
                 "responses": {
                     "200": {
                         "description": "Profil berhasil diambil",
@@ -3998,7 +3998,7 @@
                 ],
                 "summary": "Update user profile",
                 "description": "Update profil pengguna yang sedang login",
-                "operationId": "94122b3a1484d6a74360389ea0e85fcb",
+                "operationId": "aa3ed5261c039abbe8a9457ff26a0b44",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -4059,14 +4059,14 @@
                 ]
             }
         },
-        "/api/users/{id}": {
+        "/users/{id}": {
             "get": {
                 "tags": [
                     "User Management"
                 ],
                 "summary": "Get specific user",
                 "description": "Mendapatkan data pengguna spesifik (Admin only)",
-                "operationId": "36a33ff774d5cba33c039dec2c3e0287",
+                "operationId": "910a0c7cf580e1c605648d82a4e57f46",
                 "parameters": [
                     {
                         "name": "id",
@@ -4115,7 +4115,7 @@
                 ],
                 "summary": "Update user",
                 "description": "Update data pengguna (Admin only)",
-                "operationId": "b9091397c8b25f12c6adb74be6ce3a5a",
+                "operationId": "ddfe232db1870b82493bf8bd25596d37",
                 "parameters": [
                     {
                         "name": "id",
@@ -4204,7 +4204,7 @@
                 ],
                 "summary": "Delete user",
                 "description": "Hapus pengguna (Admin only)",
-                "operationId": "fa56cffde745d3f152f95cbacd936c0b",
+                "operationId": "43dd20becb1f47444e484cbb18ce345c",
                 "parameters": [
                     {
                         "name": "id",

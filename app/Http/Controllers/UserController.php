@@ -13,7 +13,7 @@ class UserController extends Controller
 {
     /**
      * @OA\Get(
-     *     path="/api/users",
+     *     path="/users",
      *     summary="Get all users with pagination",
      *     description="Mendapatkan daftar semua pengguna dengan pagination (Admin only)",
      *     tags={"User Management"},
@@ -116,7 +116,7 @@ class UserController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/api/users/statistics",
+     *     path="/users/statistics",
      *     summary="Get user statistics",
      *     description="Mendapatkan statistik pengguna (Admin only)",
      *     tags={"User Management"},
@@ -197,7 +197,7 @@ class UserController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/api/users/profile",
+     *     path="/users/profile",
      *     summary="Get user profile",
      *     description="Mendapatkan profil pengguna yang sedang login",
      *     tags={"User Management"},
@@ -263,7 +263,7 @@ class UserController extends Controller
 
     /**
      * @OA\Put(
-     *     path="/api/users/profile",
+     *     path="/users/profile",
      *     summary="Update user profile",
      *     description="Update profil pengguna yang sedang login",
      *     tags={"User Management"},
@@ -331,7 +331,7 @@ class UserController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/api/users/{id}",
+     *     path="/users/{id}",
      *     summary="Get specific user",
      *     description="Mendapatkan data pengguna spesifik (Admin only)",
      *     tags={"User Management"},
@@ -398,7 +398,7 @@ class UserController extends Controller
 
     /**
      * @OA\Post(
-     *     path="/api/users",
+     *     path="/users",
      *     summary="Create new user",
      *     description="Menambah pengguna baru (Admin only)",
      *     tags={"User Management"},
@@ -471,7 +471,7 @@ class UserController extends Controller
 
     /**
      * @OA\Put(
-     *     path="/api/users/{id}",
+     *     path="/users/{id}",
      *     summary="Update user",
      *     description="Update data pengguna (Admin only)",
      *     tags={"User Management"},
@@ -558,7 +558,7 @@ class UserController extends Controller
 
     /**
      * @OA\Delete(
-     *     path="/api/users/{id}",
+     *     path="/users/{id}",
      *     summary="Delete user",
      *     description="Hapus pengguna (Admin only)",
      *     tags={"User Management"},

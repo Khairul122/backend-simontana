@@ -27,6 +27,16 @@ class Laporans extends Model
     protected $hidden = ['created_at', 'updated_at'];
 
     /**
+     * Appended attributes to model's JSON form
+     */
+    protected $appends = [
+        'foto_bukti_1_url',
+        'foto_bukti_2_url',
+        'foto_bukti_3_url',
+        'video_bukti_url'
+    ];
+
+    /**
      * Strict type casting for data consistency and JSON serialization
      */
     protected $casts = [
@@ -254,5 +264,53 @@ class Laporans extends Model
         ', [$lat, $lng, $lat])
         ->having('distance', '<=', $radiusKm)
         ->orderBy('distance');
+    }
+
+    /**
+     * Get the full URL for foto bukti 1.
+     */
+    public function getFotoBukti1UrlAttribute(): ?string
+    {
+        if ($this->foto_bukti_1) {
+            return asset('storage/laporans/' . $this->foto_bukti_1);
+        }
+
+        return null;
+    }
+
+    /**
+     * Get the full URL for foto bukti 2.
+     */
+    public function getFotoBukti2UrlAttribute(): ?string
+    {
+        if ($this->foto_bukti_2) {
+            return asset('storage/laporans/' . $this->foto_bukti_2);
+        }
+
+        return null;
+    }
+
+    /**
+     * Get the full URL for foto bukti 3.
+     */
+    public function getFotoBukti3UrlAttribute(): ?string
+    {
+        if ($this->foto_bukti_3) {
+            return asset('storage/laporans/' . $this->foto_bukti_3);
+        }
+
+        return null;
+    }
+
+    /**
+     * Get the full URL for video bukti.
+     */
+    public function getVideoBuktiUrlAttribute(): ?string
+    {
+        if ($this->video_bukti) {
+            return asset('storage/laporans/' . $this->video_bukti);
+        }
+
+        return null;
     }
 }

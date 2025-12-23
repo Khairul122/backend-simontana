@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\TindakLanjut;
-use App\Models\Laporan;
+use App\Models\Laporans;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
@@ -18,7 +18,7 @@ class TindakLanjutController extends Controller
 {
     /**
      * @OA\Get(
-     *     path="/api/tindak-lanjut",
+     *     path="/tindak-lanjut",
      *     tags={"Tindak Lanjut"},
      *     summary="Get all tindak lanjut",
      *     description="Mengambil semua data tindak lanjut dengan filter dan pagination",
@@ -117,7 +117,7 @@ class TindakLanjutController extends Controller
 
     /**
      * @OA\Post(
-     *     path="/api/tindak-lanjut",
+     *     path="/tindak-lanjut",
      *     tags={"Tindak Lanjut"},
      *     summary="Create new tindak lanjut",
      *     description="Membuat data tindak lanjut baru",
@@ -178,7 +178,7 @@ class TindakLanjutController extends Controller
         }
 
         // Cek apakah laporan valid dan belum ditangani
-        $laporan = Laporan::find($request->laporan_id);
+        $laporan = Laporans::find($request->laporan_id);
         if (!$laporan) {
             return response()->json([
                 'success' => false,
@@ -201,7 +201,7 @@ class TindakLanjutController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/api/tindak-lanjut/{id}",
+     *     path="/tindak-lanjut/{id}",
      *     tags={"Tindak Lanjut"},
      *     summary="Get specific tindak lanjut",
      *     description="Mengambil data tindak lanjut berdasarkan ID",
@@ -262,7 +262,7 @@ class TindakLanjutController extends Controller
 
     /**
      * @OA\Put(
-     *     path="/api/tindak-lanjut/{id}",
+     *     path="/tindak-lanjut/{id}",
      *     tags={"Tindak Lanjut"},
      *     summary="Update tindak lanjut",
      *     description="Mengupdate data tindak lanjut",
@@ -347,7 +347,7 @@ class TindakLanjutController extends Controller
 
     /**
      * @OA\Delete(
-     *     path="/api/tindak-lanjut/{id}",
+     *     path="/tindak-lanjut/{id}",
      *     tags={"Tindak Lanjut"},
      *     summary="Delete tindak lanjut",
      *     description="Menghapus data tindak lanjut",

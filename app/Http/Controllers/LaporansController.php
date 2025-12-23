@@ -153,6 +153,60 @@ use Illuminate\Validation\Rule;
 class LaporansController extends Controller
 {
     /**
+     * Handle file upload with automatic deletion of old file.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @param string $fieldName - Field name in request
+     * @param string|null $oldFile - Old file path to delete
+     * @return string|null - Returns filename or null
+     */
+    private function handleFileUpload(Request $request, string $fieldName, ?string $oldFile = null): ?string
+    {
+        if (!$request->hasFile($fieldName)) {
+            return null;
+        }
+
+        $file = $request->file($fieldName);
+
+        // Delete old file if exists
+        if ($oldFile) {
+            try {
+                Storage::disk('public')->delete('laporans/' . $oldFile);
+            } catch (\Exception $e) {
+                // Silent fail if old file not found
+                \Log::warning("Failed to delete old file: {$oldFile}", ['error' => $e->getMessage()]);
+            }
+        }
+
+        // Generate unique filename
+        $fileName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+
+        // Store file
+        $file->storeAs('laporans', $fileName, 'public');
+
+        return $fileName;
+    }
+
+    /**
+     * Delete multiple files from storage.
+     *
+     * @param array $files - Array of filenames
+     * @return void
+     */
+    private function deleteFiles(array $files): void
+    {
+        foreach ($files as $file) {
+            if ($file) {
+                try {
+                    Storage::disk('public')->delete('laporans/' . $file);
+                } catch (\Exception $e) {
+                    // Silent fail if file not found
+                    \Log::warning("Failed to delete file: {$file}", ['error' => $e->getMessage()]);
+                }
+            }
+        }
+    }
+    /**
      * Display a listing of the resource with eager loading.
      *
      * @OA\Get(
@@ -433,10 +487,7 @@ class LaporansController extends Controller
                 ], 422);
             }
 
-            // Prepare data with automated fields
             $data = $request->all();
-
-            // Automated security fields
             $data['id_pelapor'] = auth()->id();
             $data['waktu_laporan'] = $request->waktu_laporan ?? now();
             $data['status'] = 'Draft';
@@ -445,14 +496,12 @@ class LaporansController extends Controller
             // Handle file uploads
             $fileFields = ['foto_bukti_1', 'foto_bukti_2', 'foto_bukti_3', 'video_bukti'];
             foreach ($fileFields as $field) {
-                if ($request->hasFile($field)) {
-                    $file = $request->file($field);
-                    $path = $file->store('laporans/' . date('Y/m'), 'public');
-                    $data[$field] = $path;
+                $fileName = $this->handleFileUpload($request, $field);
+                if ($fileName) {
+                    $data[$field] = $fileName;
                 }
             }
 
-            // Handle nullable fields
             $data['alamat_lengkap'] = $request->alamat_laporan ?? null;
             $data['jumlah_korban'] = $request->jumlah_korban ?? null;
             $data['jumlah_rumah_rusak'] = $request->jumlah_rumah_rusak ?? null;
@@ -460,8 +509,6 @@ class LaporansController extends Controller
             $data['data_tambahan'] = $request->data_tambahan ?? null;
 
             $laporan = Laporans::create($data);
-
-            // Load relationships for response
             $laporan->load(['pelapor:id,nama,email', 'kategori', 'desa']);
 
             return response()->json([
@@ -664,18 +711,12 @@ class LaporansController extends Controller
 
             $data = $request->all();
 
-            // Handle file uploads and delete old files
+            // Handle file uploads with automatic old file deletion
             $fileFields = ['foto_bukti_1', 'foto_bukti_2', 'foto_bukti_3', 'video_bukti'];
             foreach ($fileFields as $field) {
-                if ($request->hasFile($field)) {
-                    // Delete old file if exists
-                    if ($laporan->$field) {
-                        Storage::disk('public')->delete($laporan->$field);
-                    }
-
-                    $file = $request->file($field);
-                    $path = $file->store('laporans/' . date('Y/m'), 'public');
-                    $data[$field] = $path;
+                $fileName = $this->handleFileUpload($request, $field, $laporan->$field);
+                if ($fileName) {
+                    $data[$field] = $fileName;
                 }
             }
 
@@ -768,13 +809,14 @@ class LaporansController extends Controller
                 ], 403);
             }
 
-            // Delete associated files
-            $fileFields = ['foto_bukti_1', 'foto_bukti_2', 'foto_bukti_3', 'video_bukti'];
-            foreach ($fileFields as $field) {
-                if ($laporan->$field) {
-                    Storage::disk('public')->delete($laporan->$field);
-                }
-            }
+            // Delete all associated files
+            $filesToDelete = [
+                $laporan->foto_bukti_1,
+                $laporan->foto_bukti_2,
+                $laporan->foto_bukti_3,
+                $laporan->video_bukti
+            ];
+            $this->deleteFiles($filesToDelete);
 
             $laporan->delete();
 

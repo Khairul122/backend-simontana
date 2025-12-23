@@ -25,10 +25,10 @@ class TindakLanjut extends Model
         'updated_at' => 'datetime',
     ];
 
-    // Relasi ke model Laporan
+    // Relasi ke model Laporans
     public function laporan()
     {
-        return $this->belongsTo(Laporan::class, 'laporan_id', 'id_laporan');
+        return $this->belongsTo(Laporans::class, 'laporan_id', 'id');
     }
 
     // Relasi ke model Pengguna (Petugas)
