@@ -26,10 +26,9 @@ class Monitoring extends Model
         'updated_at' => 'datetime',
     ];
 
-    // Relasi ke model Laporan
     public function laporan()
     {
-        return $this->belongsTo(Laporan::class, 'id_laporan', 'id_laporan');
+        return $this->belongsTo(Laporans::class, 'id_laporan', 'id');
     }
 
     // Relasi ke model Pengguna (Operator)

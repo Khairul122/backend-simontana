@@ -211,13 +211,13 @@
                                     "username": {
                                         "description": "Username atau email",
                                         "type": "string",
-                                        "example": "johndoe"
+                                        "example": "admin"
                                     },
                                     "password": {
                                         "description": "Password",
                                         "type": "string",
                                         "format": "password",
-                                        "example": "password123"
+                                        "example": "password"
                                     }
                                 },
                                 "type": "object"
@@ -1936,14 +1936,14 @@
                 ]
             }
         },
-        "/api/monitoring": {
+        "/monitoring": {
             "get": {
                 "tags": [
                     "Monitoring"
                 ],
                 "summary": "Get all monitoring",
                 "description": "Mengambil semua data monitoring dengan filter dan pagination",
-                "operationId": "6e601ffc64b4298bd3f30e3dd442ff1a",
+                "operationId": "9a70626ac6d08b90094030d5832ddb49",
                 "parameters": [
                     {
                         "name": "id_laporan",
@@ -2031,7 +2031,7 @@
                 ],
                 "summary": "Create new monitoring",
                 "description": "Membuat data monitoring baru",
-                "operationId": "39b67cf51b2da0bbdc017a92f047201e",
+                "operationId": "ccd8363874f7f1f6585299a39dd640c1",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -2103,14 +2103,14 @@
                 ]
             }
         },
-        "/api/monitoring/{id}": {
+        "/monitoring/{id}": {
             "get": {
                 "tags": [
                     "Monitoring"
                 ],
                 "summary": "Get specific monitoring",
                 "description": "Mengambil data monitoring berdasarkan ID",
-                "operationId": "0748483f2ea219ed10b6b948fda2323f",
+                "operationId": "88575fcb0e24229e4bac7bfc7b1af8fc",
                 "parameters": [
                     {
                         "name": "id",
@@ -2162,7 +2162,7 @@
                 ],
                 "summary": "Update monitoring",
                 "description": "Mengupdate data monitoring",
-                "operationId": "d1c6c5f2e01074708eff5c884e613ba6",
+                "operationId": "2fe8a04715a9f6ed5a357a14dfcef843",
                 "parameters": [
                     {
                         "name": "id",
@@ -2236,7 +2236,7 @@
                 ],
                 "summary": "Delete monitoring",
                 "description": "Menghapus data monitoring",
-                "operationId": "140f90bf1975c2b47d407eb93c38aa10",
+                "operationId": "398561f64582dd22f2ada62530a35f3e",
                 "parameters": [
                     {
                         "name": "id",
@@ -2277,14 +2277,14 @@
                 ]
             }
         },
-        "/api/riwayat-tindakan": {
+        "/riwayat-tindakan": {
             "get": {
                 "tags": [
                     "Riwayat Tindakan"
                 ],
                 "summary": "Get all riwayat tindakan",
                 "description": "Mengambil semua data riwayat tindakan dengan filter dan pagination",
-                "operationId": "0dd260764f9e2e639937f311956b24f8",
+                "operationId": "5463bda25cca6078196ef9be3c8fe45b",
                 "parameters": [
                     {
                         "name": "tindaklanjut_id",
@@ -2372,7 +2372,7 @@
                 ],
                 "summary": "Create new riwayat tindakan",
                 "description": "Membuat data riwayat tindakan baru",
-                "operationId": "961e3c08528d77c213987b472e19c486",
+                "operationId": "6674cfe2daebab8eeb2fa09034254160",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -2440,14 +2440,14 @@
                 ]
             }
         },
-        "/api/riwayat-tindakan/{id}": {
+        "/riwayat-tindakan/{id}": {
             "get": {
                 "tags": [
                     "Riwayat Tindakan"
                 ],
                 "summary": "Get specific riwayat tindakan",
                 "description": "Mengambil data riwayat tindakan berdasarkan ID",
-                "operationId": "1a1da714eac7f904d057dbc662845bfb",
+                "operationId": "528a5913c123a4c3f544558680caff16",
                 "parameters": [
                     {
                         "name": "id",
@@ -2499,7 +2499,7 @@
                 ],
                 "summary": "Update riwayat tindakan",
                 "description": "Mengupdate data riwayat tindakan",
-                "operationId": "00638b25571ace16a6a08fae34eb1b1a",
+                "operationId": "dde7e13c621032ffe6ecd3a968493060",
                 "parameters": [
                     {
                         "name": "id",
@@ -2569,7 +2569,7 @@
                 ],
                 "summary": "Delete riwayat tindakan",
                 "description": "Menghapus data riwayat tindakan",
-                "operationId": "91ceeced095cec77e95298e0ec64ef73",
+                "operationId": "ffd3af57f5233e39666d14f01a7753f6",
                 "parameters": [
                     {
                         "name": "id",
@@ -3514,14 +3514,14 @@
                 ]
             }
         },
-        "/api/wilayah": {
+        "/wilayah": {
             "get": {
                 "tags": [
                     "Wilayah"
                 ],
                 "summary": "Get all wilayah",
                 "description": "Mengambil semua data wilayah dengan filter jenis dan pagination",
-                "operationId": "8e2b40f16cbcfba941e047a8ffb19e8d",
+                "operationId": "3c18b721d1a6c0758c1fe55e931ffe95",
                 "parameters": [
                     {
                         "name": "jenis",
@@ -3664,7 +3664,7 @@
                 ],
                 "summary": "Create new wilayah",
                 "description": "Membuat wilayah baru berdasarkan jenis - Hanya Admin yang dapat mengakses endpoint ini",
-                "operationId": "05e449ddff0aa8cee628d061bcd79eca",
+                "operationId": "c0db83884f9e134c12793581be7b18aa",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -3815,14 +3815,14 @@
                 ]
             }
         },
-        "/api/wilayah/{id}": {
+        "/wilayah/{id}": {
             "get": {
                 "tags": [
                     "Wilayah"
                 ],
                 "summary": "Get specific wilayah by ID",
                 "description": "Mengambil data wilayah berdasarkan ID - parameter jenis wajib untuk menentukan tabel",
-                "operationId": "61bf93456c3aa837b6001dad3f1851c5",
+                "operationId": "8b63302fd1724354ee3007fdf23dd302",
                 "parameters": [
                     {
                         "name": "id",
@@ -3960,7 +3960,7 @@
                 ],
                 "summary": "Update wilayah",
                 "description": "Memperbarui data wilayah berdasarkan ID - parameter jenis wajib untuk menentukan tabel",
-                "operationId": "7303ba13b52aab3ebe54bfcdb6a47495",
+                "operationId": "67300498fdc70cd0a355c0c00fc2a53d",
                 "parameters": [
                     {
                         "name": "id",
@@ -4147,7 +4147,7 @@
                 ],
                 "summary": "Delete wilayah",
                 "description": "Menghapus data wilayah berdasarkan ID - parameter jenis wajib untuk menentukan tabel",
-                "operationId": "34532250e9324caf52afab1729175e3f",
+                "operationId": "2e37c8fbd07411493db2fa4acb628213",
                 "parameters": [
                     {
                         "name": "id",
@@ -4268,14 +4268,14 @@
                 ]
             }
         },
-        "/api/wilayah/provinsi": {
+        "/wilayah/provinsi": {
             "get": {
                 "tags": [
                     "Wilayah"
                 ],
                 "summary": "Get all provinsi",
                 "description": "Mengambil semua data provinsi dengan opsi include relasi",
-                "operationId": "639109c19ff5953848a49c714e6e2168",
+                "operationId": "2c66f5e75dc54cff69f42bdf19eb2166",
                 "parameters": [
                     {
                         "name": "include",
@@ -4339,14 +4339,14 @@
                 ]
             }
         },
-        "/api/wilayah/provinsi/{id}": {
+        "/wilayah/provinsi/{id}": {
             "get": {
                 "tags": [
                     "Wilayah"
                 ],
                 "summary": "Get provinsi by ID",
                 "description": "Mengambil data provinsi berdasarkan ID dengan opsi include relasi",
-                "operationId": "823fd80028c21b85387e740b68b0ebb7",
+                "operationId": "8d06412007e230da508c278e0b323654",
                 "parameters": [
                     {
                         "name": "id",
@@ -4419,14 +4419,14 @@
                 ]
             }
         },
-        "/api/wilayah/kabupaten/{provinsi_id}": {
+        "/wilayah/kabupaten/{provinsi_id}": {
             "get": {
                 "tags": [
                     "Wilayah"
                 ],
                 "summary": "Get kabupaten by provinsi",
                 "description": "Mengambil semua data kabupaten/kota berdasarkan ID provinsi",
-                "operationId": "feb1b9e2b479125a425df6746e817e55",
+                "operationId": "c6799c8486c223fdeb6a9e8fa5ccb474",
                 "parameters": [
                     {
                         "name": "provinsi_id",
@@ -4510,14 +4510,14 @@
                 ]
             }
         },
-        "/api/wilayah/kecamatan/{kabupaten_id}": {
+        "/wilayah/kecamatan/{kabupaten_id}": {
             "get": {
                 "tags": [
                     "Wilayah"
                 ],
                 "summary": "Get kecamatan by kabupaten",
                 "description": "Mengambil semua data kecamatan berdasarkan ID kabupaten",
-                "operationId": "e45136d5bf95aca0b6fe90dbca6fbe38",
+                "operationId": "d613cc480d307edc2f332f756624420f",
                 "parameters": [
                     {
                         "name": "kabupaten_id",
@@ -4601,14 +4601,14 @@
                 ]
             }
         },
-        "/api/wilayah/desa/{kecamatan_id}": {
+        "/wilayah/desa/{kecamatan_id}": {
             "get": {
                 "tags": [
                     "Wilayah"
                 ],
                 "summary": "Get desa by kecamatan",
                 "description": "Mengambil semua data desa/kelurahan berdasarkan ID kecamatan",
-                "operationId": "4850d1e44f09d8a0d5a3b5bbd761c4f9",
+                "operationId": "89994d79b06ee468769ba4d10dd6940a",
                 "parameters": [
                     {
                         "name": "kecamatan_id",
@@ -4687,14 +4687,14 @@
                 ]
             }
         },
-        "/api/wilayah/detail/{desa_id}": {
+        "/wilayah/detail/{desa_id}": {
             "get": {
                 "tags": [
                     "Wilayah"
                 ],
                 "summary": "Get wilayah detail by desa ID",
                 "description": "Mengambil data wilayah lengkap berdasarkan ID desa (desa -> kecamatan -> kabupaten -> provinsi)",
-                "operationId": "bc4a95137b72306987ebe6bcc9241fa3",
+                "operationId": "716158bbb9fb5d49703136cdfd96418e",
                 "parameters": [
                     {
                         "name": "desa_id",
@@ -4802,14 +4802,14 @@
                 ]
             }
         },
-        "/api/wilayah/hierarchy/{desa_id}": {
+        "/wilayah/hierarchy/{desa_id}": {
             "get": {
                 "tags": [
                     "Wilayah"
                 ],
                 "summary": "Get wilayah hierarchy by desa ID",
                 "description": "Mengambil hirarki wilayah lengkap berdasarkan ID desa (desa, kecamatan, kabupaten, provinsi dalam format terstruktur)",
-                "operationId": "29282323da55f4a1d6f5a7e274534c6b",
+                "operationId": "5eded7d67cad4d97e192474f0d146885",
                 "parameters": [
                     {
                         "name": "desa_id",
@@ -4870,14 +4870,14 @@
                 ]
             }
         },
-        "/api/wilayah/search": {
+        "/wilayah/search": {
             "get": {
                 "tags": [
                     "Wilayah"
                 ],
                 "summary": "Search wilayah",
                 "description": "Mencari data wilayah berdasarkan nama",
-                "operationId": "d4d97b3890f112dccfd7f66a801c47ed",
+                "operationId": "30ea2ba6b64db01f8eca8b656fcbab1c",
                 "parameters": [
                     {
                         "name": "q",

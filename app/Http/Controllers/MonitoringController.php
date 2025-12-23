@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Monitoring;
-use App\Models\Laporan;
+use App\Models\Laporans;
 use App\Models\Pengguna;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
@@ -19,7 +19,7 @@ class MonitoringController extends Controller
 {
     /**
      * @OA\Get(
-     *     path="/api/monitoring",
+     *     path="/monitoring",
      *     tags={"Monitoring"},
      *     summary="Get all monitoring",
      *     description="Mengambil semua data monitoring dengan filter dan pagination",
@@ -66,47 +66,29 @@ class MonitoringController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        try {
-            $user = auth()->user();
+        $query = Monitoring::with(['laporan', 'operator']);
 
-            if (!$user) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Token tidak valid'
-                ], 401);
-            }
-
-            $query = Monitoring::with(['laporan', 'operator']);
-
-            // Filter berdasarkan id_laporan
-            if ($request->has('id_laporan')) {
-                $query->where('id_laporan', $request->id_laporan);
-            }
-
-            // Filter berdasarkan id_operator
-            if ($request->has('id_operator')) {
-                $query->where('id_operator', $request->id_operator);
-            }
-
-            $perPage = $request->get('per_page', 20);
-            $monitorings = $query->paginate($perPage);
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Data monitoring berhasil diambil',
-                'data' => $monitorings
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Token tidak valid'
-            ], 401);
+        if ($request->has('id_laporan')) {
+            $query->where('id_laporan', $request->id_laporan);
         }
+
+        if ($request->has('id_operator')) {
+            $query->where('id_operator', $request->id_operator);
+        }
+
+        $perPage = $request->get('per_page', 20);
+        $monitorings = $query->paginate($perPage);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Data monitoring berhasil diambil',
+            'data' => $monitorings
+        ]);
     }
 
     /**
      * @OA\Post(
-     *     path="/api/monitoring",
+     *     path="/monitoring",
      *     tags={"Monitoring"},
      *     summary="Create new monitoring",
      *     description="Membuat data monitoring baru",
@@ -136,63 +118,43 @@ class MonitoringController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
-        try {
-            $user = auth()->user();
+        $validator = Validator::make($request->all(), [
+            'id_laporan' => 'required|exists:laporans,id_laporan',
+            'id_operator' => 'required|exists:pengguna,id',
+            'waktu_monitoring' => 'required|date',
+            'hasil_monitoring' => 'required|string',
+            'koordinat_gps' => 'nullable|string'
+        ]);
 
-            if (!$user) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Token tidak valid'
-                ], 401);
-            }
-
-            $validator = Validator::make($request->all(), [
-                'id_laporan' => 'required|exists:laporan,id_laporan',
-                'id_operator' => 'required|exists:pengguna,id',
-                'waktu_monitoring' => 'required|date',
-                'hasil_monitoring' => 'required|string',
-                'koordinat_gps' => 'sometimes|nullable|string'
-            ]);
-
-            if ($validator->fails()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Validasi gagal',
-                    'errors' => $validator->errors()
-                ], 422);
-            }
-
-            // Cek apakah laporan valid
-            $laporan = Laporan::find($request->id_laporan);
-            if (!$laporan) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Laporan tidak ditemukan'
-                ], 404);
-            }
-
-            // Buat monitoring
-            $monitoring = Monitoring::create($request->all());
-
-            // Load relasi untuk response
-            $monitoring->load(['laporan', 'operator']);
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Monitoring berhasil dibuat',
-                'data' => $monitoring
-            ], 201);
-        } catch (\Exception $e) {
+        if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Token tidak valid'
-            ], 401);
+                'message' => 'Validasi gagal',
+                'errors' => $validator->errors()
+            ], 422);
         }
+
+        $laporan = Laporans::find($request->id_laporan);
+        if (!$laporan) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Laporan tidak ditemukan'
+            ], 404);
+        }
+
+        $monitoring = Monitoring::create($request->all());
+        $monitoring->load(['laporan', 'operator']);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Monitoring berhasil dibuat',
+            'data' => $monitoring
+        ], 201);
     }
 
     /**
      * @OA\Get(
-     *     path="/api/monitoring/{id}",
+     *     path="/monitoring/{id}",
      *     tags={"Monitoring"},
      *     summary="Get specific monitoring",
      *     description="Mengambil data monitoring berdasarkan ID",
@@ -219,41 +181,25 @@ class MonitoringController extends Controller
      */
     public function show(Request $request, $id): JsonResponse
     {
-        try {
-            $user = auth()->user();
+        $monitoring = Monitoring::with(['laporan', 'operator'])->find($id);
 
-            if (!$user) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Token tidak valid'
-                ], 401);
-            }
-
-            $monitoring = Monitoring::with(['laporan', 'operator'])->find($id);
-
-            if (!$monitoring) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Monitoring tidak ditemukan'
-                ], 404);
-            }
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Data monitoring berhasil diambil',
-                'data' => $monitoring
-            ]);
-        } catch (\Exception $e) {
+        if (!$monitoring) {
             return response()->json([
                 'success' => false,
-                'message' => 'Token tidak valid'
-            ], 401);
+                'message' => 'Monitoring tidak ditemukan'
+            ], 404);
         }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Data monitoring berhasil diambil',
+            'data' => $monitoring
+        ]);
     }
 
     /**
      * @OA\Put(
-     *     path="/api/monitoring/{id}",
+     *     path="/monitoring/{id}",
      *     tags={"Monitoring"},
      *     summary="Update monitoring",
      *     description="Mengupdate data monitoring",
@@ -287,60 +233,44 @@ class MonitoringController extends Controller
      */
     public function update(Request $request, $id): JsonResponse
     {
-        try {
-            $user = auth()->user();
+        $validator = Validator::make($request->all(), [
+            'id_laporan' => 'sometimes|exists:laporans,id_laporan',
+            'id_operator' => 'sometimes|exists:pengguna,id',
+            'waktu_monitoring' => 'sometimes|date',
+            'hasil_monitoring' => 'sometimes|string',
+            'koordinat_gps' => 'nullable|string'
+        ]);
 
-            if (!$user) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Token tidak valid'
-                ], 401);
-            }
-
-            $validator = Validator::make($request->all(), [
-                'hasil_monitoring' => 'sometimes|required|string',
-                'waktu_monitoring' => 'sometimes|required|date',
-                'koordinat_gps' => 'sometimes|nullable|string'
-            ]);
-
-            if ($validator->fails()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Validasi gagal',
-                    'errors' => $validator->errors()
-                ], 422);
-            }
-
-            $monitoring = Monitoring::find($id);
-
-            if (!$monitoring) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Monitoring tidak ditemukan'
-                ], 404);
-            }
-
-            $monitoring->update($request->all());
-
-            // Load relasi untuk response
-            $monitoring->load(['laporan', 'operator']);
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Monitoring berhasil diupdate',
-                'data' => $monitoring
-            ]);
-        } catch (\Exception $e) {
+        if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Token tidak valid'
-            ], 401);
+                'message' => 'Validasi gagal',
+                'errors' => $validator->errors()
+            ], 422);
         }
+
+        $monitoring = Monitoring::find($id);
+
+        if (!$monitoring) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Monitoring tidak ditemukan'
+            ], 404);
+        }
+
+        $monitoring->update($request->all());
+        $monitoring->load(['laporan', 'operator']);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Monitoring berhasil diupdate',
+            'data' => $monitoring
+        ]);
     }
 
     /**
      * @OA\Delete(
-     *     path="/api/monitoring/{id}",
+     *     path="/monitoring/{id}",
      *     tags={"Monitoring"},
      *     summary="Delete monitoring",
      *     description="Menghapus data monitoring",
@@ -365,36 +295,20 @@ class MonitoringController extends Controller
      */
     public function destroy(Request $request, $id): JsonResponse
     {
-        try {
-            $user = auth()->user();
+        $monitoring = Monitoring::find($id);
 
-            if (!$user) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Token tidak valid'
-                ], 401);
-            }
-
-            $monitoring = Monitoring::find($id);
-
-            if (!$monitoring) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Monitoring tidak ditemukan'
-                ], 404);
-            }
-
-            $monitoring->delete();
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Monitoring berhasil dihapus'
-            ]);
-        } catch (\Exception $e) {
+        if (!$monitoring) {
             return response()->json([
                 'success' => false,
-                'message' => 'Token tidak valid'
-            ], 401);
+                'message' => 'Monitoring tidak ditemukan'
+            ], 404);
         }
+
+        $monitoring->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Monitoring berhasil dihapus'
+        ]);
     }
 }

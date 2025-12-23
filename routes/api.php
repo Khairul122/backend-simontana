@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\LaporansController;
 use App\Http\Controllers\KategoriBencanaController;
+use App\Http\Controllers\WilayahController;
 use App\Http\Controllers\ProvinsiController;
 use App\Http\Controllers\KabupatenController;
 use App\Http\Controllers\KecamatanController;

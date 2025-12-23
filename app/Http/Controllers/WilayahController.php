@@ -20,7 +20,7 @@ class WilayahController extends Controller
 {
     /**
      * @OA\Get(
-     *     path="/api/wilayah",
+     *     path="/wilayah",
      *     tags={"Wilayah"},
      *     summary="Get all wilayah",
      *     description="Mengambil semua data wilayah dengan filter jenis dan pagination",
@@ -183,7 +183,7 @@ class WilayahController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/api/wilayah/{id}",
+     *     path="/wilayah/{id}",
      *     tags={"Wilayah"},
      *     summary="Get specific wilayah by ID",
      *     description="Mengambil data wilayah berdasarkan ID - parameter jenis wajib untuk menentukan tabel",
@@ -342,7 +342,7 @@ class WilayahController extends Controller
 
     /**
      * @OA\Post(
-     *     path="/api/wilayah",
+     *     path="/wilayah",
      *     tags={"Wilayah"},
      *     summary="Create new wilayah",
      *     description="Membuat wilayah baru berdasarkan jenis - Hanya Admin yang dapat mengakses endpoint ini",
@@ -518,7 +518,7 @@ class WilayahController extends Controller
 
     /**
      * @OA\Put(
-     *     path="/api/wilayah/{id}",
+     *     path="/wilayah/{id}",
      *     tags={"Wilayah"},
      *     summary="Update wilayah",
      *     description="Memperbarui data wilayah berdasarkan ID - parameter jenis wajib untuk menentukan tabel",
@@ -755,7 +755,7 @@ class WilayahController extends Controller
 
     /**
      * @OA\Delete(
-     *     path="/api/wilayah/{id}",
+     *     path="/wilayah/{id}",
      *     tags={"Wilayah"},
      *     summary="Delete wilayah",
      *     description="Menghapus data wilayah berdasarkan ID - parameter jenis wajib untuk menentukan tabel",
@@ -925,7 +925,7 @@ class WilayahController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/api/wilayah/provinsi",
+     *     path="/wilayah/provinsi",
      *     tags={"Wilayah"},
      *     summary="Get all provinsi",
      *     description="Mengambil semua data provinsi dengan opsi include relasi",
@@ -983,7 +983,7 @@ class WilayahController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/api/wilayah/provinsi/{id}",
+     *     path="/wilayah/provinsi/{id}",
      *     tags={"Wilayah"},
      *     summary="Get provinsi by ID",
      *     description="Mengambil data provinsi berdasarkan ID dengan opsi include relasi",
@@ -1053,7 +1053,7 @@ class WilayahController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/api/wilayah/kabupaten/{provinsi_id}",
+     *     path="/wilayah/kabupaten/{provinsi_id}",
      *     tags={"Wilayah"},
      *     summary="Get kabupaten by provinsi",
      *     description="Mengambil semua data kabupaten/kota berdasarkan ID provinsi",
@@ -1132,7 +1132,7 @@ class WilayahController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/api/wilayah/kecamatan/{kabupaten_id}",
+     *     path="/wilayah/kecamatan/{kabupaten_id}",
      *     tags={"Wilayah"},
      *     summary="Get kecamatan by kabupaten",
      *     description="Mengambil semua data kecamatan berdasarkan ID kabupaten",
@@ -1214,7 +1214,7 @@ class WilayahController extends Controller
      */
     /**
      * @OA\Get(
-     *     path="/api/wilayah/desa/{kecamatan_id}",
+     *     path="/wilayah/desa/{kecamatan_id}",
      *     tags={"Wilayah"},
      *     summary="Get desa by kecamatan",
      *     description="Mengambil semua data desa/kelurahan berdasarkan ID kecamatan",
@@ -1290,7 +1290,7 @@ class WilayahController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/api/wilayah/detail/{desa_id}",
+     *     path="/wilayah/detail/{desa_id}",
      *     tags={"Wilayah"},
      *     summary="Get wilayah detail by desa ID",
      *     description="Mengambil data wilayah lengkap berdasarkan ID desa (desa -> kecamatan -> kabupaten -> provinsi)",
@@ -1361,7 +1361,7 @@ class WilayahController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/api/wilayah/hierarchy/{desa_id}",
+     *     path="/wilayah/hierarchy/{desa_id}",
      *     tags={"Wilayah"},
      *     summary="Get wilayah hierarchy by desa ID",
      *     description="Mengambil hirarki wilayah lengkap berdasarkan ID desa (desa, kecamatan, kabupaten, provinsi dalam format terstruktur)",
@@ -1420,7 +1420,7 @@ class WilayahController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/api/wilayah/search",
+     *     path="/wilayah/search",
      *     tags={"Wilayah"},
      *     summary="Search wilayah",
      *     description="Mencari data wilayah berdasarkan nama",

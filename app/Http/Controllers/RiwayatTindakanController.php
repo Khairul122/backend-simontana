@@ -19,7 +19,7 @@ class RiwayatTindakanController extends Controller
 {
     /**
      * @OA\Get(
-     *     path="/api/riwayat-tindakan",
+     *     path="/riwayat-tindakan",
      *     tags={"Riwayat Tindakan"},
      *     summary="Get all riwayat tindakan",
      *     description="Mengambil semua data riwayat tindakan dengan filter dan pagination",
@@ -106,7 +106,7 @@ class RiwayatTindakanController extends Controller
 
     /**
      * @OA\Post(
-     *     path="/api/riwayat-tindakan",
+     *     path="/riwayat-tindakan",
      *     tags={"Riwayat Tindakan"},
      *     summary="Create new riwayat tindakan",
      *     description="Membuat data riwayat tindakan baru",
@@ -190,7 +190,7 @@ class RiwayatTindakanController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/api/riwayat-tindakan/{id}",
+     *     path="/riwayat-tindakan/{id}",
      *     tags={"Riwayat Tindakan"},
      *     summary="Get specific riwayat tindakan",
      *     description="Mengambil data riwayat tindakan berdasarkan ID",
@@ -251,7 +251,7 @@ class RiwayatTindakanController extends Controller
 
     /**
      * @OA\Put(
-     *     path="/api/riwayat-tindakan/{id}",
+     *     path="/riwayat-tindakan/{id}",
      *     tags={"Riwayat Tindakan"},
      *     summary="Update riwayat tindakan",
      *     description="Mengupdate data riwayat tindakan",
@@ -336,7 +336,7 @@ class RiwayatTindakanController extends Controller
 
     /**
      * @OA\Delete(
-     *     path="/api/riwayat-tindakan/{id}",
+     *     path="/riwayat-tindakan/{id}",
      *     tags={"Riwayat Tindakan"},
      *     summary="Delete riwayat tindakan",
      *     description="Menghapus data riwayat tindakan",
