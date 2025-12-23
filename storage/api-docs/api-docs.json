@@ -1934,6 +1934,737 @@
                         "jwt": []
                     }
                 ]
+            },
+            "post": {
+                "tags": [
+                    "Laporan Management"
+                ],
+                "summary": "Create new laporan bencana",
+                "description": "Membuat laporan bencana baru dengan upload bukti foto/video",
+                "operationId": "fbec0c1946c9622c9690ecbd866f9a6a",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "judul_laporan",
+                                    "deskripsi",
+                                    "tingkat_keparahan",
+                                    "latitude",
+                                    "longitude",
+                                    "id_kategori_bencana",
+                                    "id_desa"
+                                ],
+                                "properties": {
+                                    "judul_laporan": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "example": "Kebakaran Hutan di Desa Sukamaju"
+                                    },
+                                    "deskripsi": {
+                                        "type": "string",
+                                        "example": "Kebakaran terjadi di area perbukitan dengan luas sekitar 5 hektar"
+                                    },
+                                    "tingkat_keparahan": {
+                                        "type": "string",
+                                        "enum": [
+                                            "Rendah",
+                                            "Sedang",
+                                            "Tinggi",
+                                            "Sangat Tinggi"
+                                        ],
+                                        "example": "Tinggi"
+                                    },
+                                    "latitude": {
+                                        "type": "number",
+                                        "format": "double",
+                                        "example": -6.2088
+                                    },
+                                    "longitude": {
+                                        "type": "number",
+                                        "format": "double",
+                                        "example": 106.8456
+                                    },
+                                    "id_kategori_bencana": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "id_desa": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "alamat": {
+                                        "type": "string",
+                                        "maxLength": 500,
+                                        "example": "Jl. Sudirman No. 123"
+                                    },
+                                    "jumlah_korban": {
+                                        "type": "integer",
+                                        "minimum": 0,
+                                        "example": 5
+                                    },
+                                    "jumlah_rumah_rusak": {
+                                        "type": "integer",
+                                        "minimum": 0,
+                                        "example": 12
+                                    },
+                                    "is_prioritas": {
+                                        "type": "boolean",
+                                        "example": false
+                                    },
+                                    "data_tambahan": {
+                                        "type": "object",
+                                        "example": {
+                                            "cuaca": "hujan",
+                                            "akses": "sulit"
+                                        }
+                                    },
+                                    "waktu_laporan": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2024-12-22"
+                                    },
+                                    "foto_bukti_1": {
+                                        "description": "Upload foto bukti 1 (JPG/PNG max 5MB)",
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "foto_bukti_2": {
+                                        "description": "Upload foto bukti 2 (JPG/PNG max 5MB)",
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "foto_bukti_3": {
+                                        "description": "Upload foto bukti 3 (JPG/PNG max 5MB)",
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "video_bukti": {
+                                        "description": "Upload video bukti (MP4/AVI/MOV max 10MB)",
+                                        "type": "string",
+                                        "format": "binary"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Laporan successfully created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Laporan berhasil dibuat"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Laporan"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            }
+        },
+        "/laporans/{id}": {
+            "get": {
+                "tags": [
+                    "Laporan Management"
+                ],
+                "summary": "Get detailed laporan by ID",
+                "description": "Mengambil detail laporan bencana lengkap dengan semua relasi",
+                "operationId": "316ba1df793b371776d28612bd3ed994",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID laporan",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully retrieved laporan detail",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Detail laporan berhasil diambil"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Laporan"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Laporan not found"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Laporan Management"
+                ],
+                "summary": "Update laporan bencana",
+                "description": "Memperbarui data laporan bencana (hanya pelapor atau Admin/PetugasBPBD yang berhak)",
+                "operationId": "4189ae1cd554b4961907afeb0de31275",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID laporan",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "properties": {
+                                    "judul_laporan": {
+                                        "type": "string",
+                                        "maxLength": 255
+                                    },
+                                    "deskripsi": {
+                                        "type": "string"
+                                    },
+                                    "tingkat_keparahan": {
+                                        "type": "string",
+                                        "enum": [
+                                            "Rendah",
+                                            "Sedang",
+                                            "Tinggi",
+                                            "Sangat Tinggi"
+                                        ]
+                                    },
+                                    "latitude": {
+                                        "type": "number",
+                                        "format": "double"
+                                    },
+                                    "longitude": {
+                                        "type": "number",
+                                        "format": "double"
+                                    },
+                                    "id_kategori_bencana": {
+                                        "type": "integer"
+                                    },
+                                    "id_desa": {
+                                        "type": "integer"
+                                    },
+                                    "alamat": {
+                                        "type": "string",
+                                        "maxLength": 500
+                                    },
+                                    "jumlah_korban": {
+                                        "type": "integer",
+                                        "minimum": 0
+                                    },
+                                    "jumlah_rumah_rusak": {
+                                        "type": "integer",
+                                        "minimum": 0
+                                    },
+                                    "is_prioritas": {
+                                        "type": "boolean"
+                                    },
+                                    "data_tambahan": {
+                                        "type": "object"
+                                    },
+                                    "waktu_laporan": {
+                                        "type": "string",
+                                        "format": "date"
+                                    },
+                                    "foto_bukti_1": {
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "foto_bukti_2": {
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "foto_bukti_3": {
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "video_bukti": {
+                                        "type": "string",
+                                        "format": "binary"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Laporan successfully updated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Laporan berhasil diperbarui"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Laporan"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Unauthorized - Not the owner or admin"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Laporan Management"
+                ],
+                "summary": "Delete laporan bencana",
+                "description": "Menghapus laporan bencana beserta file bukti (hanya pelapor atau Admin yang berhak)",
+                "operationId": "2767fb577becbed2bd18ad18dbc61ef4",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID laporan",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Laporan successfully deleted",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Laporan berhasil dihapus"
+                                        },
+                                        "data": {
+                                            "type": "object",
+                                            "example": null
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Unauthorized - Not the owner or admin"
+                    },
+                    "404": {
+                        "description": "Laporan not found"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            }
+        },
+        "/laporans/statistics": {
+            "get": {
+                "tags": [
+                    "Laporan Management"
+                ],
+                "summary": "Get laporan statistics",
+                "description": "Mengambil statistik laporan bencana (total, perlu verifikasi, ditindak, selesai, dll)",
+                "operationId": "928752aa5d0b5502ac63f44701b7024d",
+                "parameters": [
+                    {
+                        "name": "period",
+                        "in": "query",
+                        "description": "Filter periode statistik",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "weekly",
+                                "monthly",
+                                "yearly"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Statistics successfully retrieved",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Statistics retrieved successfully"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/LaporanStatistics"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            }
+        },
+        "/laporans/{id}/verifikasi": {
+            "post": {
+                "tags": [
+                    "Laporan Management"
+                ],
+                "summary": "Verifikasi laporan bencana",
+                "description": "Verifikasi laporan oleh Operator Desa atau Petugas BPBD",
+                "operationId": "6025bcf27f59d6f197af1f030389c24d",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID laporan",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "status"
+                                ],
+                                "properties": {
+                                    "status": {
+                                        "description": "Status verifikasi",
+                                        "type": "string",
+                                        "enum": [
+                                            "Diverifikasi",
+                                            "Ditolak"
+                                        ],
+                                        "example": "Diverifikasi"
+                                    },
+                                    "catatan_verifikasi": {
+                                        "type": "string",
+                                        "maxLength": 1000,
+                                        "example": "Laporan valid dan perlu ditindak lanjuti"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Laporan successfully verified",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Laporan berhasil diverifikasi"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Laporan"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            }
+        },
+        "/laporans/{id}/proses": {
+            "post": {
+                "tags": [
+                    "Laporan Management"
+                ],
+                "summary": "Proses laporan bencana",
+                "description": "Update status penanganan laporan oleh Petugas BPBD",
+                "operationId": "5471ca56382fa0668469bb059d46f115",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID laporan",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "status"
+                                ],
+                                "properties": {
+                                    "status": {
+                                        "description": "Status penanganan",
+                                        "type": "string",
+                                        "enum": [
+                                            "Diproses",
+                                            "Tindak Lanjut",
+                                            "Selesai"
+                                        ],
+                                        "example": "Diproses"
+                                    },
+                                    "catatan_proses": {
+                                        "type": "string",
+                                        "maxLength": 1000,
+                                        "example": "Tim SAR sudah diterjunkan ke lokasi"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Status laporan successfully updated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Status laporan berhasil diperbarui"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Laporan"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            }
+        },
+        "/laporans/{id}/riwayat": {
+            "get": {
+                "tags": [
+                    "Laporan Management"
+                ],
+                "summary": "Get riwayat tindakan laporan",
+                "description": "Mengambil riwayat seluruh tindakan yang pernah dilakukan pada laporan",
+                "operationId": "7deda471cfd178f5fd74b74170183925",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID laporan",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Riwayat successfully retrieved",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Riwayat laporan berhasil diambil"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer"
+                                                    },
+                                                    "laporan_id": {
+                                                        "type": "integer"
+                                                    },
+                                                    "aksi": {
+                                                        "type": "string"
+                                                    },
+                                                    "deskripsi": {
+                                                        "type": "string"
+                                                    },
+                                                    "user_id": {
+                                                        "type": "integer"
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    },
+                                                    "user": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer"
+                                                            },
+                                                            "nama": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Laporan not found"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
             }
         },
         "/monitoring": {

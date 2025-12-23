@@ -346,6 +346,61 @@ class LaporansController extends Controller
 
     /**
      * Store a newly created resource in storage.
+     *
+     * @OA\Post(
+     *     path="/laporans",
+     *     tags={"Laporan Management"},
+     *     summary="Create new laporan bencana",
+     *     description="Membuat laporan bencana baru dengan upload bukti foto/video",
+     *     security={{"jwt": {}}},
+     *
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="multipart/form-data",
+     *             @OA\Schema(
+     *                 required={"judul_laporan", "deskripsi", "tingkat_keparahan", "latitude", "longitude", "id_kategori_bencana", "id_desa"},
+     *                 @OA\Property(property="judul_laporan", type="string", maxLength=255, example="Kebakaran Hutan di Desa Sukamaju"),
+     *                 @OA\Property(property="deskripsi", type="string", example="Kebakaran terjadi di area perbukitan dengan luas sekitar 5 hektar"),
+     *                 @OA\Property(property="tingkat_keparahan", type="string", enum={"Rendah", "Sedang", "Tinggi", "Sangat Tinggi"}, example="Tinggi"),
+     *                 @OA\Property(property="latitude", type="number", format="double", example=-6.2088),
+     *                 @OA\Property(property="longitude", type="number", format="double", example=106.8456),
+     *                 @OA\Property(property="id_kategori_bencana", type="integer", example=1),
+     *                 @OA\Property(property="id_desa", type="integer", example=1),
+     *                 @OA\Property(property="alamat", type="string", maxLength=500, example="Jl. Sudirman No. 123"),
+     *                 @OA\Property(property="jumlah_korban", type="integer", minimum=0, example=5),
+     *                 @OA\Property(property="jumlah_rumah_rusak", type="integer", minimum=0, example=12),
+     *                 @OA\Property(property="is_prioritas", type="boolean", example=false),
+     *                 @OA\Property(property="data_tambahan", type="object", example={"cuaca":"hujan", "akses":"sulit"}),
+     *                 @OA\Property(property="waktu_laporan", type="string", format="date", example="2024-12-22"),
+     *                 @OA\Property(property="foto_bukti_1", type="string", format="binary", description="Upload foto bukti 1 (JPG/PNG max 5MB)"),
+     *                 @OA\Property(property="foto_bukti_2", type="string", format="binary", description="Upload foto bukti 2 (JPG/PNG max 5MB)"),
+     *                 @OA\Property(property="foto_bukti_3", type="string", format="binary", description="Upload foto bukti 3 (JPG/PNG max 5MB)"),
+     *                 @OA\Property(property="video_bukti", type="string", format="binary", description="Upload video bukti (MP4/AVI/MOV max 10MB)")
+     *             )
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=201,
+     *         description="Laporan successfully created",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Laporan berhasil dibuat"),
+     *             @OA\Property(property="data", ref="#/components/schemas/Laporan")
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation error"
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal server error"
+     *     )
+     * )
      */
     public function store(Request $request): JsonResponse
     {
@@ -426,6 +481,42 @@ class LaporansController extends Controller
 
     /**
      * Display the specified resource.
+     *
+     * @OA\Get(
+     *     path="/laporans/{id}",
+     *     tags={"Laporan Management"},
+     *     summary="Get detailed laporan by ID",
+     *     description="Mengambil detail laporan bencana lengkap dengan semua relasi",
+     *     security={{"jwt": {}}},
+     *
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="ID laporan",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successfully retrieved laporan detail",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Detail laporan berhasil diambil"),
+     *             @OA\Property(property="data", ref="#/components/schemas/Laporan")
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=404,
+     *         description="Laporan not found"
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal server error"
+     *     )
+     * )
      */
     public function show(Laporans $laporan): JsonResponse
     {
@@ -463,6 +554,73 @@ class LaporansController extends Controller
 
     /**
      * Update the specified resource in storage.
+     *
+     * @OA\Put(
+     *     path="/laporans/{id}",
+     *     tags={"Laporan Management"},
+     *     summary="Update laporan bencana",
+     *     description="Memperbarui data laporan bencana (hanya pelapor atau Admin/PetugasBPBD yang berhak)",
+     *     security={{"jwt": {}}},
+     *
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="ID laporan",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="multipart/form-data",
+     *             @OA\Schema(
+     *                 @OA\Property(property="judul_laporan", type="string", maxLength=255),
+     *                 @OA\Property(property="deskripsi", type="string"),
+     *                 @OA\Property(property="tingkat_keparahan", type="string", enum={"Rendah", "Sedang", "Tinggi", "Sangat Tinggi"}),
+     *                 @OA\Property(property="latitude", type="number", format="double"),
+     *                 @OA\Property(property="longitude", type="number", format="double"),
+     *                 @OA\Property(property="id_kategori_bencana", type="integer"),
+     *                 @OA\Property(property="id_desa", type="integer"),
+     *                 @OA\Property(property="alamat", type="string", maxLength=500),
+     *                 @OA\Property(property="jumlah_korban", type="integer", minimum=0),
+     *                 @OA\Property(property="jumlah_rumah_rusak", type="integer", minimum=0),
+     *                 @OA\Property(property="is_prioritas", type="boolean"),
+     *                 @OA\Property(property="data_tambahan", type="object"),
+     *                 @OA\Property(property="waktu_laporan", type="string", format="date"),
+     *                 @OA\Property(property="foto_bukti_1", type="string", format="binary"),
+     *                 @OA\Property(property="foto_bukti_2", type="string", format="binary"),
+     *                 @OA\Property(property="foto_bukti_3", type="string", format="binary"),
+     *                 @OA\Property(property="video_bukti", type="string", format="binary")
+     *             )
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="Laporan successfully updated",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Laporan berhasil diperbarui"),
+     *             @OA\Property(property="data", ref="#/components/schemas/Laporan")
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=403,
+     *         description="Unauthorized - Not the owner or admin"
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation error"
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal server error"
+     *     )
+     * )
      */
     public function update(Request $request, Laporans $laporan): JsonResponse
     {
@@ -556,6 +714,47 @@ class LaporansController extends Controller
 
     /**
      * Remove the specified resource from storage.
+     *
+     * @OA\Delete(
+     *     path="/laporans/{id}",
+     *     tags={"Laporan Management"},
+     *     summary="Delete laporan bencana",
+     *     description="Menghapus laporan bencana beserta file bukti (hanya pelapor atau Admin yang berhak)",
+     *     security={{"jwt": {}}},
+     *
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="ID laporan",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="Laporan successfully deleted",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Laporan berhasil dihapus"),
+     *             @OA\Property(property="data", type="object", example=null)
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=403,
+     *         description="Unauthorized - Not the owner or admin"
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=404,
+     *         description="Laporan not found"
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal server error"
+     *     )
+     * )
      */
     public function destroy(Laporans $laporan): JsonResponse
     {
@@ -596,6 +795,40 @@ class LaporansController extends Controller
 
     /**
      * Get statistics for reports.
+     *
+     * @OA\Get(
+     *     path="/laporans/statistics",
+     *     tags={"Laporan Management"},
+     *     summary="Get laporan statistics",
+     *     description="Mengambil statistik laporan bencana (total, perlu verifikasi, ditindak, selesai, dll)",
+     *     security={{"jwt": {}}},
+     *
+     *     @OA\Parameter(
+     *         name="period",
+     *         in="query",
+     *         description="Filter periode statistik",
+     *         required=false,
+     *         @OA\Schema(type="string", enum={"weekly", "monthly", "yearly"})
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="Statistics successfully retrieved",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Statistics retrieved successfully"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 ref="#/components/schemas/LaporanStatistics"
+     *             )
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal server error"
+     *     )
+     * )
      */
     public function statistics(Request $request): JsonResponse
     {
@@ -709,6 +942,51 @@ class LaporansController extends Controller
 
     /**
      * Verify a report.
+     *
+     * @OA\Post(
+     *     path="/laporans/{id}/verifikasi",
+     *     tags={"Laporan Management"},
+     *     summary="Verifikasi laporan bencana",
+     *     description="Verifikasi laporan oleh Operator Desa atau Petugas BPBD",
+     *     security={{"jwt": {}}},
+     *
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="ID laporan",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"status"},
+     *             @OA\Property(property="status", type="string", enum={"Diverifikasi", "Ditolak"}, example="Diverifikasi", description="Status verifikasi"),
+     *             @OA\Property(property="catatan_verifikasi", type="string", maxLength=1000, example="Laporan valid dan perlu ditindak lanjuti")
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="Laporan successfully verified",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Laporan berhasil diverifikasi"),
+     *             @OA\Property(property="data", ref="#/components/schemas/Laporan")
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation error"
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal server error"
+     *     )
+     * )
      */
     public function verifikasi(Request $request, Laporans $laporan): JsonResponse
     {
@@ -749,6 +1027,51 @@ class LaporansController extends Controller
 
     /**
      * Process a report.
+     *
+     * @OA\Post(
+     *     path="/laporans/{id}/proses",
+     *     tags={"Laporan Management"},
+     *     summary="Proses laporan bencana",
+     *     description="Update status penanganan laporan oleh Petugas BPBD",
+     *     security={{"jwt": {}}},
+     *
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="ID laporan",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"status"},
+     *             @OA\Property(property="status", type="string", enum={"Diproses", "Tindak Lanjut", "Selesai"}, example="Diproses", description="Status penanganan"),
+     *             @OA\Property(property="catatan_proses", type="string", maxLength=1000, example="Tim SAR sudah diterjunkan ke lokasi")
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="Status laporan successfully updated",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Status laporan berhasil diperbarui"),
+     *             @OA\Property(property="data", ref="#/components/schemas/Laporan")
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation error"
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal server error"
+     *     )
+     * )
      */
     public function proses(Request $request, Laporans $laporan): JsonResponse
     {
@@ -792,6 +1115,58 @@ class LaporansController extends Controller
 
     /**
      * Get report history.
+     *
+     * @OA\Get(
+     *     path="/laporans/{id}/riwayat",
+     *     tags={"Laporan Management"},
+     *     summary="Get riwayat tindakan laporan",
+     *     description="Mengambil riwayat seluruh tindakan yang pernah dilakukan pada laporan",
+     *     security={{"jwt": {}}},
+     *
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="ID laporan",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="Riwayat successfully retrieved",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Riwayat laporan berhasil diambil"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer"),
+     *                     @OA\Property(property="laporan_id", type="integer"),
+     *                     @OA\Property(property="aksi", type="string"),
+     *                     @OA\Property(property="deskripsi", type="string"),
+     *                     @OA\Property(property="user_id", type="integer"),
+     *                     @OA\Property(property="created_at", type="string", format="date-time"),
+     *                     @OA\Property(property="user", type="object",
+     *                         @OA\Property(property="id", type="integer"),
+     *                         @OA\Property(property="nama", type="string")
+     *                     )
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=404,
+     *         description="Laporan not found"
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal server error"
+     *     )
+     * )
      */
     public function riwayat(Laporans $laporan): JsonResponse
     {
