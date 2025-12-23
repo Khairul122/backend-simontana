@@ -98,6 +98,24 @@ Route::prefix('wilayah')->group(function () {
     Route::delete('/{id}', [WilayahController::class, 'destroy'])->middleware('role:Admin');
 });
 
+// Wilayah CRUD Routes (Admin Only) - Explicit routes for each entity
+Route::middleware(['jwt.auth', 'role:Admin'])->prefix('wilayah')->group(function () {
+    // Provinsi CRUD
+    Route::post('/provinsi', [WilayahController::class, 'storeProvinsi']);
+    Route::put('/provinsi/{id}', [WilayahController::class, 'updateProvinsi']);
+    Route::delete('/provinsi/{id}', [WilayahController::class, 'destroyProvinsi']);
+
+    // Kabupaten CRUD
+    Route::post('/kabupaten', [WilayahController::class, 'storeKabupaten']);
+    Route::put('/kabupaten/{id}', [WilayahController::class, 'updateKabupaten']);
+    Route::delete('/kabupaten/{id}', [WilayahController::class, 'destroyKabupaten']);
+
+    // Kecamatan CRUD
+    Route::post('/kecamatan', [WilayahController::class, 'storeKecamatan']);
+    Route::put('/kecamatan/{id}', [WilayahController::class, 'updateKecamatan']);
+    Route::delete('/kecamatan/{id}', [WilayahController::class, 'destroyKecamatan']);
+});
+
 // BMKG Routes (Public & Protected)
 Route::prefix('bmkg')->group(function () {
     // Public routes for BMKG earthquake data (no authentication required)

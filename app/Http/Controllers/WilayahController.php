@@ -1512,4 +1512,849 @@ class WilayahController extends Controller
             'data' => $results
         ]);
     }
+
+    // ==============================
+    // CRUD PROVINSI
+    // ==============================
+
+    /**
+     * @OA\Post(
+     *     path="/wilayah/provinsi",
+     *     tags={"Wilayah"},
+     *     summary="Create new provinsi",
+     *     description="Membuat data provinsi baru - Hanya Admin yang dapat mengakses",
+     *     security={{"jwt": {}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"nama"},
+     *             @OA\Property(property="nama", type="string", example="Bali", description="Nama provinsi")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Provinsi berhasil ditambahkan",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Provinsi berhasil ditambahkan"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="nama", type="string", example="Bali")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Validasi gagal",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Validasi gagal"),
+     *             @OA\Property(property="errors", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Forbidden - Hanya Admin",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Akses ditolak: Hanya Admin yang dapat mengakses endpoint ini")
+     *         )
+     *     )
+     * )
+     */
+    public function storeProvinsi(Request $request): JsonResponse
+    {
+        // Cek role pengguna - hanya Admin yang bisa mengakses
+        $user = $request->user();
+        if (!$user || $user->role !== 'Admin') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Akses ditolak: Hanya Admin yang dapat mengakses endpoint ini'
+            ], 403);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'nama' => 'required|string|max:255|unique:provinsi,nama'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validasi gagal',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $provinsi = Provinsi::create([
+            'nama' => $request->nama
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Provinsi berhasil ditambahkan',
+            'data' => $provinsi
+        ], 201);
+    }
+
+    /**
+     * @OA\Put(
+     *     path="/wilayah/provinsi/{id}",
+     *     tags={"Wilayah"},
+     *     summary="Update provinsi",
+     *     description="Memperbarui data provinsi - Hanya Admin yang dapat mengakses",
+     *     security={{"jwt": {}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="ID provinsi",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"nama"},
+     *             @OA\Property(property="nama", type="string", example="Bali", description="Nama provinsi")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Provinsi berhasil diperbarui",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Provinsi berhasil diperbarui"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="nama", type="string", example="Bali")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Validasi gagal",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Validasi gagal"),
+     *             @OA\Property(property="errors", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Forbidden - Hanya Admin",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Akses ditolak: Hanya Admin yang dapat mengakses endpoint ini")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Provinsi tidak ditemukan",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Provinsi tidak ditemukan")
+     *         )
+     *     )
+     * )
+     */
+    public function updateProvinsi(Request $request, $id): JsonResponse
+    {
+        // Cek role pengguna - hanya Admin yang bisa mengakses
+        $user = $request->user();
+        if (!$user || $user->role !== 'Admin') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Akses ditolak: Hanya Admin yang dapat mengakses endpoint ini'
+            ], 403);
+        }
+
+        $provinsi = Provinsi::find($id);
+        if (!$provinsi) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Provinsi tidak ditemukan'
+            ], 404);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'nama' => 'required|string|max:255|unique:provinsi,nama,' . $id
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validasi gagal',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $provinsi->update([
+            'nama' => $request->nama
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Provinsi berhasil diperbarui',
+            'data' => $provinsi
+        ]);
+    }
+
+    /**
+     * @OA\Delete(
+     *     path="/wilayah/provinsi/{id}",
+     *     tags={"Wilayah"},
+     *     summary="Delete provinsi",
+     *     description="Menghapus data provinsi - Hanya Admin yang dapat mengakses",
+     *     security={{"jwt": {}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="ID provinsi",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Provinsi berhasil dihapus",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Provinsi berhasil dihapus")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Tidak dapat menghapus karena memiliki relasi",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Tidak dapat menghapus provinsi karena masih memiliki kabupaten terkait")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Forbidden - Hanya Admin",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Akses ditolak: Hanya Admin yang dapat mengakses endpoint ini")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Provinsi tidak ditemukan",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Provinsi tidak ditemukan")
+     *         )
+     *     )
+     * )
+     */
+    public function destroyProvinsi(Request $request, $id): JsonResponse
+    {
+        // Cek role pengguna - hanya Admin yang bisa mengakses
+        $user = $request->user();
+        if (!$user || $user->role !== 'Admin') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Akses ditolak: Hanya Admin yang dapat mengakses endpoint ini'
+            ], 403);
+        }
+
+        $provinsi = Provinsi::find($id);
+        if (!$provinsi) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Provinsi tidak ditemukan'
+            ], 404);
+        }
+
+        // Cek apakah ada kabupaten yang terkait
+        if ($provinsi->kabupatens()->count() > 0) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Tidak dapat menghapus provinsi karena masih memiliki kabupaten terkait'
+            ], 400);
+        }
+
+        $provinsi->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Provinsi berhasil dihapus'
+        ]);
+    }
+
+    // ==============================
+    // CRUD KABUPATEN
+    // ==============================
+
+    /**
+     * @OA\Post(
+     *     path="/wilayah/kabupaten",
+     *     tags={"Wilayah"},
+     *     summary="Create new kabupaten",
+     *     description="Membuat data kabupaten baru - Hanya Admin yang dapat mengakses",
+     *     security={{"jwt": {}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"nama", "id_provinsi"},
+     *             @OA\Property(property="nama", type="string", example="Badung", description="Nama kabupaten"),
+     *             @OA\Property(property="id_provinsi", type="integer", example=1, description="ID provinsi")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Kabupaten berhasil ditambahkan",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Kabupaten berhasil ditambahkan"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="nama", type="string", example="Badung"),
+     *                 @OA\Property(property="id_provinsi", type="integer", example=1)
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Validasi gagal atau provinsi tidak ditemukan",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Validasi gagal"),
+     *             @OA\Property(property="errors", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Forbidden - Hanya Admin",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Akses ditolak: Hanya Admin yang dapat mengakses endpoint ini")
+     *         )
+     *     )
+     * )
+     */
+    public function storeKabupaten(Request $request): JsonResponse
+    {
+        // Cek role pengguna - hanya Admin yang bisa mengakses
+        $user = $request->user();
+        if (!$user || $user->role !== 'Admin') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Akses ditolak: Hanya Admin yang dapat mengakses endpoint ini'
+            ], 403);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'nama' => 'required|string|max:255',
+            'id_provinsi' => 'required|exists:provinsi,id'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validasi gagal',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $kabupaten = Kabupaten::create([
+            'nama' => $request->nama,
+            'id_provinsi' => $request->id_provinsi
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Kabupaten berhasil ditambahkan',
+            'data' => $kabupaten->load('provinsi')
+        ], 201);
+    }
+
+    /**
+     * @OA\Put(
+     *     path="/wilayah/kabupaten/{id}",
+     *     tags={"Wilayah"},
+     *     summary="Update kabupaten",
+     *     description="Memperbarui data kabupaten - Hanya Admin yang dapat mengakses",
+     *     security={{"jwt": {}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="ID kabupaten",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"nama"},
+     *             @OA\Property(property="nama", type="string", example="Badung", description="Nama kabupaten"),
+     *             @OA\Property(property="id_provinsi", type="integer", example=1, description="ID provinsi")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Kabupaten berhasil diperbarui",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Kabupaten berhasil diperbarui"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="nama", type="string", example="Badung"),
+     *                 @OA\Property(property="id_provinsi", type="integer", example=1)
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Validasi gagal atau provinsi tidak ditemukan",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Validasi gagal"),
+     *             @OA\Property(property="errors", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Forbidden - Hanya Admin",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Akses ditolak: Hanya Admin yang dapat mengakses endpoint ini")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Kabupaten tidak ditemukan",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Kabupaten tidak ditemukan")
+     *         )
+     *     )
+     * )
+     */
+    public function updateKabupaten(Request $request, $id): JsonResponse
+    {
+        // Cek role pengguna - hanya Admin yang bisa mengakses
+        $user = $request->user();
+        if (!$user || $user->role !== 'Admin') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Akses ditolak: Hanya Admin yang dapat mengakses endpoint ini'
+            ], 403);
+        }
+
+        $kabupaten = Kabupaten::find($id);
+        if (!$kabupaten) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Kabupaten tidak ditemukan'
+            ], 404);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'nama' => 'required|string|max:255',
+            'id_provinsi' => 'nullable|exists:provinsi,id'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validasi gagal',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $data = ['nama' => $request->nama];
+        if ($request->has('id_provinsi')) {
+            $data['id_provinsi'] = $request->id_provinsi;
+        }
+
+        $kabupaten->update($data);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Kabupaten berhasil diperbarui',
+            'data' => $kabupaten->load('provinsi')
+        ]);
+    }
+
+    /**
+     * @OA\Delete(
+     *     path="/wilayah/kabupaten/{id}",
+     *     tags={"Wilayah"},
+     *     summary="Delete kabupaten",
+     *     description="Menghapus data kabupaten - Hanya Admin yang dapat mengakses",
+     *     security={{"jwt": {}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="ID kabupaten",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Kabupaten berhasil dihapus",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Kabupaten berhasil dihapus")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Tidak dapat menghapus karena memiliki relasi",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Tidak dapat menghapus kabupaten karena masih memiliki kecamatan terkait")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Forbidden - Hanya Admin",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Akses ditolak: Hanya Admin yang dapat mengakses endpoint ini")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Kabupaten tidak ditemukan",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Kabupaten tidak ditemukan")
+     *         )
+     *     )
+     * )
+     */
+    public function destroyKabupaten(Request $request, $id): JsonResponse
+    {
+        // Cek role pengguna - hanya Admin yang bisa mengakses
+        $user = $request->user();
+        if (!$user || $user->role !== 'Admin') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Akses ditolak: Hanya Admin yang dapat mengakses endpoint ini'
+            ], 403);
+        }
+
+        $kabupaten = Kabupaten::find($id);
+        if (!$kabupaten) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Kabupaten tidak ditemukan'
+            ], 404);
+        }
+
+        // Cek apakah ada kecamatan yang terkait
+        if ($kabupaten->kecamatans()->count() > 0) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Tidak dapat menghapus kabupaten karena masih memiliki kecamatan terkait'
+            ], 400);
+        }
+
+        $kabupaten->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Kabupaten berhasil dihapus'
+        ]);
+    }
+
+    // ==============================
+    // CRUD KECAMATAN
+    // ==============================
+
+    /**
+     * @OA\Post(
+     *     path="/wilayah/kecamatan",
+     *     tags={"Wilayah"},
+     *     summary="Create new kecamatan",
+     *     description="Membuat data kecamatan baru - Hanya Admin yang dapat mengakses",
+     *     security={{"jwt": {}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"nama", "id_kabupaten"},
+     *             @OA\Property(property="nama", type="string", example="Kuta", description="Nama kecamatan"),
+     *             @OA\Property(property="id_kabupaten", type="integer", example=1, description="ID kabupaten")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Kecamatan berhasil ditambahkan",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Kecamatan berhasil ditambahkan"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="nama", type="string", example="Kuta"),
+     *                 @OA\Property(property="id_kabupaten", type="integer", example=1)
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Validasi gagal atau kabupaten tidak ditemukan",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Validasi gagal"),
+     *             @OA\Property(property="errors", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Forbidden - Hanya Admin",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Akses ditolak: Hanya Admin yang dapat mengakses endpoint ini")
+     *         )
+     *     )
+     * )
+     */
+    public function storeKecamatan(Request $request): JsonResponse
+    {
+        // Cek role pengguna - hanya Admin yang bisa mengakses
+        $user = $request->user();
+        if (!$user || $user->role !== 'Admin') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Akses ditolak: Hanya Admin yang dapat mengakses endpoint ini'
+            ], 403);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'nama' => 'required|string|max:255',
+            'id_kabupaten' => 'required|exists:kabupaten,id'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validasi gagal',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $kecamatan = Kecamatan::create([
+            'nama' => $request->nama,
+            'id_kabupaten' => $request->id_kabupaten
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Kecamatan berhasil ditambahkan',
+            'data' => $kecamatan->load('kabupaten')
+        ], 201);
+    }
+
+    /**
+     * @OA\Put(
+     *     path="/wilayah/kecamatan/{id}",
+     *     tags={"Wilayah"},
+     *     summary="Update kecamatan",
+     *     description="Memperbarui data kecamatan - Hanya Admin yang dapat mengakses",
+     *     security={{"jwt": {}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="ID kecamatan",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"nama"},
+     *             @OA\Property(property="nama", type="string", example="Kuta", description="Nama kecamatan"),
+     *             @OA\Property(property="id_kabupaten", type="integer", example=1, description="ID kabupaten")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Kecamatan berhasil diperbarui",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Kecamatan berhasil diperbarui"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="nama", type="string", example="Kuta"),
+     *                 @OA\Property(property="id_kabupaten", type="integer", example=1)
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Validasi gagal atau kabupaten tidak ditemukan",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Validasi gagal"),
+     *             @OA\Property(property="errors", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Forbidden - Hanya Admin",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Akses ditolak: Hanya Admin yang dapat mengakses endpoint ini")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Kecamatan tidak ditemukan",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Kecamatan tidak ditemukan")
+     *         )
+     *     )
+     * )
+     */
+    public function updateKecamatan(Request $request, $id): JsonResponse
+    {
+        // Cek role pengguna - hanya Admin yang bisa mengakses
+        $user = $request->user();
+        if (!$user || $user->role !== 'Admin') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Akses ditolak: Hanya Admin yang dapat mengakses endpoint ini'
+            ], 403);
+        }
+
+        $kecamatan = Kecamatan::find($id);
+        if (!$kecamatan) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Kecamatan tidak ditemukan'
+            ], 404);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'nama' => 'required|string|max:255',
+            'id_kabupaten' => 'nullable|exists:kabupaten,id'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validasi gagal',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $data = ['nama' => $request->nama];
+        if ($request->has('id_kabupaten')) {
+            $data['id_kabupaten'] = $request->id_kabupaten;
+        }
+
+        $kecamatan->update($data);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Kecamatan berhasil diperbarui',
+            'data' => $kecamatan->load('kabupaten')
+        ]);
+    }
+
+    /**
+     * @OA\Delete(
+     *     path="/wilayah/kecamatan/{id}",
+     *     tags={"Wilayah"},
+     *     summary="Delete kecamatan",
+     *     description="Menghapus data kecamatan - Hanya Admin yang dapat mengakses",
+     *     security={{"jwt": {}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="ID kecamatan",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Kecamatan berhasil dihapus",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Kecamatan berhasil dihapus")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Tidak dapat menghapus karena memiliki relasi",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Tidak dapat menghapus kecamatan karena masih memiliki desa terkait")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Forbidden - Hanya Admin",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Akses ditolak: Hanya Admin yang dapat mengakses endpoint ini")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Kecamatan tidak ditemukan",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Kecamatan tidak ditemukan")
+     *         )
+     *     )
+     * )
+     */
+    public function destroyKecamatan(Request $request, $id): JsonResponse
+    {
+        // Cek role pengguna - hanya Admin yang bisa mengakses
+        $user = $request->user();
+        if (!$user || $user->role !== 'Admin') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Akses ditolak: Hanya Admin yang dapat mengakses endpoint ini'
+            ], 403);
+        }
+
+        $kecamatan = Kecamatan::find($id);
+        if (!$kecamatan) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Kecamatan tidak ditemukan'
+            ], 404);
+        }
+
+        // Cek apakah ada desa yang terkait
+        if ($kecamatan->desas()->count() > 0) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Tidak dapat menghapus kecamatan karena masih memiliki desa terkait'
+            ], 400);
+        }
+
+        $kecamatan->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Kecamatan berhasil dihapus'
+        ]);
+    }
 }
