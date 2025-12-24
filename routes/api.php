@@ -114,6 +114,11 @@ Route::middleware(['jwt.auth', 'role:Admin'])->prefix('wilayah')->group(function
     Route::post('/kecamatan', [WilayahController::class, 'storeKecamatan']);
     Route::put('/kecamatan/{id}', [WilayahController::class, 'updateKecamatan']);
     Route::delete('/kecamatan/{id}', [WilayahController::class, 'destroyKecamatan']);
+
+    // Desa CRUD
+    Route::post('/desa', [WilayahController::class, 'storeDesa']);
+    Route::put('/desa/{id}', [WilayahController::class, 'updateDesa']);
+    Route::delete('/desa/{id}', [WilayahController::class, 'destroyDesa']);
 });
 
 // BMKG Routes (Public & Protected)

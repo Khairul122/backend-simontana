@@ -44,6 +44,6 @@ class Desa extends Model
      */
     public function laporan()
     {
-        return $this->hasMany(Laporan::class, 'id_desa');
+        return $this->hasMany(Laporans::class, 'id_desa');
     }
 }
