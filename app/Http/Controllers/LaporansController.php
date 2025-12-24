@@ -327,7 +327,14 @@ class LaporansController extends Controller
     public function index(Request $request): JsonResponse
     {
         try {
-            $query = Laporans::with(['pelapor:id,nama,email', 'kategori:id,nama_kategori', 'desa:id,nama']);
+            $query = Laporans::with([
+                'pelapor:id,nama,email,alamat,no_telepon',
+                'kategori:id,nama_kategori',
+                'desa:id,nama,id_kecamatan',
+                'desa.kecamatan:id,nama,id_kabupaten',
+                'desa.kecamatan.kabupaten:id,nama,id_provinsi',
+                'desa.kecamatan.kabupaten.provinsi:id,nama'
+            ]);
 
             // Apply filters
             if ($request->has('status') && $request->status) {
@@ -509,7 +516,14 @@ class LaporansController extends Controller
             $data['data_tambahan'] = $request->data_tambahan ?? null;
 
             $laporan = Laporans::create($data);
-            $laporan->load(['pelapor:id,nama,email', 'kategori', 'desa']);
+            $laporan->load([
+                'pelapor:id,nama,email,alamat,no_telepon',
+                'kategori:id,nama_kategori,deskripsi',
+                'desa:id,nama,id_kecamatan',
+                'desa.kecamatan:id,nama,id_kabupaten',
+                'desa.kecamatan.kabupaten:id,nama,id_provinsi',
+                'desa.kecamatan.kabupaten.provinsi:id,nama'
+            ]);
 
             return response()->json([
                 'success' => true,
@@ -573,9 +587,9 @@ class LaporansController extends Controller
 
             // Load relationships
             $laporan->load([
-                'pelapor:id,nama,email,no_telepon',
+                'pelapor:id,nama,email,alamat,no_telepon',
                 'kategori:id,nama_kategori,deskripsi',
-                'desa:id,nama,kecamatan_id',
+                'desa:id,nama',
                 'desa.kecamatan:id,nama,kabupaten_id',
                 'desa.kecamatan.kabupaten:id,nama,provinsi_id',
                 'desa.kecamatan.kabupaten.provinsi:id,nama',
@@ -736,7 +750,14 @@ class LaporansController extends Controller
             $laporan->update($data);
 
             // Load relationships for response
-            $laporan->load(['pelapor:id,nama,email', 'kategori', 'desa']);
+            $laporan->load([
+                'pelapor:id,nama,email,alamat,no_telepon',
+                'kategori:id,nama_kategori,deskripsi',
+                'desa:id,nama',
+                'desa.kecamatan:id,nama,kabupaten_id',
+                'desa.kecamatan.kabupaten:id,nama,provinsi_id',
+                'desa.kecamatan.kabupaten.provinsi:id,nama'
+            ]);
 
             return response()->json([
                 'success' => true,
@@ -1055,7 +1076,14 @@ class LaporansController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Laporan berhasil diverifikasi',
-                'data' => $laporan->load(['pelapor:id,nama', 'kategori'])
+                'data' => $laporan->load([
+                    'pelapor:id,nama,email,alamat,no_telepon',
+                    'kategori:id,nama_kategori,deskripsi',
+                    'desa:id,nama',
+                    'desa.kecamatan:id,nama,kabupaten_id',
+                    'desa.kecamatan.kabupaten:id,nama,provinsi_id',
+                    'desa.kecamatan.kabupaten.provinsi:id,nama'
+                ])
             ], 200);
 
         } catch (\Exception $e) {
@@ -1143,7 +1171,14 @@ class LaporansController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Status laporan berhasil diperbarui',
-                'data' => $laporan->load(['pelapor:id,nama', 'kategori'])
+                'data' => $laporan->load([
+                    'pelapor:id,nama,email,alamat,no_telepon',
+                    'kategori:id,nama_kategori,deskripsi',
+                    'desa:id,nama',
+                    'desa.kecamatan:id,nama,kabupaten_id',
+                    'desa.kecamatan.kabupaten:id,nama,provinsi_id',
+                    'desa.kecamatan.kabupaten.provinsi:id,nama'
+                ])
             ], 200);
 
         } catch (\Exception $e) {
