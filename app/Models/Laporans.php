@@ -135,32 +135,11 @@ class Laporans extends Model
 
     /**
      * Get the alamat lengkap attribute.
+     * Returns the value directly from the alamat_lengkap column in the database
      */
-    public function getAlamatLengkapAttribute(): string
+    public function getAlamatLengkapAttribute(): ?string
     {
-        $alamat = [];
-
-        if ($this->alamat) {
-            $alamat[] = $this->alamat;
-        }
-
-        if ($this->desa) {
-            $alamat[] = $this->desa->nama ?? '';
-        }
-
-        if ($this->desa && $this->desa->kecamatan) {
-            $alamat[] = $this->desa->kecamatan->nama ?? '';
-        }
-
-        if ($this->desa && $this->desa->kecamatan && $this->desa->kecamatan->kabupaten) {
-            $alamat[] = $this->desa->kecamatan->kabupaten->nama ?? '';
-        }
-
-        if ($this->desa && $this->desa->kecamatan && $this->desa->kecamatan->kabupaten && $this->desa->kecamatan->kabupaten->provinsi) {
-            $alamat[] = $this->desa->kecamatan->kabupaten->provinsi->nama ?? '';
-        }
-
-        return implode(', ', array_filter($alamat));
+        return $this->attributes['alamat_lengkap'] ?? null;
     }
 
     /**
