@@ -43,7 +43,8 @@ use Illuminate\Validation\Rule;
  *     @OA\Property(property="pelapor", ref="#/components/schemas/Pelapor", description="Data pelapor"),
  *     @OA\Property(property="kategori", ref="#/components/schemas/KategoriBencana", description="Data kategori bencana"),
  *     @OA\Property(property="desa", ref="#/components/schemas/Desa", description="Data desa lokasi"),
- *     @OA\Property(property="alamat_lengkap", type="string", example="Desa Sukamaju, Kecamatan Makmur, Kabupaten Sejahtera", description="Alamat lengkap otomatis"),
+ *     @OA\Property(property="alamat_lengkap", type="string", example="Jl. Sudirman No. 123, RT 01/RW 02", description="Alamat detail manual (Jalan, RT/RW, Patokan)"),
+ *     @OA\Property(property="administrative_area", type="string", example="Desa Sukamaju, Kecamatan Makmur, Kabupaten Sejahtera, Provinsi Jawa Barat", description="Wilayah administratif otomatis (Generated from Desa -> Provinsi)"),
  *     @OA\Property(property="coordinates", type="object", example={"lat":-6.2088, "lng":106.8456}, description="Koordinat untuk mapping"),
  *     @OA\Property(property="time_ago", type="string", example="2 jam yang lalu", description="Waktu relatif"),
  * )
@@ -329,11 +330,14 @@ class LaporansController extends Controller
         try {
             $query = Laporans::with([
                 'pelapor:id,nama,email,alamat,no_telepon',
-                'kategori:id,nama_kategori',
+                'kategori:id,nama_kategori,deskripsi',
                 'desa:id,nama,id_kecamatan',
                 'desa.kecamatan:id,nama,id_kabupaten',
                 'desa.kecamatan.kabupaten:id,nama,id_provinsi',
-                'desa.kecamatan.kabupaten.provinsi:id,nama'
+                'desa.kecamatan.kabupaten.provinsi:id,nama',
+                'tindakLanjut:id_tindaklanjut,laporan_id,id_petugas,tanggal_tanggapan,status,created_at',
+                'tindakLanjut.petugas:id,nama',
+                'monitoring:id_monitoring,id_laporan,id_operator,waktu_monitoring,hasil_monitoring,koordinat_gps,created_at'
             ]);
 
             // Apply filters
@@ -589,13 +593,13 @@ class LaporansController extends Controller
             $laporan->load([
                 'pelapor:id,nama,email,alamat,no_telepon',
                 'kategori:id,nama_kategori,deskripsi',
-                'desa:id,nama',
-                'desa.kecamatan:id,nama,kabupaten_id',
-                'desa.kecamatan.kabupaten:id,nama,provinsi_id',
+                'desa:id,nama,id_kecamatan',
+                'desa.kecamatan:id,nama,id_kabupaten',
+                'desa.kecamatan.kabupaten:id,nama,id_provinsi',
                 'desa.kecamatan.kabupaten.provinsi:id,nama',
-                'tindakLanjut:id,laporan_id,deskripsi,status,created_at',
-                'monitoring:id,laporan_id,status,catatan,created_at',
-                'riwayatTindakan:id,laporan_id,aksi,deskripsi,user_id,created_at'
+                'tindakLanjut:id_tindaklanjut,laporan_id,id_petugas,tanggal_tanggapan,status,created_at',
+                'tindakLanjut.petugas:id,nama',
+                'monitoring:id_monitoring,id_laporan,id_operator,waktu_monitoring,hasil_monitoring,koordinat_gps,created_at'
             ]);
 
             return response()->json([
@@ -753,9 +757,9 @@ class LaporansController extends Controller
             $laporan->load([
                 'pelapor:id,nama,email,alamat,no_telepon',
                 'kategori:id,nama_kategori,deskripsi',
-                'desa:id,nama',
-                'desa.kecamatan:id,nama,kabupaten_id',
-                'desa.kecamatan.kabupaten:id,nama,provinsi_id',
+                'desa:id,nama,id_kecamatan',
+                'desa.kecamatan:id,nama,id_kabupaten',
+                'desa.kecamatan.kabupaten:id,nama,id_provinsi',
                 'desa.kecamatan.kabupaten.provinsi:id,nama'
             ]);
 
@@ -1079,9 +1083,9 @@ class LaporansController extends Controller
                 'data' => $laporan->load([
                     'pelapor:id,nama,email,alamat,no_telepon',
                     'kategori:id,nama_kategori,deskripsi',
-                    'desa:id,nama',
-                    'desa.kecamatan:id,nama,kabupaten_id',
-                    'desa.kecamatan.kabupaten:id,nama,provinsi_id',
+                    'desa:id,nama,id_kecamatan',
+                    'desa.kecamatan:id,nama,id_kabupaten',
+                    'desa.kecamatan.kabupaten:id,nama,id_provinsi',
                     'desa.kecamatan.kabupaten.provinsi:id,nama'
                 ])
             ], 200);
@@ -1174,9 +1178,9 @@ class LaporansController extends Controller
                 'data' => $laporan->load([
                     'pelapor:id,nama,email,alamat,no_telepon',
                     'kategori:id,nama_kategori,deskripsi',
-                    'desa:id,nama',
-                    'desa.kecamatan:id,nama,kabupaten_id',
-                    'desa.kecamatan.kabupaten:id,nama,provinsi_id',
+                    'desa:id,nama,id_kecamatan',
+                    'desa.kecamatan:id,nama,id_kabupaten',
+                    'desa.kecamatan.kabupaten:id,nama,id_provinsi',
                     'desa.kecamatan.kabupaten.provinsi:id,nama'
                 ])
             ], 200);

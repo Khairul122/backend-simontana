@@ -33,7 +33,8 @@ class Laporans extends Model
         'foto_bukti_1_url',
         'foto_bukti_2_url',
         'foto_bukti_3_url',
-        'video_bukti_url'
+        'video_bukti_url',
+        'administrative_area'
     ];
 
     /**
@@ -89,7 +90,7 @@ class Laporans extends Model
      */
     public function monitoring(): HasMany
     {
-        return $this->hasMany(Monitoring::class, 'laporan_id');
+        return $this->hasMany(Monitoring::class, 'id_laporan');
     }
 
     /**
@@ -160,6 +161,29 @@ class Laporans extends Model
         }
 
         return implode(', ', array_filter($alamat));
+    }
+
+    /**
+     * Get the administrative area attribute.
+     * Concatenates region names from Desa -> Kecamatan -> Kabupaten -> Provinsi
+     * Returns full names as stored in database
+     */
+    public function getAdministrativeAreaAttribute(): ?string
+    {
+        // Check if desa relationship is loaded to prevent N+1 issues
+        if (!$this->relationLoaded('desa') || !$this->desa) {
+            return null;
+        }
+
+        // Use null-safe operator to traverse the hierarchy and filter out null values
+        $regionNames = array_filter([
+            $this->desa?->nama,
+            $this->desa?->kecamatan?->nama,
+            $this->desa?->kecamatan?->kabupaten?->nama,
+            $this->desa?->kecamatan?->kabupaten?->provinsi?->nama
+        ]);
+
+        return implode(', ', $regionNames);
     }
 
     /**
