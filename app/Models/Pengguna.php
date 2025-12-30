@@ -164,4 +164,19 @@ class Pengguna extends Authenticatable implements JWTSubject
     {
         return [];
     }
+
+    /**
+     * Check if user has specific role
+     *
+     * @param string|array $role
+     * @return bool
+     */
+    public function hasRole($role): bool
+    {
+        if (is_array($role)) {
+            return in_array($this->role, $role);
+        }
+
+        return $this->role === $role;
+    }
 }
