@@ -762,7 +762,29 @@ class LaporansController extends Controller
                 $data['data_tambahan'] = $request->data_tambahan;
             }
 
-            $laporan->update($data);
+            // Check if status is being changed
+            $isStatusChanging = isset($data['status']) && $data['status'] !== $laporan->status;
+
+            if ($isStatusChanging) {
+                // Prepare update data with verification fields when status changes
+                $updateData = $data;
+
+                // Auto-fill data sistem (Back-end Logic) when status changes to 'Diverifikasi'
+                if ($data['status'] === 'Diverifikasi') {
+                    $user_id = auth()->id(); // Mengambil ID dari Token JWT
+                    $updateData['id_verifikator'] = $user_id;
+                    $updateData['waktu_verifikasi'] = now();
+
+                    // Hanya isi penanggung jawab jika belum ada sebelumnya
+                    if (is_null($laporan->id_penanggung_jawab)) {
+                        $updateData['id_penanggung_jawab'] = $user_id;
+                    }
+                }
+
+                $laporan->update($updateData);
+            } else {
+                $laporan->update($data);
+            }
 
             // Load relationships for response
             $laporan->load([
