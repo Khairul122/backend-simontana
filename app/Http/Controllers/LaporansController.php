@@ -1091,19 +1091,20 @@ class LaporansController extends Controller
                 ], 422);
             }
 
-            $laporan->update([
+            // Prepare update data
+            $updateData = [
                 'status' => $request->status,
                 'waktu_verifikasi' => now(),
                 'id_verifikator' => auth()->id(), // Ambil dari token JWT/Session
                 'catatan_verifikasi' => $request->catatan_verifikasi
-            ]);
+            ];
 
-            // Jika penanggung jawab belum ada, set ke user yang memverifikasi
+            // Hanya isi penanggung jawab jika belum ada sebelumnya
             if (is_null($laporan->id_penanggung_jawab)) {
-                $laporan->update([
-                    'id_penanggung_jawab' => auth()->id()
-                ]);
+                $updateData['id_penanggung_jawab'] = auth()->id();
             }
+
+            $laporan->update($updateData);
 
             return response()->json([
                 'success' => true,
@@ -1200,17 +1201,18 @@ class LaporansController extends Controller
                 ], 422);
             }
 
-            $laporan->update([
+            // Prepare update data
+            $updateData = [
                 'status' => $request->status,
                 'catatan_proses' => $request->catatan_proses
-            ]);
+            ];
 
-            // Jika penanggung jawab belum ada, set ke user yang memproses
+            // Hanya isi penanggung jawab jika belum ada sebelumnya
             if (is_null($laporan->id_penanggung_jawab)) {
-                $laporan->update([
-                    'id_penanggung_jawab' => auth()->id()
-                ]);
+                $updateData['id_penanggung_jawab'] = auth()->id();
             }
+
+            $laporan->update($updateData);
 
             if ($request->status === 'Selesai') {
                 $laporan->update(['waktu_selesai' => now()]);
