@@ -1094,8 +1094,16 @@ class LaporansController extends Controller
             $laporan->update([
                 'status' => $request->status,
                 'waktu_verifikasi' => now(),
+                'id_verifikator' => auth()->id(), // Ambil dari token JWT/Session
                 'catatan_verifikasi' => $request->catatan_verifikasi
             ]);
+
+            // Jika penanggung jawab belum ada, set ke user yang memverifikasi
+            if (is_null($laporan->id_penanggung_jawab)) {
+                $laporan->update([
+                    'id_penanggung_jawab' => auth()->id()
+                ]);
+            }
 
             return response()->json([
                 'success' => true,
@@ -1196,6 +1204,13 @@ class LaporansController extends Controller
                 'status' => $request->status,
                 'catatan_proses' => $request->catatan_proses
             ]);
+
+            // Jika penanggung jawab belum ada, set ke user yang memproses
+            if (is_null($laporan->id_penanggung_jawab)) {
+                $laporan->update([
+                    'id_penanggung_jawab' => auth()->id()
+                ]);
+            }
 
             if ($request->status === 'Selesai') {
                 $laporan->update(['waktu_selesai' => now()]);
