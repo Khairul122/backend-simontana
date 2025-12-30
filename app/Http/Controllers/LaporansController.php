@@ -246,6 +246,13 @@ class LaporansController extends Controller
      *     ),
      *
      *     @OA\Parameter(
+     *         name="id_desa",
+     *         in="query",
+     *         description="Filter berdasarkan ID desa",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *
+     *     @OA\Parameter(
      *         name="search",
      *         in="query",
      *         description="Search di judul, deskripsi, atau alamat",
@@ -355,6 +362,10 @@ class LaporansController extends Controller
 
             if ($request->has('prioritas') && $request->boolean('prioritas')) {
                 $query->prioritas();
+            }
+
+            if ($request->has('id_desa') && $request->id_desa) {
+                $query->where('id_desa', $request->id_desa);
             }
 
             // Apply date range
@@ -691,7 +702,7 @@ class LaporansController extends Controller
     {
         try {
             // Authorization check
-            if (auth()->id() !== $laporan->id_pelapor && !auth()->user()->hasRole(['Admin', 'PetugasBPBD'])) {
+            if (auth()->id() !== $laporan->id_pelapor && !auth()->user()->hasRole(['Admin', 'PetugasBPBD', 'OperatorDesa'])) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Tidak memiliki izin untuk mengubah laporan ini',
@@ -826,7 +837,7 @@ class LaporansController extends Controller
     {
         try {
             // Authorization check
-            if (auth()->id() !== $laporan->id_pelapor && !auth()->user()->hasRole(['Admin'])) {
+            if (auth()->id() !== $laporan->id_pelapor && !auth()->user()->hasRole(['Admin', 'OperatorDesa'])) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Tidak memiliki izin untuk menghapus laporan ini',
@@ -1058,6 +1069,15 @@ class LaporansController extends Controller
     public function verifikasi(Request $request, Laporans $laporan): JsonResponse
     {
         try {
+            // Authorization check
+            if (!auth()->user()->hasRole(['Admin', 'PetugasBPBD', 'OperatorDesa'])) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Tidak memiliki izin untuk memverifikasi laporan ini',
+                    'data' => null
+                ], 403);
+            }
+
             $validator = Validator::make($request->all(), [
                 'status' => 'required|in:Diverifikasi,Ditolak',
                 'catatan_verifikasi' => 'nullable|string|max:1000'
@@ -1106,7 +1126,7 @@ class LaporansController extends Controller
      *     path="/laporans/{id}/proses",
      *     tags={"Laporan Management"},
      *     summary="Proses laporan bencana",
-     *     description="Update status penanganan laporan oleh Petugas BPBD",
+     *     description="Update status penanganan laporan oleh Admin, Petugas BPBD, atau Operator Desa",
      *     security={{"jwt": {}}},
      *
      *     @OA\Parameter(
@@ -1150,6 +1170,15 @@ class LaporansController extends Controller
     public function proses(Request $request, Laporans $laporan): JsonResponse
     {
         try {
+            // Authorization check
+            if (!auth()->user()->hasRole(['Admin', 'PetugasBPBD', 'OperatorDesa'])) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Tidak memiliki izin untuk memproses laporan ini',
+                    'data' => null
+                ], 403);
+            }
+
             $validator = Validator::make($request->all(), [
                 'status' => 'required|in:Diproses,Tindak Lanjut,Selesai',
                 'catatan_proses' => 'nullable|string|max:1000'

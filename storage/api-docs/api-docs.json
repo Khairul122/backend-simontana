@@ -1801,6 +1801,14 @@
                         }
                     },
                     {
+                        "name": "id_desa",
+                        "in": "query",
+                        "description": "Filter berdasarkan ID desa",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
                         "name": "search",
                         "in": "query",
                         "description": "Search di judul, deskripsi, atau alamat",
@@ -7358,9 +7366,14 @@
                         "$ref": "#/components/schemas/Desa"
                     },
                     "alamat_lengkap": {
-                        "description": "Alamat lengkap otomatis",
+                        "description": "Alamat detail manual (Jalan, RT/RW, Patokan)",
                         "type": "string",
-                        "example": "Desa Sukamaju, Kecamatan Makmur, Kabupaten Sejahtera"
+                        "example": "Jl. Sudirman No. 123, RT 01/RW 02"
+                    },
+                    "administrative_area": {
+                        "description": "Wilayah administratif otomatis (Generated from Desa -> Provinsi)",
+                        "type": "string",
+                        "example": "Desa Sukamaju, Kecamatan Makmur, Kabupaten Sejahtera, Provinsi Jawa Barat"
                     },
                     "coordinates": {
                         "description": "Koordinat untuk mapping",

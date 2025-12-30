@@ -520,6 +520,7 @@ Mendapatkan semua laporan bencana dengan filter dan pagination.
 | status | string | No | Filter by status (Draft, Menunggu Verifikasi, etc.) |
 | kategori_id | integer | No | Filter by kategori bencana |
 | user_id | integer | No | Filter by pelapor |
+| id_desa | integer | No | Filter by desa ID |
 | prioritas | boolean | No | Filter laporan prioritas only |
 | search | string | No | Search in judul, deskripsi, alamat |
 | lat/lng/radius | number | No | Filter by location radius |
