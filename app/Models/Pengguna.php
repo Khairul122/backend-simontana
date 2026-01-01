@@ -49,7 +49,7 @@ class Pengguna extends Authenticatable implements JWTSubject
      */
     public function laporan()
     {
-        return $this->hasMany(Laporan::class, 'id_warga');
+        return $this->hasMany(Laporans::class, 'id_pelapor');
     }
 
     /**

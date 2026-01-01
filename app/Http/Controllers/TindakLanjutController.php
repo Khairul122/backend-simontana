@@ -88,7 +88,7 @@ class TindakLanjutController extends Controller
             ], 401);
         }
 
-        $query = TindakLanjut::with(['laporan', 'petugas']);
+        $query = TindakLanjut::with(['laporan.pelapor', 'petugas']);
 
         // Filter berdasarkan laporan_id
         if ($request->has('laporan_id')) {
@@ -190,7 +190,7 @@ class TindakLanjutController extends Controller
         $tindakLanjut = TindakLanjut::create($request->all());
 
         // Load relasi untuk response
-        $tindakLanjut->load(['laporan', 'petugas']);
+        $tindakLanjut->load(['laporan.pelapor', 'petugas']);
 
         return response()->json([
             'success' => true,
@@ -244,7 +244,7 @@ class TindakLanjutController extends Controller
             ], 401);
         }
 
-        $tindakLanjut = TindakLanjut::with(['laporan', 'petugas'])->find($id);
+        $tindakLanjut = TindakLanjut::with(['laporan.pelapor', 'petugas'])->find($id);
 
         if (!$tindakLanjut) {
             return response()->json([
@@ -336,7 +336,7 @@ class TindakLanjutController extends Controller
         $tindakLanjut->update($request->all());
 
         // Load relasi untuk response
-        $tindakLanjut->load(['laporan', 'petugas']);
+        $tindakLanjut->load(['laporan.pelapor', 'petugas']);
 
         return response()->json([
             'success' => true,

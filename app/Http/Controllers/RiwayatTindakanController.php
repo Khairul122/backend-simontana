@@ -76,7 +76,7 @@ class RiwayatTindakanController extends Controller
                 ], 401);
             }
 
-            $query = RiwayatTindakan::with(['tindakLanjut', 'petugas']);
+            $query = RiwayatTindakan::with(['tindakLanjut.laporan.pelapor', 'petugas']);
 
             // Filter berdasarkan tindaklanjut_id
             if ($request->has('tindaklanjut_id')) {
@@ -173,7 +173,7 @@ class RiwayatTindakanController extends Controller
             $riwayatTindakan = RiwayatTindakan::create($request->all());
 
             // Load relasi untuk response
-            $riwayatTindakan->load(['tindakLanjut', 'petugas']);
+            $riwayatTindakan->load(['tindakLanjut.laporan.pelapor', 'petugas']);
 
             return response()->json([
                 'success' => true,
@@ -227,7 +227,7 @@ class RiwayatTindakanController extends Controller
                 ], 401);
             }
 
-            $riwayatTindakan = RiwayatTindakan::with(['tindakLanjut', 'petugas'])->find($id);
+            $riwayatTindakan = RiwayatTindakan::with(['tindakLanjut.laporan.pelapor', 'petugas'])->find($id);
 
             if (!$riwayatTindakan) {
                 return response()->json([
@@ -319,7 +319,7 @@ class RiwayatTindakanController extends Controller
             $riwayatTindakan->update($request->all());
 
             // Load relasi untuk response
-            $riwayatTindakan->load(['tindakLanjut', 'petugas']);
+            $riwayatTindakan->load(['tindakLanjut.laporan.pelapor', 'petugas']);
 
             return response()->json([
                 'success' => true,

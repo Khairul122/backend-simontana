@@ -344,6 +344,8 @@ class LaporansController extends Controller
                 'desa.kecamatan.kabupaten.provinsi:id,nama',
                 'tindakLanjut:id_tindaklanjut,laporan_id,id_petugas,tanggal_tanggapan,status,created_at',
                 'tindakLanjut.petugas:id,nama',
+                'tindakLanjut.laporan:id,id_pelapor,judul_laporan,deskripsi,tingkat_keparahan,latitude,longitude,alamat,jumlah_korban,jumlah_rumah_rusak,is_prioritas,view_count,status,waktu_laporan,waktu_verifikasi,waktu_selesai,catatan_verifikasi,catatan_proses,data_tambahan,foto_bukti_1,foto_bukti_2,foto_bukti_3,video_bukti,id_kategori_bencana,id_desa,alamat_lengkap',
+                'tindakLanjut.laporan.pelapor:id,nama,email,no_telepon',
                 'monitoring:id_monitoring,id_laporan,id_operator,waktu_monitoring,hasil_monitoring,koordinat_gps,created_at'
             ]);
 
@@ -610,6 +612,8 @@ class LaporansController extends Controller
                 'desa.kecamatan.kabupaten.provinsi:id,nama',
                 'tindakLanjut:id_tindaklanjut,laporan_id,id_petugas,tanggal_tanggapan,status,created_at',
                 'tindakLanjut.petugas:id,nama',
+                'tindakLanjut.laporan:id,id_pelapor,judul_laporan,deskripsi,tingkat_keparahan,latitude,longitude,alamat,jumlah_korban,jumlah_rumah_rusak,is_prioritas,view_count,status,waktu_laporan,waktu_verifikasi,waktu_selesai,catatan_verifikasi,catatan_proses,data_tambahan,foto_bukti_1,foto_bukti_2,foto_bukti_3,video_bukti,id_kategori_bencana,id_desa,alamat_lengkap',
+                'tindakLanjut.laporan.pelapor:id,nama,email,no_telepon',
                 'monitoring:id_monitoring,id_laporan,id_operator,waktu_monitoring,hasil_monitoring,koordinat_gps,created_at'
             ]);
 
