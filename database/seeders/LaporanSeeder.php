@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Models\Laporans;
 
 class LaporanSeeder extends Seeder
 {
@@ -16,7 +17,7 @@ class LaporanSeeder extends Seeder
             [
                 'id_pelapor' => 4,
                 'id_kategori_bencana' => 1, // Banjir
-                'id_desa' => 1,
+                'id_desa' => 3171010001,
                 'judul_laporan' => 'Banjir di Perumahan Sukajadi',
                 'deskripsi' => 'Terjadi banjir setelah hujan deras selama 3 jam. Air masuk ke rumah warga dengan ketinggian sekitar 50 cm.',
                 'tingkat_keparahan' => 'Tinggi',
@@ -27,15 +28,12 @@ class LaporanSeeder extends Seeder
                 'jumlah_korban' => 0,
                 'jumlah_rumah_rusak' => 5,
                 'is_prioritas' => true,
-                'view_count' => 0,
                 'waktu_laporan' => '2024-12-15 10:30:00',
-                'created_at' => now(),
-                'updated_at' => now(),
             ],
             [
                 'id_pelapor' => 4,
                 'id_kategori_bencana' => 2, // Gempa Bumi
-                'id_desa' => 2,
+                'id_desa' => 3171010001,
                 'judul_laporan' => 'Gempa Bumi Kecil',
                 'deskripsi' => 'Terjadi gempa bumi skala kecil yang menyebabkan retak-retak dinding rumah warga.',
                 'tingkat_keparahan' => 'Rendah',
@@ -46,15 +44,12 @@ class LaporanSeeder extends Seeder
                 'jumlah_korban' => 0,
                 'jumlah_rumah_rusak' => 2,
                 'is_prioritas' => false,
-                'view_count' => 5,
                 'waktu_laporan' => '2024-12-14 15:45:00',
-                'created_at' => now(),
-                'updated_at' => now(),
             ],
             [
                 'id_pelapor' => 4,
                 'id_kategori_bencana' => 3, // Kebakaran Hutan
-                'id_desa' => 3,
+                'id_desa' => 3171010001,
                 'judul_laporan' => 'Kebakaran Hutan Kecil',
                 'deskripsi' => 'Kebakaran hutan di area perbukitan seluas 2 hektar. Api menjalar ke arah pemukiman.',
                 'tingkat_keparahan' => 'Sedang',
@@ -68,15 +63,12 @@ class LaporanSeeder extends Seeder
                 'jumlah_korban' => 0,
                 'jumlah_rumah_rusak' => 0,
                 'is_prioritas' => true,
-                'view_count' => 15,
                 'waktu_laporan' => '2024-12-13 08:15:00',
-                'created_at' => now(),
-                'updated_at' => now(),
             ],
             [
                 'id_pelapor' => 4,
                 'id_kategori_bencana' => 1, // Banjir
-                'id_desa' => 1,
+                'id_desa' => 3171010001,
                 'judul_laporan' => 'Banjir Bandang',
                 'deskripsi' => 'Banjir bandang disertai longsor menutup akses jalan utama. Puluhan rumah terendam.',
                 'tingkat_keparahan' => 'Kritis',
@@ -84,22 +76,19 @@ class LaporanSeeder extends Seeder
                 'id_verifikator' => 2,
                 'id_penanggung_jawab' => 2,
                 'waktu_verifikasi' => '2024-12-12 14:30:00',
-                'catatan_penanganan' => 'Tim rescue sudah diterjunkan',
+                'waktu_selesai' => null,
                 'latitude' => -6.8915,
                 'longitude' => 107.6107,
                 'alamat_lengkap' => 'Jalan Sukajadi No. 99',
                 'jumlah_korban' => 3,
                 'jumlah_rumah_rusak' => 25,
                 'is_prioritas' => true,
-                'view_count' => 50,
                 'waktu_laporan' => '2024-12-12 09:00:00',
-                'created_at' => now(),
-                'updated_at' => now(),
             ],
             [
                 'id_pelapor' => 4,
                 'id_kategori_bencana' => 2, // Gempa Bumi
-                'id_desa' => 2,
+                'id_desa' => 3171010001,
                 'judul_laporan' => 'Gempa Kuat dan Tsunami',
                 'deskripsi' => 'Gempa bumi kuat dengan potensi tsunami. Warga panik dan berlarian mencari tempat tinggi.',
                 'tingkat_keparahan' => 'Kritis',
@@ -109,22 +98,18 @@ class LaporanSeeder extends Seeder
                 'waktu_verifikasi' => '2024-12-11 10:00:00',
                 'waktu_selesai' => '2024-12-11 18:00:00',
                 'catatan_verifikasi' => 'Emergency response activated',
-                'catatan_penanganan' => 'Evakuasi berhasil, tidak ada korban jiwa',
                 'latitude' => -6.1944,
                 'longitude' => 106.8229,
                 'alamat_lengkap' => 'Pantai Menteng',
                 'jumlah_korban' => 0,
                 'jumlah_rumah_rusak' => 10,
                 'is_prioritas' => true,
-                'view_count' => 200,
                 'waktu_laporan' => '2024-12-11 08:30:00',
-                'created_at' => now(),
-                'updated_at' => now(),
             ],
             [
                 'id_pelapor' => 4,
                 'id_kategori_bencana' => 1, // Banjir
-                'id_desa' => 1,
+                'id_desa' => 3171010001,
                 'judul_laporan' => 'Genangan Air di Jalan',
                 'deskripsi' => 'Genangan air setelah hujan, mengganggu lalu lintas namun tidak masuk ke rumah.',
                 'tingkat_keparahan' => 'Rendah',
@@ -138,15 +123,12 @@ class LaporanSeeder extends Seeder
                 'jumlah_korban' => 0,
                 'jumlah_rumah_rusak' => 0,
                 'is_prioritas' => false,
-                'view_count' => 3,
                 'waktu_laporan' => '2024-12-10 12:00:00',
-                'created_at' => now(),
-                'updated_at' => now(),
             ],
             [
                 'id_pelapor' => 4,
                 'id_kategori_bencana' => 3, // Kebakaran Hutan
-                'id_desa' => 3,
+                'id_desa' => 3171010001,
                 'judul_laporan' => 'Kebakaran Lahan Gambut',
                 'deskripsi' => 'Kebakaran lahan gambut yang sulit dipadamkan, asap tebal mengganggu pernapasan.',
                 'tingkat_keparahan' => 'Tinggi',
@@ -154,22 +136,18 @@ class LaporanSeeder extends Seeder
                 'id_verifikator' => 1,
                 'id_penanggung_jawab' => 2,
                 'waktu_verifikasi' => '2024-12-09 11:00:00',
-                'catatan_penanganan' => 'Tim pemadam kebakaran sudah diturunkan',
                 'latitude' => -7.0159,
                 'longitude' => 110.4039,
                 'alamat_lengkap' => 'Lahan Gambut Candisari',
                 'jumlah_korban' => 0,
                 'jumlah_rumah_rusak' => 0,
                 'is_prioritas' => true,
-                'view_count' => 75,
                 'waktu_laporan' => '2024-12-09 09:30:00',
-                'created_at' => now(),
-                'updated_at' => now(),
             ],
             [
                 'id_pelapor' => 4,
                 'id_kategori_bencana' => 2, // Gempa Bumi
-                'id_desa' => 2,
+                'id_desa' => 3171010001,
                 'judul_laporan' => 'Guncangan Gempa Susulan',
                 'deskripsi' => 'Gempa susulan pasca gempa utama, beberapa bangunan retak.',
                 'tingkat_keparahan' => 'Sedang',
@@ -180,15 +158,12 @@ class LaporanSeeder extends Seeder
                 'jumlah_korban' => 0,
                 'jumlah_rumah_rusak' => 3,
                 'is_prioritas' => false,
-                'view_count' => 20,
                 'waktu_laporan' => '2024-12-08 14:20:00',
-                'created_at' => now(),
-                'updated_at' => now(),
             ],
             [
                 'id_pelapor' => 4,
                 'id_kategori_bencana' => 1, // Banjir
-                'id_desa' => 1,
+                'id_desa' => 3171010001,
                 'judul_laporan' => 'Luapan Sungai Cikapundung',
                 'deskripsi' => 'Sungai Cikapundung meluap setelah hujan lebat, air menggenangi permukiman warga.',
                 'tingkat_keparahan' => 'Sedang',
@@ -202,15 +177,12 @@ class LaporanSeeder extends Seeder
                 'jumlah_korban' => 0,
                 'jumlah_rumah_rusak' => 8,
                 'is_prioritas' => true,
-                'view_count' => 30,
                 'waktu_laporan' => '2024-12-07 13:45:00',
-                'created_at' => now(),
-                'updated_at' => now(),
             ],
             [
                 'id_pelapor' => 4,
                 'id_kategori_bencana' => 3, // Kebakaran Hutan
-                'id_desa' => 3,
+                'id_desa' => 3171010001,
                 'judul_laporan' => 'Kebakaran Sampah dan Tumpahan Minyak',
                 'deskripsi' => 'Kebakaran tempat pembuangan sampah yang menyebar ke area industri. Terdapat tumpahan minyak.',
                 'tingkat_keparahan' => 'Tinggi',
@@ -218,7 +190,6 @@ class LaporanSeeder extends Seeder
                 'id_verifikator' => 2,
                 'id_penanggung_jawab' => 2,
                 'waktu_verifikasi' => '2024-12-06 10:15:00',
-                'catatan_penanganan' => 'Tim Hazmat sedang dalam perjalanan',
                 'latitude' => -7.0159,
                 'longitude' => 110.4039,
                 'alamat_lengkap' => 'TPA Candisari',
@@ -226,13 +197,12 @@ class LaporanSeeder extends Seeder
                 'jumlah_korban' => 0,
                 'jumlah_rumah_rusak' => 0,
                 'is_prioritas' => true,
-                'view_count' => 100,
                 'waktu_laporan' => '2024-12-06 09:00:00',
-                'created_at' => now(),
-                'updated_at' => now(),
             ]
         ];
 
-        \DB::table('laporans')->insert($laporans);
+        foreach ($laporans as $laporan) {
+            Laporans::create($laporan);
+        }
     }
 }

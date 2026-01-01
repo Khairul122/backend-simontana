@@ -39,7 +39,6 @@ return new class extends Migration
             $table->timestamp('waktu_verifikasi')->nullable();
             $table->timestamp('waktu_selesai')->nullable();
             $table->text('catatan_verifikasi')->nullable();
-            $table->text('catatan_penanganan')->nullable();
 
             // Additional metadata
             $table->integer('jumlah_korban')->default(0);

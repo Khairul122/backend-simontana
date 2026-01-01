@@ -119,7 +119,7 @@ class MonitoringController extends Controller
     public function store(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
-            'id_laporan' => 'required|exists:laporans,id_laporan',
+            'id_laporan' => 'required|exists:laporans,id',
             'id_operator' => 'required|exists:pengguna,id',
             'waktu_monitoring' => 'required|date',
             'hasil_monitoring' => 'required|string',
@@ -234,7 +234,7 @@ class MonitoringController extends Controller
     public function update(Request $request, $id): JsonResponse
     {
         $validator = Validator::make($request->all(), [
-            'id_laporan' => 'sometimes|exists:laporans,id_laporan',
+            'id_laporan' => 'sometimes|exists:laporans,id',
             'id_operator' => 'sometimes|exists:pengguna,id',
             'waktu_monitoring' => 'sometimes|date',
             'hasil_monitoring' => 'sometimes|string',

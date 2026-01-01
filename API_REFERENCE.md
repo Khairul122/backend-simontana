@@ -694,8 +694,7 @@ Update status penanganan laporan oleh Petugas BPBD.
 **Request Body:**
 ```json
 {
-  "status": "Diproses|Tindak Lanjut|Selesai",
-  "catatan_penanganan": "string (optional)"
+  "status": "Diproses|Tindak Lanjut|Selesai"
 }
 ```
 

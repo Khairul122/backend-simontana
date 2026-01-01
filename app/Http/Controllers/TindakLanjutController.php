@@ -163,7 +163,7 @@ class TindakLanjutController extends Controller
         }
 
         $validator = Validator::make($request->all(), [
-            'laporan_id' => 'required|exists:laporan,id_laporan',
+            'laporan_id' => 'required|exists:laporans,id',
             'id_petugas' => 'required|exists:pengguna,id',
             'tanggal_tanggapan' => 'required|date',
             'status' => 'sometimes|in:Menuju Lokasi,Selesai'

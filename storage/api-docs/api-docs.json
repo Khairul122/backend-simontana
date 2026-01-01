@@ -2502,7 +2502,7 @@
                     "Laporan Management"
                 ],
                 "summary": "Proses laporan bencana",
-                "description": "Update status penanganan laporan oleh Petugas BPBD",
+                "description": "Update status penanganan laporan oleh Admin, Petugas BPBD, atau Operator Desa",
                 "operationId": "5471ca56382fa0668469bb059d46f115",
                 "parameters": [
                     {
@@ -2533,11 +2533,6 @@
                                             "Selesai"
                                         ],
                                         "example": "Diproses"
-                                    },
-                                    "catatan_penanganan": {
-                                        "type": "string",
-                                        "maxLength": 1000,
-                                        "example": "Tim SAR sudah diterjunkan ke lokasi"
                                     }
                                 },
                                 "type": "object"
@@ -7307,11 +7302,6 @@
                         "description": "Catatan verifikasi",
                         "type": "string",
                         "example": "Laporan valid dan perlu ditindak lanjuti"
-                    },
-                    "catatan_penanganan": {
-                        "description": "Catatan proses",
-                        "type": "string",
-                        "example": "Tim SAR sudah diterjunkan ke lokasi"
                     },
                     "data_tambahan": {
                         "description": "Data tambahan dalam format JSON",
