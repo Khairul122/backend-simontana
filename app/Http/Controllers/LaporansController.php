@@ -31,7 +31,7 @@ use Illuminate\Validation\Rule;
  *     @OA\Property(property="waktu_verifikasi", type="string", format="date-time", example="2024-12-22T11:00:00Z", description="Waktu verifikasi"),
  *     @OA\Property(property="waktu_selesai", type="string", format="date-time", example="2024-12-22T15:00:00Z", description="Waktu selesai penanganan"),
  *     @OA\Property(property="catatan_verifikasi", type="string", example="Laporan valid dan perlu ditindak lanjuti", description="Catatan verifikasi"),
- *     @OA\Property(property="catatan_proses", type="string", example="Tim SAR sudah diterjunkan ke lokasi", description="Catatan proses"),
+ *     @OA\Property(property="catatan_penanganan", type="string", example="Tim SAR sudah diterjunkan ke lokasi", description="Catatan penanganan"),
  *     @OA\Property(property="data_tambahan", type="object", example={"cuaca":"hujan", "akses":"sulit"}, description="Data tambahan dalam format JSON"),
  *     @OA\Property(property="foto_bukti_1", type="string", example="storage/laporans/2024/12/foto1.jpg", description="Path foto bukti 1"),
  *     @OA\Property(property="foto_bukti_2", type="string", example="storage/laporans/2024/12/foto2.jpg", description="Path foto bukti 2"),
@@ -344,7 +344,7 @@ class LaporansController extends Controller
                 'desa.kecamatan.kabupaten.provinsi:id,nama',
                 'tindakLanjut:id_tindaklanjut,laporan_id,id_petugas,tanggal_tanggapan,status,created_at',
                 'tindakLanjut.petugas:id,nama',
-                'tindakLanjut.laporan:id,id_pelapor,judul_laporan,deskripsi,tingkat_keparahan,latitude,longitude,alamat,jumlah_korban,jumlah_rumah_rusak,is_prioritas,view_count,status,waktu_laporan,waktu_verifikasi,waktu_selesai,catatan_verifikasi,catatan_proses,data_tambahan,foto_bukti_1,foto_bukti_2,foto_bukti_3,video_bukti,id_kategori_bencana,id_desa,alamat_lengkap',
+                'tindakLanjut.laporan:id,id_pelapor,judul_laporan,deskripsi,tingkat_keparahan,latitude,longitude,jumlah_korban,jumlah_rumah_rusak,is_prioritas,view_count,status,waktu_laporan,waktu_verifikasi,waktu_selesai,catatan_verifikasi,catatan_penanganan,data_tambahan,foto_bukti_1,foto_bukti_2,foto_bukti_3,video_bukti,id_kategori_bencana,id_desa,alamat_lengkap',
                 'tindakLanjut.laporan.pelapor:id,nama,email,no_telepon',
                 'monitoring:id_monitoring,id_laporan,id_operator,waktu_monitoring,hasil_monitoring,koordinat_gps,created_at'
             ]);
@@ -381,7 +381,7 @@ class LaporansController extends Controller
                 $query->where(function ($q) use ($search) {
                     $q->where('judul_laporan', 'like', "%{$search}%")
                       ->orWhere('deskripsi', 'like', "%{$search}%")
-                      ->orWhere('alamat', 'like', "%{$search}%");
+                      ->orWhere('alamat_lengkap', 'like', "%{$search}%");
                 });
             }
 
@@ -612,7 +612,7 @@ class LaporansController extends Controller
                 'desa.kecamatan.kabupaten.provinsi:id,nama',
                 'tindakLanjut:id_tindaklanjut,laporan_id,id_petugas,tanggal_tanggapan,status,created_at',
                 'tindakLanjut.petugas:id,nama',
-                'tindakLanjut.laporan:id,id_pelapor,judul_laporan,deskripsi,tingkat_keparahan,latitude,longitude,alamat,jumlah_korban,jumlah_rumah_rusak,is_prioritas,view_count,status,waktu_laporan,waktu_verifikasi,waktu_selesai,catatan_verifikasi,catatan_proses,data_tambahan,foto_bukti_1,foto_bukti_2,foto_bukti_3,video_bukti,id_kategori_bencana,id_desa,alamat_lengkap',
+                'tindakLanjut.laporan:id,id_pelapor,judul_laporan,deskripsi,tingkat_keparahan,latitude,longitude,jumlah_korban,jumlah_rumah_rusak,is_prioritas,view_count,status,waktu_laporan,waktu_verifikasi,waktu_selesai,catatan_verifikasi,catatan_penanganan,data_tambahan,foto_bukti_1,foto_bukti_2,foto_bukti_3,video_bukti,id_kategori_bencana,id_desa,alamat_lengkap',
                 'tindakLanjut.laporan.pelapor:id,nama,email,no_telepon',
                 'monitoring:id_monitoring,id_laporan,id_operator,waktu_monitoring,hasil_monitoring,koordinat_gps,created_at'
             ]);
@@ -1177,7 +1177,7 @@ class LaporansController extends Controller
      *         @OA\JsonContent(
      *             required={"status"},
      *             @OA\Property(property="status", type="string", enum={"Diproses", "Tindak Lanjut", "Selesai"}, example="Diproses", description="Status penanganan"),
-     *             @OA\Property(property="catatan_proses", type="string", maxLength=1000, example="Tim SAR sudah diterjunkan ke lokasi")
+     *             @OA\Property(property="catatan_penanganan", type="string", maxLength=1000, example="Tim SAR sudah diterjunkan ke lokasi")
      *         )
      *     ),
      *
@@ -1216,7 +1216,7 @@ class LaporansController extends Controller
 
             $validator = Validator::make($request->all(), [
                 'status' => 'required|in:Diproses,Tindak Lanjut,Selesai',
-                'catatan_proses' => 'nullable|string|max:1000'
+                'catatan_penanganan' => 'nullable|string|max:1000'
             ]);
 
             if ($validator->fails()) {
@@ -1230,7 +1230,7 @@ class LaporansController extends Controller
             // Prepare update data
             $updateData = [
                 'status' => $request->status,
-                'catatan_proses' => $request->catatan_proses
+                'catatan_penanganan' => $request->catatan_penanganan
             ];
 
             // Hanya isi penanggung jawab jika belum ada sebelumnya

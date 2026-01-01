@@ -2534,7 +2534,7 @@
                                         ],
                                         "example": "Diproses"
                                     },
-                                    "catatan_proses": {
+                                    "catatan_penanganan": {
                                         "type": "string",
                                         "maxLength": 1000,
                                         "example": "Tim SAR sudah diterjunkan ke lokasi"
@@ -7308,7 +7308,7 @@
                         "type": "string",
                         "example": "Laporan valid dan perlu ditindak lanjuti"
                     },
-                    "catatan_proses": {
+                    "catatan_penanganan": {
                         "description": "Catatan proses",
                         "type": "string",
                         "example": "Tim SAR sudah diterjunkan ke lokasi"
