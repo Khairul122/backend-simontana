@@ -315,7 +315,8 @@ class AuthController extends Controller
      */
     public function me(Request $request): JsonResponse
     {
-        $user = $request->user ?? null;
+        // Get the authenticated user using the JWT guard
+        $user = auth()->user();
 
         if (!$user) {
             return response()->json([

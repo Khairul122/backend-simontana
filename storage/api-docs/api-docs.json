@@ -4364,40 +4364,15 @@
                                 }
                             }
                         }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": false
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Unauthenticated."
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
                     }
-                },
-                "security": [
-                    {
-                        "jwt": []
-                    }
-                ]
+                }
             },
             "post": {
                 "tags": [
                     "Wilayah"
                 ],
                 "summary": "Create new wilayah",
-                "description": "Membuat wilayah baru berdasarkan jenis - Hanya Admin yang dapat mengakses endpoint ini",
+                "description": "Membuat wilayah baru berdasarkan jenis",
                 "operationId": "c0db83884f9e134c12793581be7b18aa",
                 "requestBody": {
                     "required": true,
@@ -4501,28 +4476,8 @@
                             }
                         }
                     },
-                    "401": {
-                        "description": "Unauthorized - Token tidak valid",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": false
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Unauthenticated."
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
                     "403": {
-                        "description": "Forbidden - Hanya Admin yang dapat mengakses",
+                        "description": "Forbidden",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -4533,7 +4488,7 @@
                                         },
                                         "message": {
                                             "type": "string",
-                                            "example": "Akses ditolak: Hanya Admin yang dapat mengakses endpoint ini"
+                                            "example": "Akses ditolak"
                                         }
                                     },
                                     "type": "object"
@@ -4541,12 +4496,7 @@
                             }
                         }
                     }
-                },
-                "security": [
-                    {
-                        "jwt": []
-                    }
-                ]
+                }
             }
         },
         "/wilayah/{id}": {
@@ -4641,26 +4591,6 @@
                             }
                         }
                     },
-                    "401": {
-                        "description": "Unauthorized",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": false
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Unauthenticated."
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
                     "404": {
                         "description": "Wilayah not found",
                         "content": {
@@ -4681,12 +4611,7 @@
                             }
                         }
                     }
-                },
-                "security": [
-                    {
-                        "jwt": []
-                    }
-                ]
+                }
             },
             "put": {
                 "tags": [
@@ -4808,28 +4733,8 @@
                             }
                         }
                     },
-                    "401": {
-                        "description": "Unauthorized - Token tidak valid",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": false
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Unauthenticated."
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
                     "403": {
-                        "description": "Forbidden - Hanya Admin yang dapat mengakses",
+                        "description": "Forbidden",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -4840,7 +4745,7 @@
                                         },
                                         "message": {
                                             "type": "string",
-                                            "example": "Akses ditolak: Hanya Admin yang dapat mengakses endpoint ini"
+                                            "example": "Akses ditolak"
                                         }
                                     },
                                     "type": "object"
@@ -4868,12 +4773,7 @@
                             }
                         }
                     }
-                },
-                "security": [
-                    {
-                        "jwt": []
-                    }
-                ]
+                }
             },
             "delete": {
                 "tags": [
@@ -4934,28 +4834,8 @@
                             }
                         }
                     },
-                    "401": {
-                        "description": "Unauthorized - Token tidak valid",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": false
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Unauthenticated."
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
                     "403": {
-                        "description": "Forbidden - Hanya Admin yang dapat mengakses",
+                        "description": "Forbidden",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -4966,7 +4846,7 @@
                                         },
                                         "message": {
                                             "type": "string",
-                                            "example": "Akses ditolak: Hanya Admin yang dapat mengakses endpoint ini"
+                                            "example": "Akses ditolak"
                                         }
                                     },
                                     "type": "object"
@@ -4994,12 +4874,7 @@
                             }
                         }
                     }
-                },
-                "security": [
-                    {
-                        "jwt": []
-                    }
-                ]
+                }
             }
         },
         "/wilayah/provinsi": {
@@ -5065,19 +4940,14 @@
                             }
                         }
                     }
-                },
-                "security": [
-                    {
-                        "jwt": []
-                    }
-                ]
+                }
             },
             "post": {
                 "tags": [
                     "Wilayah"
                 ],
                 "summary": "Create new provinsi",
-                "description": "Membuat data provinsi baru - Hanya Admin yang dapat mengakses",
+                "description": "Membuat data provinsi baru",
                 "operationId": "3a3e6887e34ea83dbadcb76f2a86b8f6",
                 "requestBody": {
                     "required": true,
@@ -5157,7 +5027,7 @@
                         }
                     },
                     "403": {
-                        "description": "Forbidden - Hanya Admin",
+                        "description": "Forbidden",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -5168,7 +5038,7 @@
                                         },
                                         "message": {
                                             "type": "string",
-                                            "example": "Akses ditolak: Hanya Admin yang dapat mengakses endpoint ini"
+                                            "example": "Akses ditolak"
                                         }
                                     },
                                     "type": "object"
@@ -5176,12 +5046,7 @@
                             }
                         }
                     }
-                },
-                "security": [
-                    {
-                        "jwt": []
-                    }
-                ]
+                }
             }
         },
         "/wilayah/provinsi/{id}": {
@@ -5256,19 +5121,14 @@
                     "404": {
                         "description": "Provinsi not found"
                     }
-                },
-                "security": [
-                    {
-                        "jwt": []
-                    }
-                ]
+                }
             },
             "put": {
                 "tags": [
                     "Wilayah"
                 ],
                 "summary": "Update provinsi",
-                "description": "Memperbarui data provinsi - Hanya Admin yang dapat mengakses",
+                "description": "Memperbarui data provinsi",
                 "operationId": "f8676df73ba9c22d20ac1f684d72398c",
                 "parameters": [
                     {
@@ -5359,7 +5219,7 @@
                         }
                     },
                     "403": {
-                        "description": "Forbidden - Hanya Admin",
+                        "description": "Forbidden",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -5370,7 +5230,7 @@
                                         },
                                         "message": {
                                             "type": "string",
-                                            "example": "Akses ditolak: Hanya Admin yang dapat mengakses endpoint ini"
+                                            "example": "Akses ditolak"
                                         }
                                     },
                                     "type": "object"
@@ -5398,19 +5258,14 @@
                             }
                         }
                     }
-                },
-                "security": [
-                    {
-                        "jwt": []
-                    }
-                ]
+                }
             },
             "delete": {
                 "tags": [
                     "Wilayah"
                 ],
                 "summary": "Delete provinsi",
-                "description": "Menghapus data provinsi - Hanya Admin yang dapat mengakses",
+                "description": "Menghapus data provinsi",
                 "operationId": "f11e7f2473ca7a231a3f68c566245870",
                 "parameters": [
                     {
@@ -5465,7 +5320,7 @@
                         }
                     },
                     "403": {
-                        "description": "Forbidden - Hanya Admin",
+                        "description": "Forbidden",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -5476,7 +5331,7 @@
                                         },
                                         "message": {
                                             "type": "string",
-                                            "example": "Akses ditolak: Hanya Admin yang dapat mengakses endpoint ini"
+                                            "example": "Akses ditolak"
                                         }
                                     },
                                     "type": "object"
@@ -5504,12 +5359,7 @@
                             }
                         }
                     }
-                },
-                "security": [
-                    {
-                        "jwt": []
-                    }
-                ]
+                }
             }
         },
         "/wilayah/kabupaten/{provinsi_id}": {
@@ -5595,12 +5445,7 @@
                     "404": {
                         "description": "Provinsi not found"
                     }
-                },
-                "security": [
-                    {
-                        "jwt": []
-                    }
-                ]
+                }
             }
         },
         "/wilayah/kecamatan/{kabupaten_id}": {
@@ -5686,12 +5531,7 @@
                     "404": {
                         "description": "Kabupaten not found"
                     }
-                },
-                "security": [
-                    {
-                        "jwt": []
-                    }
-                ]
+                }
             }
         },
         "/wilayah/desa/{kecamatan_id}": {
@@ -5772,12 +5612,7 @@
                     "404": {
                         "description": "Kecamatan not found"
                     }
-                },
-                "security": [
-                    {
-                        "jwt": []
-                    }
-                ]
+                }
             }
         },
         "/wilayah/detail/{desa_id}": {
@@ -5887,12 +5722,7 @@
                     "404": {
                         "description": "Desa not found"
                     }
-                },
-                "security": [
-                    {
-                        "jwt": []
-                    }
-                ]
+                }
             }
         },
         "/wilayah/hierarchy/{desa_id}": {
@@ -5955,12 +5785,7 @@
                     "404": {
                         "description": "Desa not found"
                     }
-                },
-                "security": [
-                    {
-                        "jwt": []
-                    }
-                ]
+                }
             }
         },
         "/wilayah/search": {
@@ -6042,12 +5867,7 @@
                     "400": {
                         "description": "Parameter pencarian (q) wajib disertakan"
                     }
-                },
-                "security": [
-                    {
-                        "jwt": []
-                    }
-                ]
+                }
             }
         },
         "/wilayah/kabupaten": {
@@ -6056,7 +5876,7 @@
                     "Wilayah"
                 ],
                 "summary": "Create new kabupaten",
-                "description": "Membuat data kabupaten baru - Hanya Admin yang dapat mengakses",
+                "description": "Membuat data kabupaten baru",
                 "operationId": "a640c3566c25464dc457de2c281a2a6d",
                 "requestBody": {
                     "required": true,
@@ -6146,7 +5966,7 @@
                         }
                     },
                     "403": {
-                        "description": "Forbidden - Hanya Admin",
+                        "description": "Forbidden",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -6157,7 +5977,7 @@
                                         },
                                         "message": {
                                             "type": "string",
-                                            "example": "Akses ditolak: Hanya Admin yang dapat mengakses endpoint ini"
+                                            "example": "Akses ditolak"
                                         }
                                     },
                                     "type": "object"
@@ -6165,12 +5985,7 @@
                             }
                         }
                     }
-                },
-                "security": [
-                    {
-                        "jwt": []
-                    }
-                ]
+                }
             }
         },
         "/wilayah/kabupaten/{id}": {
@@ -6179,7 +5994,7 @@
                     "Wilayah"
                 ],
                 "summary": "Update kabupaten",
-                "description": "Memperbarui data kabupaten - Hanya Admin yang dapat mengakses",
+                "description": "Memperbarui data kabupaten",
                 "operationId": "ea7028c37a1e7048de103039492e80db",
                 "parameters": [
                     {
@@ -6279,7 +6094,7 @@
                         }
                     },
                     "403": {
-                        "description": "Forbidden - Hanya Admin",
+                        "description": "Forbidden",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -6290,7 +6105,7 @@
                                         },
                                         "message": {
                                             "type": "string",
-                                            "example": "Akses ditolak: Hanya Admin yang dapat mengakses endpoint ini"
+                                            "example": "Akses ditolak"
                                         }
                                     },
                                     "type": "object"
@@ -6318,19 +6133,14 @@
                             }
                         }
                     }
-                },
-                "security": [
-                    {
-                        "jwt": []
-                    }
-                ]
+                }
             },
             "delete": {
                 "tags": [
                     "Wilayah"
                 ],
                 "summary": "Delete kabupaten",
-                "description": "Menghapus data kabupaten - Hanya Admin yang dapat mengakses",
+                "description": "Menghapus data kabupaten",
                 "operationId": "00e8aaeaf7ff397cd82e5a5a7758f9e5",
                 "parameters": [
                     {
@@ -6385,7 +6195,7 @@
                         }
                     },
                     "403": {
-                        "description": "Forbidden - Hanya Admin",
+                        "description": "Forbidden",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -6396,7 +6206,7 @@
                                         },
                                         "message": {
                                             "type": "string",
-                                            "example": "Akses ditolak: Hanya Admin yang dapat mengakses endpoint ini"
+                                            "example": "Akses ditolak"
                                         }
                                     },
                                     "type": "object"
@@ -6424,12 +6234,7 @@
                             }
                         }
                     }
-                },
-                "security": [
-                    {
-                        "jwt": []
-                    }
-                ]
+                }
             }
         },
         "/wilayah/kecamatan": {
@@ -6438,7 +6243,7 @@
                     "Wilayah"
                 ],
                 "summary": "Create new kecamatan",
-                "description": "Membuat data kecamatan baru - Hanya Admin yang dapat mengakses",
+                "description": "Membuat data kecamatan baru",
                 "operationId": "360d2425d19ca4c46a18ca3a4e6f81a5",
                 "requestBody": {
                     "required": true,
@@ -6528,7 +6333,7 @@
                         }
                     },
                     "403": {
-                        "description": "Forbidden - Hanya Admin",
+                        "description": "Forbidden",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -6539,7 +6344,7 @@
                                         },
                                         "message": {
                                             "type": "string",
-                                            "example": "Akses ditolak: Hanya Admin yang dapat mengakses endpoint ini"
+                                            "example": "Akses ditolak"
                                         }
                                     },
                                     "type": "object"
@@ -6547,12 +6352,7 @@
                             }
                         }
                     }
-                },
-                "security": [
-                    {
-                        "jwt": []
-                    }
-                ]
+                }
             }
         },
         "/wilayah/kecamatan/{id}": {
@@ -6561,7 +6361,7 @@
                     "Wilayah"
                 ],
                 "summary": "Update kecamatan",
-                "description": "Memperbarui data kecamatan - Hanya Admin yang dapat mengakses",
+                "description": "Memperbarui data kecamatan",
                 "operationId": "c84c01ac699c2da7bdd64ada44c47483",
                 "parameters": [
                     {
@@ -6661,7 +6461,7 @@
                         }
                     },
                     "403": {
-                        "description": "Forbidden - Hanya Admin",
+                        "description": "Forbidden",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -6672,7 +6472,7 @@
                                         },
                                         "message": {
                                             "type": "string",
-                                            "example": "Akses ditolak: Hanya Admin yang dapat mengakses endpoint ini"
+                                            "example": "Akses ditolak"
                                         }
                                     },
                                     "type": "object"
@@ -6700,19 +6500,14 @@
                             }
                         }
                     }
-                },
-                "security": [
-                    {
-                        "jwt": []
-                    }
-                ]
+                }
             },
             "delete": {
                 "tags": [
                     "Wilayah"
                 ],
                 "summary": "Delete kecamatan",
-                "description": "Menghapus data kecamatan - Hanya Admin yang dapat mengakses",
+                "description": "Menghapus data kecamatan",
                 "operationId": "23251e75c2c79cad08d649817480ad86",
                 "parameters": [
                     {
@@ -6767,7 +6562,7 @@
                         }
                     },
                     "403": {
-                        "description": "Forbidden - Hanya Admin",
+                        "description": "Forbidden",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -6778,7 +6573,7 @@
                                         },
                                         "message": {
                                             "type": "string",
-                                            "example": "Akses ditolak: Hanya Admin yang dapat mengakses endpoint ini"
+                                            "example": "Akses ditolak"
                                         }
                                     },
                                     "type": "object"
@@ -6806,12 +6601,7 @@
                             }
                         }
                     }
-                },
-                "security": [
-                    {
-                        "jwt": []
-                    }
-                ]
+                }
             }
         },
         "/wilayah/desa": {
@@ -6820,7 +6610,7 @@
                     "Wilayah"
                 ],
                 "summary": "Create new desa",
-                "description": "Membuat data desa baru - Hanya Admin yang dapat mengakses",
+                "description": "Membuat data desa baru",
                 "operationId": "8f315552c837089a136d51066f8a4da3",
                 "requestBody": {
                     "required": true,
@@ -6910,7 +6700,7 @@
                         }
                     },
                     "403": {
-                        "description": "Forbidden - Hanya Admin",
+                        "description": "Forbidden",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -6921,7 +6711,7 @@
                                         },
                                         "message": {
                                             "type": "string",
-                                            "example": "Akses ditolak: Hanya Admin yang dapat mengakses endpoint ini"
+                                            "example": "Akses ditolak"
                                         }
                                     },
                                     "type": "object"
@@ -6929,12 +6719,7 @@
                             }
                         }
                     }
-                },
-                "security": [
-                    {
-                        "jwt": []
-                    }
-                ]
+                }
             }
         },
         "/wilayah/desa/{id}": {
@@ -6943,7 +6728,7 @@
                     "Wilayah"
                 ],
                 "summary": "Update desa",
-                "description": "Memperbarui data desa - Hanya Admin yang dapat mengakses",
+                "description": "Memperbarui data desa",
                 "operationId": "aa536bb4e838a4ff6f26313f885bc3dc",
                 "parameters": [
                     {
@@ -7043,7 +6828,7 @@
                         }
                     },
                     "403": {
-                        "description": "Forbidden - Hanya Admin",
+                        "description": "Forbidden",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -7054,7 +6839,7 @@
                                         },
                                         "message": {
                                             "type": "string",
-                                            "example": "Akses ditolak: Hanya Admin yang dapat mengakses endpoint ini"
+                                            "example": "Akses ditolak"
                                         }
                                     },
                                     "type": "object"
@@ -7082,19 +6867,14 @@
                             }
                         }
                     }
-                },
-                "security": [
-                    {
-                        "jwt": []
-                    }
-                ]
+                }
             },
             "delete": {
                 "tags": [
                     "Wilayah"
                 ],
                 "summary": "Delete desa",
-                "description": "Menghapus data desa - Hanya Admin yang dapat mengakses",
+                "description": "Menghapus data desa",
                 "operationId": "98cc6480ec40f28e761c3bf0274f2ba6",
                 "parameters": [
                     {
@@ -7149,7 +6929,7 @@
                         }
                     },
                     "403": {
-                        "description": "Forbidden - Hanya Admin",
+                        "description": "Forbidden",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -7160,7 +6940,7 @@
                                         },
                                         "message": {
                                             "type": "string",
-                                            "example": "Akses ditolak: Hanya Admin yang dapat mengakses endpoint ini"
+                                            "example": "Akses ditolak"
                                         }
                                     },
                                     "type": "object"
@@ -7188,12 +6968,7 @@
                             }
                         }
                     }
-                },
-                "security": [
-                    {
-                        "jwt": []
-                    }
-                ]
+                }
             }
         }
     },

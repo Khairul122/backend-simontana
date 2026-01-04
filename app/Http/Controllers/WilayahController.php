@@ -24,7 +24,6 @@ class WilayahController extends Controller
      *     tags={"Wilayah"},
      *     summary="Get all wilayah",
      *     description="Mengambil semua data wilayah dengan filter jenis dan pagination",
-     *     security={{"jwt": {}}},
      *     @OA\Parameter(
      *         name="jenis",
      *         in="query",
@@ -71,14 +70,6 @@ class WilayahController extends Controller
      *                 @OA\Property(property="per_page", type="integer", example=15),
      *                 @OA\Property(property="total", type="integer", example=75)
      *             )
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=401,
-     *         description="Unauthorized",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Unauthenticated.")
      *         )
      *     )
      * )
@@ -187,7 +178,6 @@ class WilayahController extends Controller
      *     tags={"Wilayah"},
      *     summary="Get specific wilayah by ID",
      *     description="Mengambil data wilayah berdasarkan ID - parameter jenis wajib untuk menentukan tabel",
-     *     security={{"jwt": {}}},
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
@@ -225,14 +215,6 @@ class WilayahController extends Controller
      *                 @OA\Property(property="parent", type="object"),
      *                 @OA\Property(property="children", type="array", @OA\Items())
      *             )
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=401,
-     *         description="Unauthorized",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Unauthenticated.")
      *         )
      *     ),
      *     @OA\Response(
@@ -345,8 +327,7 @@ class WilayahController extends Controller
      *     path="/wilayah",
      *     tags={"Wilayah"},
      *     summary="Create new wilayah",
-     *     description="Membuat wilayah baru berdasarkan jenis - Hanya Admin yang dapat mengakses endpoint ini",
-     *     security={{"jwt": {}}},
+     *     description="Membuat wilayah baru berdasarkan jenis",
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
@@ -383,33 +364,17 @@ class WilayahController extends Controller
      *         )
      *     ),
      *     @OA\Response(
-     *         response=401,
-     *         description="Unauthorized - Token tidak valid",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Unauthenticated.")
-     *         )
-     *     ),
-     *     @OA\Response(
      *         response=403,
-     *         description="Forbidden - Hanya Admin yang dapat mengakses",
+     *         description="Forbidden",
      *         @OA\JsonContent(
      *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Akses ditolak: Hanya Admin yang dapat mengakses endpoint ini")
+     *             @OA\Property(property="message", type="string", example="Akses ditolak")
      *         )
      *     )
      * )
      */
     public function store(Request $request): JsonResponse
     {
-        // Cek role pengguna - hanya Admin yang bisa mengakses
-        $user = $request->user();
-        if (!$user || $user->role !== 'Admin') {
-            return response()->json([
-                'success' => false,
-                'message' => 'Akses ditolak: Hanya Admin yang dapat mengakses endpoint ini'
-            ], 403);
-        }
 
         $validator = Validator::make($request->all(), [
             'jenis' => 'required|in:provinsi,kabupaten,kecamatan,desa',
@@ -522,7 +487,6 @@ class WilayahController extends Controller
      *     tags={"Wilayah"},
      *     summary="Update wilayah",
      *     description="Memperbarui data wilayah berdasarkan ID - parameter jenis wajib untuk menentukan tabel",
-     *     security={{"jwt": {}}},
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
@@ -566,19 +530,11 @@ class WilayahController extends Controller
      *         )
      *     ),
      *     @OA\Response(
-     *         response=401,
-     *         description="Unauthorized - Token tidak valid",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Unauthenticated.")
-     *         )
-     *     ),
-     *     @OA\Response(
      *         response=403,
-     *         description="Forbidden - Hanya Admin yang dapat mengakses",
+     *         description="Forbidden",
      *         @OA\JsonContent(
      *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Akses ditolak: Hanya Admin yang dapat mengakses endpoint ini")
+     *             @OA\Property(property="message", type="string", example="Akses ditolak")
      *         )
      *     ),
      *     @OA\Response(
@@ -593,14 +549,6 @@ class WilayahController extends Controller
      */
     public function update(Request $request, $id): JsonResponse
     {
-        // Cek role pengguna - hanya Admin yang bisa mengakses
-        $user = $request->user();
-        if (!$user || $user->role !== 'Admin') {
-            return response()->json([
-                'success' => false,
-                'message' => 'Akses ditolak: Hanya Admin yang dapat mengakses endpoint ini'
-            ], 403);
-        }
 
         $jenis = $request->get('jenis');
         if (!$jenis) {
@@ -759,7 +707,6 @@ class WilayahController extends Controller
      *     tags={"Wilayah"},
      *     summary="Delete wilayah",
      *     description="Menghapus data wilayah berdasarkan ID - parameter jenis wajib untuk menentukan tabel",
-     *     security={{"jwt": {}}},
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
@@ -792,19 +739,11 @@ class WilayahController extends Controller
      *         )
      *     ),
      *     @OA\Response(
-     *         response=401,
-     *         description="Unauthorized - Token tidak valid",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Unauthenticated.")
-     *         )
-     *     ),
-     *     @OA\Response(
      *         response=403,
-     *         description="Forbidden - Hanya Admin yang dapat mengakses",
+     *         description="Forbidden",
      *         @OA\JsonContent(
      *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Akses ditolak: Hanya Admin yang dapat mengakses endpoint ini")
+     *             @OA\Property(property="message", type="string", example="Akses ditolak")
      *         )
      *     ),
      *     @OA\Response(
@@ -819,14 +758,6 @@ class WilayahController extends Controller
      */
     public function destroy(Request $request, $id): JsonResponse
     {
-        // Cek role pengguna - hanya Admin yang bisa mengakses
-        $user = $request->user();
-        if (!$user || $user->role !== 'Admin') {
-            return response()->json([
-                'success' => false,
-                'message' => 'Akses ditolak: Hanya Admin yang dapat mengakses endpoint ini'
-            ], 403);
-        }
 
         $jenis = $request->get('jenis');
         if (!$jenis) {
@@ -929,7 +860,6 @@ class WilayahController extends Controller
      *     tags={"Wilayah"},
      *     summary="Get all provinsi",
      *     description="Mengambil semua data provinsi dengan opsi include relasi",
-     *     security={{"jwt": {}}},
      *     @OA\Parameter(
      *         name="include",
      *         in="query",
@@ -987,7 +917,6 @@ class WilayahController extends Controller
      *     tags={"Wilayah"},
      *     summary="Get provinsi by ID",
      *     description="Mengambil data provinsi berdasarkan ID dengan opsi include relasi",
-     *     security={{"jwt": {}}},
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
@@ -1057,7 +986,6 @@ class WilayahController extends Controller
      *     tags={"Wilayah"},
      *     summary="Get kabupaten by provinsi",
      *     description="Mengambil semua data kabupaten/kota berdasarkan ID provinsi",
-     *     security={{"jwt": {}}},
      *     @OA\Parameter(
      *         name="provinsi_id",
      *         in="path",
@@ -1136,7 +1064,6 @@ class WilayahController extends Controller
      *     tags={"Wilayah"},
      *     summary="Get kecamatan by kabupaten",
      *     description="Mengambil semua data kecamatan berdasarkan ID kabupaten",
-     *     security={{"jwt": {}}},
      *     @OA\Parameter(
      *         name="kabupaten_id",
      *         in="path",
@@ -1218,7 +1145,6 @@ class WilayahController extends Controller
      *     tags={"Wilayah"},
      *     summary="Get desa by kecamatan",
      *     description="Mengambil semua data desa/kelurahan berdasarkan ID kecamatan",
-     *     security={{"jwt": {}}},
      *     @OA\Parameter(
      *         name="kecamatan_id",
      *         in="path",
@@ -1294,7 +1220,6 @@ class WilayahController extends Controller
      *     tags={"Wilayah"},
      *     summary="Get wilayah detail by desa ID",
      *     description="Mengambil data wilayah lengkap berdasarkan ID desa (desa -> kecamatan -> kabupaten -> provinsi)",
-     *     security={{"jwt": {}}},
      *     @OA\Parameter(
      *         name="desa_id",
      *         in="path",
@@ -1365,7 +1290,6 @@ class WilayahController extends Controller
      *     tags={"Wilayah"},
      *     summary="Get wilayah hierarchy by desa ID",
      *     description="Mengambil hirarki wilayah lengkap berdasarkan ID desa (desa, kecamatan, kabupaten, provinsi dalam format terstruktur)",
-     *     security={{"jwt": {}}},
      *     @OA\Parameter(
      *         name="desa_id",
      *         in="path",
@@ -1424,7 +1348,6 @@ class WilayahController extends Controller
      *     tags={"Wilayah"},
      *     summary="Search wilayah",
      *     description="Mencari data wilayah berdasarkan nama",
-     *     security={{"jwt": {}}},
      *     @OA\Parameter(
      *         name="q",
      *         in="query",
@@ -1522,8 +1445,7 @@ class WilayahController extends Controller
      *     path="/wilayah/provinsi",
      *     tags={"Wilayah"},
      *     summary="Create new provinsi",
-     *     description="Membuat data provinsi baru - Hanya Admin yang dapat mengakses",
-     *     security={{"jwt": {}}},
+     *     description="Membuat data provinsi baru",
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
@@ -1557,24 +1479,16 @@ class WilayahController extends Controller
      *     ),
      *     @OA\Response(
      *         response=403,
-     *         description="Forbidden - Hanya Admin",
+     *         description="Forbidden",
      *         @OA\JsonContent(
      *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Akses ditolak: Hanya Admin yang dapat mengakses endpoint ini")
+     *             @OA\Property(property="message", type="string", example="Akses ditolak")
      *         )
      *     )
      * )
      */
     public function storeProvinsi(Request $request): JsonResponse
     {
-        // Cek role pengguna - hanya Admin yang bisa mengakses
-        $user = $request->user();
-        if (!$user || $user->role !== 'Admin') {
-            return response()->json([
-                'success' => false,
-                'message' => 'Akses ditolak: Hanya Admin yang dapat mengakses endpoint ini'
-            ], 403);
-        }
 
         $validator = Validator::make($request->all(), [
             'nama' => 'required|string|max:255|unique:provinsi,nama'
@@ -1604,8 +1518,7 @@ class WilayahController extends Controller
      *     path="/wilayah/provinsi/{id}",
      *     tags={"Wilayah"},
      *     summary="Update provinsi",
-     *     description="Memperbarui data provinsi - Hanya Admin yang dapat mengakses",
-     *     security={{"jwt": {}}},
+     *     description="Memperbarui data provinsi",
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
@@ -1646,10 +1559,10 @@ class WilayahController extends Controller
      *     ),
      *     @OA\Response(
      *         response=403,
-     *         description="Forbidden - Hanya Admin",
+     *         description="Forbidden",
      *         @OA\JsonContent(
      *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Akses ditolak: Hanya Admin yang dapat mengakses endpoint ini")
+     *             @OA\Property(property="message", type="string", example="Akses ditolak")
      *         )
      *     ),
      *     @OA\Response(
@@ -1664,14 +1577,6 @@ class WilayahController extends Controller
      */
     public function updateProvinsi(Request $request, $id): JsonResponse
     {
-        // Cek role pengguna - hanya Admin yang bisa mengakses
-        $user = $request->user();
-        if (!$user || $user->role !== 'Admin') {
-            return response()->json([
-                'success' => false,
-                'message' => 'Akses ditolak: Hanya Admin yang dapat mengakses endpoint ini'
-            ], 403);
-        }
 
         $provinsi = Provinsi::find($id);
         if (!$provinsi) {
@@ -1709,8 +1614,7 @@ class WilayahController extends Controller
      *     path="/wilayah/provinsi/{id}",
      *     tags={"Wilayah"},
      *     summary="Delete provinsi",
-     *     description="Menghapus data provinsi - Hanya Admin yang dapat mengakses",
-     *     security={{"jwt": {}}},
+     *     description="Menghapus data provinsi",
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
@@ -1737,10 +1641,10 @@ class WilayahController extends Controller
      *     ),
      *     @OA\Response(
      *         response=403,
-     *         description="Forbidden - Hanya Admin",
+     *         description="Forbidden",
      *         @OA\JsonContent(
      *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Akses ditolak: Hanya Admin yang dapat mengakses endpoint ini")
+     *             @OA\Property(property="message", type="string", example="Akses ditolak")
      *         )
      *     ),
      *     @OA\Response(
@@ -1755,14 +1659,6 @@ class WilayahController extends Controller
      */
     public function destroyProvinsi(Request $request, $id): JsonResponse
     {
-        // Cek role pengguna - hanya Admin yang bisa mengakses
-        $user = $request->user();
-        if (!$user || $user->role !== 'Admin') {
-            return response()->json([
-                'success' => false,
-                'message' => 'Akses ditolak: Hanya Admin yang dapat mengakses endpoint ini'
-            ], 403);
-        }
 
         $provinsi = Provinsi::find($id);
         if (!$provinsi) {
@@ -1797,8 +1693,7 @@ class WilayahController extends Controller
      *     path="/wilayah/kabupaten",
      *     tags={"Wilayah"},
      *     summary="Create new kabupaten",
-     *     description="Membuat data kabupaten baru - Hanya Admin yang dapat mengakses",
-     *     security={{"jwt": {}}},
+     *     description="Membuat data kabupaten baru",
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
@@ -1834,24 +1729,16 @@ class WilayahController extends Controller
      *     ),
      *     @OA\Response(
      *         response=403,
-     *         description="Forbidden - Hanya Admin",
+     *         description="Forbidden",
      *         @OA\JsonContent(
      *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Akses ditolak: Hanya Admin yang dapat mengakses endpoint ini")
+     *             @OA\Property(property="message", type="string", example="Akses ditolak")
      *         )
      *     )
      * )
      */
     public function storeKabupaten(Request $request): JsonResponse
     {
-        // Cek role pengguna - hanya Admin yang bisa mengakses
-        $user = $request->user();
-        if (!$user || $user->role !== 'Admin') {
-            return response()->json([
-                'success' => false,
-                'message' => 'Akses ditolak: Hanya Admin yang dapat mengakses endpoint ini'
-            ], 403);
-        }
 
         $validator = Validator::make($request->all(), [
             'nama' => 'required|string|max:255',
@@ -1883,8 +1770,7 @@ class WilayahController extends Controller
      *     path="/wilayah/kabupaten/{id}",
      *     tags={"Wilayah"},
      *     summary="Update kabupaten",
-     *     description="Memperbarui data kabupaten - Hanya Admin yang dapat mengakses",
-     *     security={{"jwt": {}}},
+     *     description="Memperbarui data kabupaten",
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
@@ -1927,10 +1813,10 @@ class WilayahController extends Controller
      *     ),
      *     @OA\Response(
      *         response=403,
-     *         description="Forbidden - Hanya Admin",
+     *         description="Forbidden",
      *         @OA\JsonContent(
      *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Akses ditolak: Hanya Admin yang dapat mengakses endpoint ini")
+     *             @OA\Property(property="message", type="string", example="Akses ditolak")
      *         )
      *     ),
      *     @OA\Response(
@@ -1945,14 +1831,6 @@ class WilayahController extends Controller
      */
     public function updateKabupaten(Request $request, $id): JsonResponse
     {
-        // Cek role pengguna - hanya Admin yang bisa mengakses
-        $user = $request->user();
-        if (!$user || $user->role !== 'Admin') {
-            return response()->json([
-                'success' => false,
-                'message' => 'Akses ditolak: Hanya Admin yang dapat mengakses endpoint ini'
-            ], 403);
-        }
 
         $kabupaten = Kabupaten::find($id);
         if (!$kabupaten) {
@@ -1994,8 +1872,7 @@ class WilayahController extends Controller
      *     path="/wilayah/kabupaten/{id}",
      *     tags={"Wilayah"},
      *     summary="Delete kabupaten",
-     *     description="Menghapus data kabupaten - Hanya Admin yang dapat mengakses",
-     *     security={{"jwt": {}}},
+     *     description="Menghapus data kabupaten",
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
@@ -2022,10 +1899,10 @@ class WilayahController extends Controller
      *     ),
      *     @OA\Response(
      *         response=403,
-     *         description="Forbidden - Hanya Admin",
+     *         description="Forbidden",
      *         @OA\JsonContent(
      *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Akses ditolak: Hanya Admin yang dapat mengakses endpoint ini")
+     *             @OA\Property(property="message", type="string", example="Akses ditolak")
      *         )
      *     ),
      *     @OA\Response(
@@ -2040,14 +1917,6 @@ class WilayahController extends Controller
      */
     public function destroyKabupaten(Request $request, $id): JsonResponse
     {
-        // Cek role pengguna - hanya Admin yang bisa mengakses
-        $user = $request->user();
-        if (!$user || $user->role !== 'Admin') {
-            return response()->json([
-                'success' => false,
-                'message' => 'Akses ditolak: Hanya Admin yang dapat mengakses endpoint ini'
-            ], 403);
-        }
 
         $kabupaten = Kabupaten::find($id);
         if (!$kabupaten) {
@@ -2082,8 +1951,7 @@ class WilayahController extends Controller
      *     path="/wilayah/kecamatan",
      *     tags={"Wilayah"},
      *     summary="Create new kecamatan",
-     *     description="Membuat data kecamatan baru - Hanya Admin yang dapat mengakses",
-     *     security={{"jwt": {}}},
+     *     description="Membuat data kecamatan baru",
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
@@ -2119,24 +1987,16 @@ class WilayahController extends Controller
      *     ),
      *     @OA\Response(
      *         response=403,
-     *         description="Forbidden - Hanya Admin",
+     *         description="Forbidden",
      *         @OA\JsonContent(
      *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Akses ditolak: Hanya Admin yang dapat mengakses endpoint ini")
+     *             @OA\Property(property="message", type="string", example="Akses ditolak")
      *         )
      *     )
      * )
      */
     public function storeKecamatan(Request $request): JsonResponse
     {
-        // Cek role pengguna - hanya Admin yang bisa mengakses
-        $user = $request->user();
-        if (!$user || $user->role !== 'Admin') {
-            return response()->json([
-                'success' => false,
-                'message' => 'Akses ditolak: Hanya Admin yang dapat mengakses endpoint ini'
-            ], 403);
-        }
 
         $validator = Validator::make($request->all(), [
             'nama' => 'required|string|max:255',
@@ -2168,8 +2028,7 @@ class WilayahController extends Controller
      *     path="/wilayah/kecamatan/{id}",
      *     tags={"Wilayah"},
      *     summary="Update kecamatan",
-     *     description="Memperbarui data kecamatan - Hanya Admin yang dapat mengakses",
-     *     security={{"jwt": {}}},
+     *     description="Memperbarui data kecamatan",
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
@@ -2212,10 +2071,10 @@ class WilayahController extends Controller
      *     ),
      *     @OA\Response(
      *         response=403,
-     *         description="Forbidden - Hanya Admin",
+     *         description="Forbidden",
      *         @OA\JsonContent(
      *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Akses ditolak: Hanya Admin yang dapat mengakses endpoint ini")
+     *             @OA\Property(property="message", type="string", example="Akses ditolak")
      *         )
      *     ),
      *     @OA\Response(
@@ -2230,14 +2089,6 @@ class WilayahController extends Controller
      */
     public function updateKecamatan(Request $request, $id): JsonResponse
     {
-        // Cek role pengguna - hanya Admin yang bisa mengakses
-        $user = $request->user();
-        if (!$user || $user->role !== 'Admin') {
-            return response()->json([
-                'success' => false,
-                'message' => 'Akses ditolak: Hanya Admin yang dapat mengakses endpoint ini'
-            ], 403);
-        }
 
         $kecamatan = Kecamatan::find($id);
         if (!$kecamatan) {
@@ -2279,8 +2130,7 @@ class WilayahController extends Controller
      *     path="/wilayah/kecamatan/{id}",
      *     tags={"Wilayah"},
      *     summary="Delete kecamatan",
-     *     description="Menghapus data kecamatan - Hanya Admin yang dapat mengakses",
-     *     security={{"jwt": {}}},
+     *     description="Menghapus data kecamatan",
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
@@ -2307,10 +2157,10 @@ class WilayahController extends Controller
      *     ),
      *     @OA\Response(
      *         response=403,
-     *         description="Forbidden - Hanya Admin",
+     *         description="Forbidden",
      *         @OA\JsonContent(
      *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Akses ditolak: Hanya Admin yang dapat mengakses endpoint ini")
+     *             @OA\Property(property="message", type="string", example="Akses ditolak")
      *         )
      *     ),
      *     @OA\Response(
@@ -2325,14 +2175,6 @@ class WilayahController extends Controller
      */
     public function destroyKecamatan(Request $request, $id): JsonResponse
     {
-        // Cek role pengguna - hanya Admin yang bisa mengakses
-        $user = $request->user();
-        if (!$user || $user->role !== 'Admin') {
-            return response()->json([
-                'success' => false,
-                'message' => 'Akses ditolak: Hanya Admin yang dapat mengakses endpoint ini'
-            ], 403);
-        }
 
         $kecamatan = Kecamatan::find($id);
         if (!$kecamatan) {
@@ -2367,8 +2209,7 @@ class WilayahController extends Controller
      *     path="/wilayah/desa",
      *     tags={"Wilayah"},
      *     summary="Create new desa",
-     *     description="Membuat data desa baru - Hanya Admin yang dapat mengakses",
-     *     security={{"jwt": {}}},
+     *     description="Membuat data desa baru",
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
@@ -2404,24 +2245,16 @@ class WilayahController extends Controller
      *     ),
      *     @OA\Response(
      *         response=403,
-     *         description="Forbidden - Hanya Admin",
+     *         description="Forbidden",
      *         @OA\JsonContent(
      *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Akses ditolak: Hanya Admin yang dapat mengakses endpoint ini")
+     *             @OA\Property(property="message", type="string", example="Akses ditolak")
      *         )
      *     )
      * )
      */
     public function storeDesa(Request $request): JsonResponse
     {
-        // Cek role pengguna - hanya Admin yang bisa mengakses
-        $user = $request->user();
-        if (!$user || $user->role !== 'Admin') {
-            return response()->json([
-                'success' => false,
-                'message' => 'Akses ditolak: Hanya Admin yang dapat mengakses endpoint ini'
-            ], 403);
-        }
 
         $validator = Validator::make($request->all(), [
             'nama' => 'required|string|max:255',
@@ -2453,8 +2286,7 @@ class WilayahController extends Controller
      *     path="/wilayah/desa/{id}",
      *     tags={"Wilayah"},
      *     summary="Update desa",
-     *     description="Memperbarui data desa - Hanya Admin yang dapat mengakses",
-     *     security={{"jwt": {}}},
+     *     description="Memperbarui data desa",
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
@@ -2497,10 +2329,10 @@ class WilayahController extends Controller
      *     ),
      *     @OA\Response(
      *         response=403,
-     *         description="Forbidden - Hanya Admin",
+     *         description="Forbidden",
      *         @OA\JsonContent(
      *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Akses ditolak: Hanya Admin yang dapat mengakses endpoint ini")
+     *             @OA\Property(property="message", type="string", example="Akses ditolak")
      *         )
      *     ),
      *     @OA\Response(
@@ -2515,14 +2347,6 @@ class WilayahController extends Controller
      */
     public function updateDesa(Request $request, $id): JsonResponse
     {
-        // Cek role pengguna - hanya Admin yang bisa mengakses
-        $user = $request->user();
-        if (!$user || $user->role !== 'Admin') {
-            return response()->json([
-                'success' => false,
-                'message' => 'Akses ditolak: Hanya Admin yang dapat mengakses endpoint ini'
-            ], 403);
-        }
 
         $desa = Desa::find($id);
         if (!$desa) {
@@ -2564,8 +2388,7 @@ class WilayahController extends Controller
      *     path="/wilayah/desa/{id}",
      *     tags={"Wilayah"},
      *     summary="Delete desa",
-     *     description="Menghapus data desa - Hanya Admin yang dapat mengakses",
-     *     security={{"jwt": {}}},
+     *     description="Menghapus data desa",
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
@@ -2592,10 +2415,10 @@ class WilayahController extends Controller
      *     ),
      *     @OA\Response(
      *         response=403,
-     *         description="Forbidden - Hanya Admin",
+     *         description="Forbidden",
      *         @OA\JsonContent(
      *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Akses ditolak: Hanya Admin yang dapat mengakses endpoint ini")
+     *             @OA\Property(property="message", type="string", example="Akses ditolak")
      *         )
      *     ),
      *     @OA\Response(
@@ -2610,14 +2433,6 @@ class WilayahController extends Controller
      */
     public function destroyDesa(Request $request, $id): JsonResponse
     {
-        // Cek role pengguna - hanya Admin yang bisa mengakses
-        $user = $request->user();
-        if (!$user || $user->role !== 'Admin') {
-            return response()->json([
-                'success' => false,
-                'message' => 'Akses ditolak: Hanya Admin yang dapat mengakses endpoint ini'
-            ], 403);
-        }
 
         $desa = Desa::find($id);
         if (!$desa) {
