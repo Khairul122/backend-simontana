@@ -133,14 +133,14 @@ Route::prefix('bmkg')->group(function () {
     // Public route for tsunami warnings (critical safety information)
     Route::get('/peringatan-tsunami', [BmkgController::class, 'getPeringatanTsunami']);
 
+    // Public route for weather forecast (critical safety information)
+    Route::get('/prakiraan-cuaca', [BmkgController::class, 'getPrakiraanCuaca']);
+
     // Protected routes for BMKG management (require authentication)
     Route::middleware('jwt.auth')->group(function () {
         Route::get('/', [BmkgController::class, 'index']);
         Route::get('/cache/status', [BmkgController::class, 'getCacheStatus']);
         Route::post('/cache/clear', [BmkgController::class, 'clearCache']);
-
-        // Weather forecast (requires authentication)
-        Route::get('/prakiraan-cuaca', [BmkgController::class, 'getPrakiraanCuaca']);
     });
 });
 
