@@ -2,12 +2,12 @@
     "openapi": "3.0.0",
     "info": {
         "title": "SIMONTA BENCANA API",
-        "description": "API Documentation untuk Sistem Informasi Monitoring Bencana dengan Access Token Authentication",
+        "description": "API Documentation untuk Sistem Informasi Monitoring Bencana dengan Access Token Authentication. Diselaraskan dengan pemecahan controller wilayah dan workflow laporan.",
         "contact": {
             "name": "Development Team",
             "email": "dev@simonta.id"
         },
-        "version": "2.0.0"
+        "version": "2.1.0"
     },
     "servers": [
         {
@@ -2416,7 +2416,7 @@
                     "Laporan Management"
                 ],
                 "summary": "Verifikasi laporan bencana",
-                "description": "Verifikasi laporan oleh Operator Desa atau Petugas BPBD",
+                "description": "Verifikasi laporan oleh Operator Desa atau Petugas BPBD. Endpoint ini ditangani oleh LaporanWorkflowController setelah refactor controller.",
                 "operationId": "6025bcf27f59d6f197af1f030389c24d",
                 "parameters": [
                     {
@@ -2502,7 +2502,7 @@
                     "Laporan Management"
                 ],
                 "summary": "Proses laporan bencana",
-                "description": "Update status penanganan laporan oleh Admin, Petugas BPBD, atau Operator Desa",
+                "description": "Update status penanganan laporan oleh Admin, Petugas BPBD, atau Operator Desa. Endpoint ini ditangani oleh LaporanWorkflowController setelah refactor controller.",
                 "operationId": "5471ca56382fa0668469bb059d46f115",
                 "parameters": [
                     {
@@ -2584,7 +2584,7 @@
                     "Laporan Management"
                 ],
                 "summary": "Get riwayat tindakan laporan",
-                "description": "Mengambil riwayat seluruh tindakan yang pernah dilakukan pada laporan",
+                "description": "Mengambil riwayat seluruh tindakan yang pernah dilakukan pada laporan. Endpoint ini ditangani oleh LaporanWorkflowController setelah refactor controller.",
                 "operationId": "7deda471cfd178f5fd74b74170183925",
                 "parameters": [
                     {
@@ -7509,7 +7509,7 @@
         },
         {
             "name": "Laporan Management",
-            "description": "CRUD operations dan statistik untuk laporan bencana"
+            "description": "CRUD operations, statistik, dan workflow laporan bencana (verifikasi/proses/riwayat)"
         },
         {
             "name": "Tindak Lanjut",
