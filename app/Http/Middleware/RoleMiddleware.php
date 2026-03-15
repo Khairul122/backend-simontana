@@ -8,35 +8,32 @@ use Symfony\Component\HttpFoundation\Response;
 
 class RoleMiddleware
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
-     * @param  string[]  ...$roles
-     */
+    private function errorResponse(string $message, int $status, string $code, array $extra = []): Response
+    {
+        return response()->json(array_merge([
+            'success' => false,
+            'message' => $message,
+            'code' => $code,
+        ], $extra), $status);
+    }
+
+    
     public function handle(Request $request, Closure $next, ...$roles): Response
     {
         $user = $request->user();
 
         if (!$user) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Token tidak valid atau tidak ditemukan',
-                'code' => 'NO_AUTHENTICATED_USER'
-            ], 401);
+            return $this->errorResponse('Token tidak valid atau tidak ditemukan', 401, 'NO_AUTHENTICATED_USER');
         }
 
         $userRole = $user->role;
 
-        // Check if user has required role
+        
         if (!in_array($userRole, $roles)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Anda tidak memiliki izin untuk mengakses resource ini',
+            return $this->errorResponse('Anda tidak memiliki izin untuk mengakses resource ini', 403, 'INSUFFICIENT_PERMISSIONS', [
                 'required_roles' => $roles,
                 'user_role' => $userRole,
-                'code' => 'INSUFFICIENT_PERMISSIONS'
-            ], 403);
+            ]);
         }
 
         return $next($request);
