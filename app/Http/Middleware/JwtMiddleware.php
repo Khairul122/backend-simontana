@@ -13,37 +13,50 @@ use Tymon\JWTAuth\Exceptions\TokenInvalidException;
 
 class JwtMiddleware
 {
-    private function errorResponse(string $message, int $status, string $code): Response
+    private function errorResponse(Request $request, string $message, int $status, string $code, mixed $details = null): Response
     {
-        return response()->json([
+        $payload = [
             'success' => false,
             'message' => $message,
             'code' => $code,
-        ], $status);
+        ];
+
+        if ($details !== null) {
+            $payload['details'] = $details;
+        }
+
+        $requestId = $request->attributes->get('request_id');
+        if ($requestId) {
+            $payload['request_id'] = $requestId;
+        }
+
+        return response()->json($payload, $status);
     }
 
     public function handle(Request $request, Closure $next)
     {
-        if (!$request->header('Authorization')) {
-            return $this->errorResponse('Token tidak ditemukan', Response::HTTP_UNAUTHORIZED, 'TOKEN_MISSING');
+        $authorization = (string) $request->header('Authorization', '');
+
+        if ($authorization === '' || !str_starts_with($authorization, 'Bearer ')) {
+            return $this->errorResponse($request, 'Token tidak ditemukan', Response::HTTP_UNAUTHORIZED, 'TOKEN_MISSING');
         }
 
         try {
             $user = JWTAuth::parseToken()->authenticate();
 
             if (!$user) {
-                return $this->errorResponse('Pengguna tidak ditemukan', Response::HTTP_UNAUTHORIZED, 'USER_NOT_FOUND');
+                return $this->errorResponse($request, 'Pengguna tidak ditemukan', Response::HTTP_UNAUTHORIZED, 'USER_NOT_FOUND');
             }
 
             Auth::guard('api')->setUser($user);
             $request->attributes->set('user', $user);
             $request->setUserResolver(static fn () => $user);
         } catch (TokenExpiredException $e) {
-            return $this->errorResponse('Token telah kadaluarsa', Response::HTTP_UNAUTHORIZED, 'TOKEN_EXPIRED');
+            return $this->errorResponse($request, 'Token telah kadaluarsa', Response::HTTP_UNAUTHORIZED, 'TOKEN_EXPIRED');
         } catch (TokenInvalidException $e) {
-            return $this->errorResponse('Token tidak valid', Response::HTTP_UNAUTHORIZED, 'TOKEN_INVALID');
+            return $this->errorResponse($request, 'Token tidak valid', Response::HTTP_UNAUTHORIZED, 'TOKEN_INVALID');
         } catch (JWTException $e) {
-            return $this->errorResponse('Token tidak dapat diproses', Response::HTTP_UNAUTHORIZED, 'TOKEN_PROCESSING_FAILED');
+            return $this->errorResponse($request, 'Token tidak dapat diproses', Response::HTTP_UNAUTHORIZED, 'TOKEN_PROCESSING_FAILED');
         }
 
         return $next($request);

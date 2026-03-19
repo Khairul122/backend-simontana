@@ -24,6 +24,10 @@ class TindakLanjutController extends Controller
             return $this->unauthorized();
         }
 
+        if ($user->role === 'Warga') {
+            return $this->deniedByPolicy('Warga tidak memiliki akses ke data tindak lanjut operasional');
+        }
+
         $query = TindakLanjut::with(['laporan.pelapor', 'petugas']);
 
         if ($request->has('laporan_id')) {
@@ -38,7 +42,7 @@ class TindakLanjutController extends Controller
             $query->where('status', $request->status);
         }
 
-        $perPage = $request->get('per_page', 20);
+        $perPage = $this->clampPerPage((int) $request->get('per_page', 20), 20, 100);
         $tindakLanjuts = $query->paginate($perPage);
 
         return $this->successResponse('Data tindak lanjut berhasil diambil', $tindakLanjuts);
@@ -68,7 +72,16 @@ class TindakLanjutController extends Controller
             return $this->notFoundResponse('Laporan tidak ditemukan');
         }
 
-        $tindakLanjut = TindakLanjut::create($request->all());
+        if ($user->cannot('create', [TindakLanjut::class, $laporan, (int) $request->id_petugas])) {
+            return $this->deniedByPolicy('Tidak memiliki izin untuk membuat tindak lanjut pada laporan ini');
+        }
+
+        $payload = $validator->validated();
+        if ($user->role !== 'Admin') {
+            $payload['id_petugas'] = $user->id;
+        }
+
+        $tindakLanjut = TindakLanjut::create($payload);
 
         $tindakLanjut->load(['laporan.pelapor', 'petugas']);
 
@@ -89,6 +102,10 @@ class TindakLanjutController extends Controller
 
         if (!$tindakLanjut) {
             return $this->notFoundResponse('Tindak lanjut tidak ditemukan');
+        }
+
+        if ($user->cannot('view', $tindakLanjut)) {
+            return $this->deniedByPolicy('Tidak memiliki izin untuk melihat tindak lanjut ini');
         }
 
         return $this->successResponse('Data tindak lanjut berhasil diambil', $tindakLanjut);
@@ -117,7 +134,11 @@ class TindakLanjutController extends Controller
             return $this->notFoundResponse('Tindak lanjut tidak ditemukan');
         }
 
-        $tindakLanjut->update($request->all());
+        if ($user->cannot('update', $tindakLanjut)) {
+            return $this->deniedByPolicy('Tidak memiliki izin untuk mengubah tindak lanjut ini');
+        }
+
+        $tindakLanjut->update($validator->validated());
 
         $tindakLanjut->load(['laporan.pelapor', 'petugas']);
 
@@ -138,6 +159,10 @@ class TindakLanjutController extends Controller
 
         if (!$tindakLanjut) {
             return $this->notFoundResponse('Tindak lanjut tidak ditemukan');
+        }
+
+        if ($user->cannot('delete', $tindakLanjut)) {
+            return $this->deniedByPolicy('Tidak memiliki izin untuk menghapus tindak lanjut ini');
         }
 
         $this->logActivityService->log($user->id, $user->role, 'Hapus tindak lanjut', '/api/tindak-lanjut/' . $id, $request->ip(), $request->userAgent());

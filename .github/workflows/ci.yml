@@ -1,0 +1,83 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: simonta_bencana_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -proot"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, bcmath, pdo_mysql
+          tools: composer:v2
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Prepare env
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+          php artisan jwt:secret --force
+
+      - name: Run migrations
+        env:
+          DB_CONNECTION: mysql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_DATABASE: simonta_bencana_test
+          DB_USERNAME: root
+          DB_PASSWORD: root
+        run: php artisan migrate --force
+
+      - name: Lint changed php
+        run: |
+          php -l app/Http/Controllers/Controller.php
+          php -l app/Http/Controllers/AuthController.php
+          php -l app/Http/Controllers/BmkgController.php
+          php -l app/Http/Controllers/LaporansController.php
+          php -l app/Http/Controllers/Laporan/LaporanWorkflowController.php
+          php -l app/Http/Middleware/JwtMiddleware.php
+          php -l app/Http/Middleware/RoleMiddleware.php
+          php -l app/Http/Middleware/RequestIdMiddleware.php
+          php -l app/Services/BmkgService.php
+
+      - name: Run tests
+        env:
+          DB_CONNECTION: mysql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_DATABASE: simonta_bencana_test
+          DB_USERNAME: root
+          DB_PASSWORD: root
+        run: php artisan test

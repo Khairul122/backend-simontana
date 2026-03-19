@@ -23,17 +23,13 @@ class Kecamatan extends Model
         'updated_at' => 'datetime',
     ];
 
-    /**
-     * Relasi ke kabupaten
-     */
+    
     public function kabupaten()
     {
         return $this->belongsTo(Kabupaten::class, 'id_kabupaten');
     }
 
-    /**
-     * Relasi ke desa
-     */
+    
     public function desas()
     {
         return $this->hasMany(Desa::class, 'id_kecamatan');

@@ -17,15 +17,16 @@ return Application::configure(basePath: dirname(__DIR__))
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
         ]);
 
-        // Add CORS middleware for API routes
+        
         $middleware->append(\Illuminate\Http\Middleware\HandleCors::class);
+        $middleware->append(\App\Http\Middleware\RequestIdMiddleware::class);
 
-        // Add session middleware for API routes (required for CheckSession middleware)
+        
         $middleware->api(prepend: [
             \Illuminate\Session\Middleware\StartSession::class,
         ]);
 
-        // Register middleware aliases
+        
         $middleware->alias([
             'check.session' => \App\Http\Middleware\CheckSession::class,
             'role' => \App\Http\Middleware\RoleMiddleware::class,
@@ -34,8 +35,10 @@ return Application::configure(basePath: dirname(__DIR__))
             'dynamic.cors' => \App\Http\Middleware\DynamicCors::class,
             'swagger.cors' => \App\Http\Middleware\SwaggerCors::class,
             'jwt.auth' => \App\Http\Middleware\JwtMiddleware::class,
+            'request.id' => \App\Http\Middleware\RequestIdMiddleware::class,
+            'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        
     })->create();

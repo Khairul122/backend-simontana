@@ -6,9 +6,7 @@ use Illuminate\Support\Facades\Log;
 
 class WilayahFallbackProvider
 {
-    /**
-     * Get comprehensive fallback provinces data
-     */
+    
     public function getProvinces(): array
     {
         return [
@@ -49,13 +47,11 @@ class WilayahFallbackProvider
         ];
     }
 
-    /**
-     * Get comprehensive fallback regencies data
-     */
+    
     public function getRegencies(): array
     {
         return [
-            // Aceh (11)
+            
             ['id' => 1101, 'province_id' => 11, 'name' => 'Kabupaten Simeulue'],
             ['id' => 1102, 'province_id' => 11, 'name' => 'Kabupaten Aceh Singkil'],
             ['id' => 1103, 'province_id' => 11, 'name' => 'Kabupaten Aceh Selatan'],
@@ -78,7 +74,7 @@ class WilayahFallbackProvider
             ['id' => 1174, 'province_id' => 11, 'name' => 'Kota Lhokseumawe'],
             ['id' => 1175, 'province_id' => 11, 'name' => 'Kota Subulussalam'],
 
-            // Sumatera Utara (12)
+            
             ['id' => 1201, 'province_id' => 12, 'name' => 'Kabupaten Nias'],
             ['id' => 1202, 'province_id' => 12, 'name' => 'Kabupaten Mandailing Natal'],
             ['id' => 1203, 'province_id' => 12, 'name' => 'Kabupaten Tapanuli Selatan'],
@@ -93,7 +89,7 @@ class WilayahFallbackProvider
             ['id' => 1213, 'province_id' => 12, 'name' => 'Kabupaten Langkat'],
             ['id' => 1214, 'province_id' => 12, 'name' => 'Kabupaten Deli Serdang'],
 
-            // DKI Jakarta (31)
+            
             ['id' => 3171, 'province_id' => 31, 'name' => 'Kota Administrasi Jakarta Pusat'],
             ['id' => 3172, 'province_id' => 31, 'name' => 'Kota Administrasi Jakarta Utara'],
             ['id' => 3173, 'province_id' => 31, 'name' => 'Kota Administrasi Jakarta Barat'],
@@ -101,7 +97,7 @@ class WilayahFallbackProvider
             ['id' => 3175, 'province_id' => 31, 'name' => 'Kota Administrasi Jakarta Timur'],
             ['id' => 3176, 'province_id' => 31, 'name' => 'Kabupaten Administrasi Kepulauan Seribu'],
 
-            // Jawa Barat (32)
+            
             ['id' => 3201, 'province_id' => 32, 'name' => 'Kabupaten Bogor'],
             ['id' => 3202, 'province_id' => 32, 'name' => 'Kabupaten Sukabumi'],
             ['id' => 3203, 'province_id' => 32, 'name' => 'Kabupaten Cianjur'],
@@ -128,7 +124,7 @@ class WilayahFallbackProvider
             ['id' => 3278, 'province_id' => 32, 'name' => 'Kota Tasikmalaya'],
             ['id' => 3279, 'province_id' => 32, 'name' => 'Kota Banjar'],
 
-            // Jawa Tengah (33)
+            
             ['id' => 3301, 'province_id' => 33, 'name' => 'Kabupaten Cilacap'],
             ['id' => 3302, 'province_id' => 33, 'name' => 'Kabupaten Banyumas'],
             ['id' => 3303, 'province_id' => 33, 'name' => 'Kabupaten Purbalingga'],
@@ -165,7 +161,7 @@ class WilayahFallbackProvider
             ['id' => 3375, 'province_id' => 33, 'name' => 'Kota Pekalongan'],
             ['id' => 3376, 'province_id' => 33, 'name' => 'Kota Tegal'],
 
-            // Jawa Timur (35)
+            
             ['id' => 3501, 'province_id' => 35, 'name' => 'Kabupaten Pacitan'],
             ['id' => 3502, 'province_id' => 35, 'name' => 'Kabupaten Ponorogo'],
             ['id' => 3503, 'province_id' => 35, 'name' => 'Kabupaten Trenggalek'],
@@ -207,13 +203,11 @@ class WilayahFallbackProvider
         ];
     }
 
-    /**
-     * Get sample districts data (comprehensive sample)
-     */
+    
     public function getDistricts(): array
     {
         return [
-            // Sample districts from major cities
+            
             ['id' => 3201010, 'regency_id' => 3201, 'name' => 'Kecamatan Cibinong'],
             ['id' => 3201011, 'regency_id' => 3201, 'name' => 'Kecamatan Bojonggede'],
             ['id' => 3201012, 'regency_id' => 3201, 'name' => 'Kecamatan Tajurhalang'],
@@ -238,9 +232,7 @@ class WilayahFallbackProvider
         ];
     }
 
-    /**
-     * Get sample villages data
-     */
+    
     public function getVillages(): array
     {
         return [
@@ -262,25 +254,19 @@ class WilayahFallbackProvider
         ];
     }
 
-    /**
-     * Get regencies by province ID from fallback data
-     */
+    
     public function getRegenciesByProvince(int $provinceId): array
     {
         return array_filter($this->getRegencies(), fn($r) => $r['province_id'] === $provinceId);
     }
 
-    /**
-     * Get districts by regency ID from fallback data
-     */
+    
     public function getDistrictsByRegency(int $regencyId): array
     {
         return array_filter($this->getDistricts(), fn($d) => $d['regency_id'] === $regencyId);
     }
 
-    /**
-     * Get villages by district ID from fallback data
-     */
+    
     public function getVillagesByDistrict(int $districtId): array
     {
         return array_filter($this->getVillages(), fn($v) => $v['district_id'] === $districtId);

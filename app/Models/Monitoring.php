@@ -31,7 +31,7 @@ class Monitoring extends Model
         return $this->belongsTo(Laporans::class, 'id_laporan', 'id');
     }
 
-    // Relasi ke model Pengguna (Operator)
+    
     public function operator()
     {
         return $this->belongsTo(Pengguna::class, 'id_operator');

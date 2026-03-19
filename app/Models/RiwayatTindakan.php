@@ -25,13 +25,13 @@ class RiwayatTindakan extends Model
         'updated_at' => 'datetime',
     ];
 
-    // Relasi ke model TindakLanjut
+    
     public function tindakLanjut()
     {
         return $this->belongsTo(TindakLanjut::class, 'tindaklanjut_id', 'id_tindaklanjut');
     }
 
-    // Relasi ke model Pengguna (Petugas)
+    
     public function petugas()
     {
         return $this->belongsTo(Pengguna::class, 'id_petugas');

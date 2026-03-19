@@ -22,9 +22,7 @@ class KategoriBencana extends Model
         'updated_at' => 'datetime',
     ];
 
-    /**
-     * Relasi ke laporan
-     */
+    
     public function laporans(): HasMany
     {
         return $this->hasMany(Laporans::class, 'id_kategori_bencana');

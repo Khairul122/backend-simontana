@@ -1,0 +1,289 @@
+<?php
+
+namespace Tests\Feature;
+
+use App\Models\Desa;
+use App\Models\Kabupaten;
+use App\Models\KategoriBencana;
+use App\Models\Kecamatan;
+use App\Models\Laporans;
+use App\Models\Monitoring;
+use App\Models\Pengguna;
+use App\Models\Provinsi;
+use App\Models\TindakLanjut;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+use Tymon\JWTAuth\Facades\JWTAuth;
+
+class SecurityWorkflowPerformanceTest extends TestCase
+{
+    use RefreshDatabase;
+
+    private function seedWilayahMinimal(): Desa
+    {
+        $provinsi = Provinsi::create(['nama' => 'Provinsi Uji']);
+        $kabupaten = Kabupaten::create([
+            'nama' => 'Kabupaten Uji',
+            'id_provinsi' => $provinsi->id,
+        ]);
+        $kecamatan = Kecamatan::create([
+            'nama' => 'Kecamatan Uji',
+            'id_kabupaten' => $kabupaten->id,
+        ]);
+
+        return Desa::create([
+            'nama' => 'Desa Uji',
+            'id_kecamatan' => $kecamatan->id,
+        ]);
+    }
+
+    private function createUser(string $role, ?int $idDesa = null): Pengguna
+    {
+        return Pengguna::create([
+            'nama' => $role . ' Tester',
+            'username' => strtolower($role) . '_tester_' . random_int(1000, 9999),
+            'password' => 'password123',
+            'role' => $role,
+            'email' => strtolower($role) . '_tester_' . random_int(1000, 9999) . '@example.com',
+            'id_desa' => $idDesa,
+        ]);
+    }
+
+    private function makeLaporan(Pengguna $pelapor, int $desaId, string $status = 'Draft', ?KategoriBencana $kategori = null): Laporans
+    {
+        $kategori ??= KategoriBencana::create([
+            'nama_kategori' => 'Banjir-' . random_int(1000, 9999),
+            'deskripsi' => 'Kategori uji',
+        ]);
+
+        return Laporans::create([
+            'id_pelapor' => $pelapor->id,
+            'id_kategori_bencana' => $kategori->id,
+            'id_desa' => $desaId,
+            'judul_laporan' => 'Laporan Uji',
+            'deskripsi' => 'Deskripsi laporan uji',
+            'tingkat_keparahan' => 'Tinggi',
+            'status' => $status,
+            'latitude' => -6.20000000,
+            'longitude' => 106.80000000,
+            'waktu_laporan' => now(),
+        ]);
+    }
+
+    public function test_login_endpoint_is_throttled_after_too_many_attempts(): void
+    {
+        $user = $this->createUser('Warga');
+
+        for ($attempt = 1; $attempt <= 5; $attempt++) {
+            $this->withHeader('X-Forwarded-For', '10.10.10.10')
+                ->postJson('/api/auth/login', [
+                    'username' => $user->username,
+                    'password' => 'wrong-password',
+                ])
+                ->assertStatus(401);
+        }
+
+        $this->withHeader('X-Forwarded-For', '10.10.10.10')
+            ->postJson('/api/auth/login', [
+                'username' => $user->username,
+                'password' => 'wrong-password',
+            ])
+            ->assertStatus(429);
+    }
+
+    public function test_register_endpoint_is_throttled_after_too_many_attempts(): void
+    {
+        for ($attempt = 1; $attempt <= 5; $attempt++) {
+            $this->withHeader('X-Forwarded-For', '10.10.10.20')
+                ->postJson('/api/auth/register', [
+                    'nama' => 'Registrant ' . $attempt,
+                    'username' => 'registrant_' . $attempt,
+                    'email' => 'registrant_' . $attempt . '@example.com',
+                    'password' => 'password123',
+                    'password_confirmation' => 'password123',
+                    'role' => 'Warga',
+                ])
+                ->assertStatus(201);
+        }
+
+        $this->withHeader('X-Forwarded-For', '10.10.10.20')
+            ->postJson('/api/auth/register', [
+                'nama' => 'Registrant 6',
+                'username' => 'registrant_6',
+                'email' => 'registrant_6@example.com',
+                'password' => 'password123',
+                'password_confirmation' => 'password123',
+                'role' => 'Warga',
+            ])
+            ->assertStatus(429);
+    }
+
+    public function test_monitoring_update_is_denied_for_non_owner_operator(): void
+    {
+        $desa = $this->seedWilayahMinimal();
+        $pelapor = $this->createUser('Warga', $desa->id);
+        $operatorA = $this->createUser('OperatorDesa', $desa->id);
+        $operatorB = $this->createUser('OperatorDesa', $desa->id);
+        $laporan = $this->makeLaporan($pelapor, $desa->id, 'Diproses');
+
+        $monitoring = Monitoring::create([
+            'id_laporan' => $laporan->id,
+            'id_operator' => $operatorA->id,
+            'waktu_monitoring' => now(),
+            'hasil_monitoring' => 'Monitoring awal',
+            'koordinat_gps' => '-6.2,106.8',
+        ]);
+
+        $token = JWTAuth::fromUser($operatorB);
+
+        $this->withHeader('Authorization', 'Bearer ' . $token)
+            ->putJson('/api/monitoring/' . $monitoring->id_monitoring, [
+                'hasil_monitoring' => 'Diubah oleh operator lain',
+            ])
+            ->assertStatus(403)
+            ->assertJsonPath('code', 'INSUFFICIENT_PERMISSIONS');
+    }
+
+    public function test_tindak_lanjut_create_denies_operator_spoofing_other_petugas(): void
+    {
+        $desa = $this->seedWilayahMinimal();
+        $pelapor = $this->createUser('Warga', $desa->id);
+        $operatorA = $this->createUser('OperatorDesa', $desa->id);
+        $operatorB = $this->createUser('OperatorDesa', $desa->id);
+        $laporan = $this->makeLaporan($pelapor, $desa->id, 'Diverifikasi');
+
+        $token = JWTAuth::fromUser($operatorA);
+
+        $this->withHeader('Authorization', 'Bearer ' . $token)
+            ->postJson('/api/tindak-lanjut', [
+                'laporan_id' => $laporan->id,
+                'id_petugas' => $operatorB->id,
+                'tanggal_tanggapan' => now()->toDateTimeString(),
+                'status' => 'Menuju Lokasi',
+            ])
+            ->assertStatus(403)
+            ->assertJsonPath('code', 'INSUFFICIENT_PERMISSIONS');
+    }
+
+    public function test_riwayat_create_denies_non_assigned_petugas(): void
+    {
+        $desa = $this->seedWilayahMinimal();
+        $pelapor = $this->createUser('Warga', $desa->id);
+        $operatorA = $this->createUser('OperatorDesa', $desa->id);
+        $operatorB = $this->createUser('OperatorDesa', $desa->id);
+        $laporan = $this->makeLaporan($pelapor, $desa->id, 'Diverifikasi');
+
+        $tindakLanjut = TindakLanjut::create([
+            'laporan_id' => $laporan->id,
+            'id_petugas' => $operatorA->id,
+            'tanggal_tanggapan' => now(),
+            'status' => 'Menuju Lokasi',
+        ]);
+
+        $token = JWTAuth::fromUser($operatorB);
+
+        $this->withHeader('Authorization', 'Bearer ' . $token)
+            ->postJson('/api/riwayat-tindakan', [
+                'tindaklanjut_id' => $tindakLanjut->id_tindaklanjut,
+                'id_petugas' => $operatorB->id,
+                'keterangan' => 'Coba update riwayat',
+                'waktu_tindakan' => now()->toDateTimeString(),
+            ])
+            ->assertStatus(403)
+            ->assertJsonPath('code', 'INSUFFICIENT_PERMISSIONS');
+    }
+
+    public function test_workflow_rejects_invalid_transition_from_draft_to_selesai(): void
+    {
+        $desa = $this->seedWilayahMinimal();
+        $pelapor = $this->createUser('Warga', $desa->id);
+        $admin = $this->createUser('Admin', $desa->id);
+        $laporan = $this->makeLaporan($pelapor, $desa->id, 'Draft');
+
+        $token = JWTAuth::fromUser($admin);
+
+        $this->withHeader('Authorization', 'Bearer ' . $token)
+            ->postJson('/api/laporans/' . $laporan->id . '/proses', [
+                'status' => 'Selesai',
+            ])
+            ->assertStatus(422)
+            ->assertJsonPath('code', 'INVALID_STATUS_TRANSITION');
+    }
+
+    public function test_workflow_valid_transition_sequence_logs_audit_trail(): void
+    {
+        $desa = $this->seedWilayahMinimal();
+        $pelapor = $this->createUser('Warga', $desa->id);
+        $admin = $this->createUser('Admin', $desa->id);
+        $laporan = $this->makeLaporan($pelapor, $desa->id, 'Draft');
+
+        $token = JWTAuth::fromUser($admin);
+
+        $this->withHeader('Authorization', 'Bearer ' . $token)
+            ->postJson('/api/laporans/' . $laporan->id . '/verifikasi', [
+                'status' => 'Diverifikasi',
+                'catatan_verifikasi' => 'Laporan valid',
+            ])
+            ->assertStatus(200);
+
+        $this->withHeader('Authorization', 'Bearer ' . $token)
+            ->postJson('/api/laporans/' . $laporan->id . '/proses', [
+                'status' => 'Diproses',
+            ])
+            ->assertStatus(200);
+
+        $this->withHeader('Authorization', 'Bearer ' . $token)
+            ->postJson('/api/laporans/' . $laporan->id . '/proses', [
+                'status' => 'Selesai',
+            ])
+            ->assertStatus(200);
+
+        $laporan->refresh();
+
+        $this->assertSame('Selesai', $laporan->status);
+        $this->assertNotNull($laporan->waktu_selesai);
+
+        $this->assertDatabaseHas('log_activity', [
+            'user_id' => $admin->id,
+            'aktivitas' => 'Perubahan status laporan #' . $laporan->id . ': Draft -> Diverifikasi',
+        ]);
+    }
+
+    public function test_laporan_location_radius_is_capped_to_100km_guardrail(): void
+    {
+        $desa = $this->seedWilayahMinimal();
+        $pelapor = $this->createUser('Warga', $desa->id);
+        $admin = $this->createUser('Admin', $desa->id);
+        $kategori = KategoriBencana::create([
+            'nama_kategori' => 'Gempa-' . random_int(1000, 9999),
+            'deskripsi' => 'Kategori gempa',
+        ]);
+
+        $nearby = $this->makeLaporan($pelapor, $desa->id, 'Draft', $kategori);
+
+        Laporans::create([
+            'id_pelapor' => $pelapor->id,
+            'id_kategori_bencana' => $kategori->id,
+            'id_desa' => $desa->id,
+            'judul_laporan' => 'Laporan Jauh',
+            'deskripsi' => 'Lokasi jauh',
+            'tingkat_keparahan' => 'Sedang',
+            'status' => 'Draft',
+            'latitude' => -7.25044500,
+            'longitude' => 112.76884500,
+            'waktu_laporan' => now(),
+        ]);
+
+        $token = JWTAuth::fromUser($admin);
+
+        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+            ->getJson('/api/laporans?lat=-6.2&lng=106.8&radius=1000&limit=20');
+
+        $response->assertStatus(200)
+            ->assertJsonPath('success', true);
+
+        $data = $response->json('data');
+        $this->assertCount(1, $data);
+        $this->assertSame($nearby->id, $data[0]['id']);
+    }
+}

@@ -9,14 +9,10 @@ use Symfony\Component\HttpFoundation\Response;
 
 class CheckSession
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
-     */
+    
     public function handle(Request $request, Closure $next): Response
     {
-        // Check if user has active session
+        
         if (!Session::has('user_id')) {
             return response()->json([
                 'success' => false,
@@ -25,7 +21,7 @@ class CheckSession
             ], 401);
         }
 
-        // Optional: Check if session is still valid (user exists in database)
+        
         $userId = Session::get('user_id');
         $user = \App\Models\Pengguna::find($userId);
 
@@ -38,7 +34,7 @@ class CheckSession
             ], 401);
         }
 
-        // Add user info to request for easier access in controllers
+        
         $request->merge([
             'user_id' => $userId,
             'user_role' => Session::get('user_role'),

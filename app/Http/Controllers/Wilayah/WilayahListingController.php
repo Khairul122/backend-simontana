@@ -7,6 +7,7 @@ use App\Models\Desa;
 use App\Services\WilayahManagementService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class WilayahListingController extends Controller
 {
@@ -18,13 +19,16 @@ class WilayahListingController extends Controller
     {
         $jenis = $this->wilayahManagementService->normalizeJenis($request->get('jenis', null));
         $include = $request->get('include', null);
-        $perPage = $request->get('per_page', 15);
+        $perPage = $this->clampPerPage((int) $request->get('per_page', 15), 15, 100);
 
         if (!$jenis) {
-            return $this->successResponse(
-                'Data wilayah berhasil diambil',
-                collect($this->wilayahManagementService->buildAllWilayahData())
-            );
+            $cacheKey = 'wilayah:index:all:' . md5((string) $request->get('include', ''));
+
+            $data = Cache::remember($cacheKey, now()->addMinutes(15), function () {
+                return collect($this->wilayahManagementService->buildAllWilayahData());
+            });
+
+            return $this->successResponse('Data wilayah berhasil diambil', $data);
         }
 
         $data = $this->wilayahManagementService
@@ -57,7 +61,9 @@ class WilayahListingController extends Controller
 
     public function getWilayahDetailByDesaId($desa_id): JsonResponse
     {
-        $desa = Desa::with(['kecamatan.kabupaten.provinsi'])->find($desa_id);
+        $desa = Cache::remember('wilayah:detail:desa:' . (int) $desa_id, now()->addMinutes(15), function () use ($desa_id) {
+            return Desa::with(['kecamatan.kabupaten.provinsi'])->find($desa_id);
+        });
 
         if (!$desa) {
             return $this->notFoundResponse('Desa tidak ditemukan');
@@ -68,7 +74,9 @@ class WilayahListingController extends Controller
 
     public function getWilayahHierarchyByDesaId($desa_id): JsonResponse
     {
-        $desa = Desa::with(['kecamatan.kabupaten.provinsi'])->find($desa_id);
+        $desa = Cache::remember('wilayah:hierarchy:desa:' . (int) $desa_id, now()->addMinutes(15), function () use ($desa_id) {
+            return Desa::with(['kecamatan.kabupaten.provinsi'])->find($desa_id);
+        });
 
         if (!$desa) {
             return $this->notFoundResponse('Desa tidak ditemukan');

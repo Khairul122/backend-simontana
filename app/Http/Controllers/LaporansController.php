@@ -7,12 +7,26 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 
 
 class LaporansController extends Controller
 {
+    private const MAX_RADIUS_KM = 100;
+
+    private const ALLOWED_ORDER_BY = [
+        'id',
+        'created_at',
+        'updated_at',
+        'waktu_laporan',
+        'status',
+        'tingkat_keparahan',
+        'view_count',
+        'is_prioritas',
+    ];
+
     
     private function handleFileUpload(Request $request, string $fieldName, ?string $oldFile = null): ?string
     {
@@ -28,7 +42,7 @@ class LaporansController extends Controller
                 Storage::disk('public')->delete('laporans/' . $oldFile);
             } catch (\Exception $e) {
                 
-                \Log::warning("Failed to delete old file: {$oldFile}", ['error' => $e->getMessage()]);
+                Log::warning("Failed to delete old file: {$oldFile}", ['error' => $e->getMessage()]);
             }
         }
 
@@ -50,7 +64,7 @@ class LaporansController extends Controller
                     Storage::disk('public')->delete('laporans/' . $file);
                 } catch (\Exception $e) {
                     
-                    \Log::warning("Failed to delete file: {$file}", ['error' => $e->getMessage()]);
+                    Log::warning("Failed to delete file: {$file}", ['error' => $e->getMessage()]);
                 }
             }
         }
@@ -68,9 +82,29 @@ class LaporansController extends Controller
                 'desa.kecamatan.kabupaten.provinsi:id,nama',
                 'tindakLanjut:id_tindaklanjut,laporan_id,id_petugas,tanggal_tanggapan,status,created_at',
                 'tindakLanjut.petugas:id,nama',
-                'tindakLanjut.laporan:id,id_pelapor,judul_laporan,deskripsi,tingkat_keparahan,latitude,longitude,jumlah_korban,jumlah_rumah_rusak,is_prioritas,view_count,status,waktu_laporan,waktu_verifikasi,waktu_selesai,catatan_verifikasi,data_tambahan,foto_bukti_1,foto_bukti_2,foto_bukti_3,video_bukti,id_kategori_bencana,id_desa,alamat_lengkap',
-                'tindakLanjut.laporan.pelapor:id,nama,email,no_telepon',
                 'monitoring:id_monitoring,id_laporan,id_operator,waktu_monitoring,hasil_monitoring,koordinat_gps,created_at'
+            ])->select([
+                'id',
+                'id_pelapor',
+                'id_kategori_bencana',
+                'id_desa',
+                'judul_laporan',
+                'deskripsi',
+                'tingkat_keparahan',
+                'status',
+                'latitude',
+                'longitude',
+                'alamat_lengkap',
+                'is_prioritas',
+                'view_count',
+                'jumlah_korban',
+                'jumlah_rumah_rusak',
+                'waktu_laporan',
+                'waktu_verifikasi',
+                'waktu_selesai',
+                'catatan_verifikasi',
+                'created_at',
+                'updated_at',
             ]);
 
             
@@ -111,16 +145,33 @@ class LaporansController extends Controller
 
             
             if ($request->has('lat') && $request->has('lng') && $request->has('radius')) {
-                $query->byLocationRadius($request->lat, $request->lng, $request->radius);
+                $radius = (float) $request->radius;
+                if ($radius <= 0) {
+                    $radius = 10;
+                }
+
+                if ($radius > self::MAX_RADIUS_KM) {
+                    $radius = self::MAX_RADIUS_KM;
+                }
+
+                $query->byLocationRadius($request->lat, $request->lng, $radius);
             }
 
             
             $orderBy = $request->get('order_by', 'created_at');
-            $orderDirection = $request->get('order_direction', 'desc');
+            if (!in_array($orderBy, self::ALLOWED_ORDER_BY, true)) {
+                $orderBy = 'created_at';
+            }
+
+            $orderDirection = strtolower((string) $request->get('order_direction', 'desc'));
+            if (!in_array($orderDirection, ['asc', 'desc'], true)) {
+                $orderDirection = 'desc';
+            }
+
             $query->orderBy($orderBy, $orderDirection);
 
             
-            $limit = $request->get('limit', 15);
+            $limit = $this->clampPerPage((int) $request->get('limit', 15), 15, 100);
             $laporans = $query->paginate($limit);
 
             return $this->successResponse('Data laporan berhasil diambil', $laporans->items(), 200, [
@@ -135,7 +186,8 @@ class LaporansController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            return $this->errorResponse('Gagal mengambil data laporan: ' . $e->getMessage(), 500, ['data' => null]);
+            Log::error('Gagal mengambil data laporan', ['error' => $e->getMessage()]);
+            return $this->internalError('Gagal mengambil data laporan');
         }
     }
 
@@ -143,10 +195,15 @@ class LaporansController extends Controller
     public function store(Request $request): JsonResponse
     {
         try {
+            $user = $this->ensureAuthenticated($request);
+            if (!$user) {
+                return $this->unauthorized();
+            }
+
             $validator = Validator::make($request->all(), [
                 'judul_laporan' => 'required|string|max:255',
                 'deskripsi' => 'required|string',
-                'tingkat_keparahan' => 'required|string|in:Rendah,Sedang,Tinggi,Sangat Tinggi',
+                'tingkat_keparahan' => 'required|string|in:Rendah,Sedang,Tinggi,Kritis',
                 'latitude' => 'required|numeric|between:-90,90',
                 'longitude' => 'required|numeric|between:-180,180',
                 'id_kategori_bencana' => 'required|exists:kategori_bencana,id',
@@ -167,8 +224,8 @@ class LaporansController extends Controller
                 return $this->validationErrorResponse($validator->errors());
             }
 
-            $data = $request->all();
-            $data['id_pelapor'] = auth()->id();
+            $data = $validator->validated();
+            $data['id_pelapor'] = $user->id;
             $data['waktu_laporan'] = $request->waktu_laporan ?? now();
             $data['status'] = 'Draft';
             $data['view_count'] = 0;
@@ -201,7 +258,12 @@ class LaporansController extends Controller
             return $this->successResponse('Laporan berhasil dibuat', $laporan, 201);
 
         } catch (\Exception $e) {
-            return $this->errorResponse('Gagal membuat laporan: ' . $e->getMessage(), 500, ['data' => null]);
+            Log::error('Gagal membuat laporan', [
+                'error' => $e->getMessage(),
+                'user_id' => $user->id ?? null,
+            ]);
+
+            return $this->internalError('Gagal membuat laporan');
         }
     }
 
@@ -230,7 +292,12 @@ class LaporansController extends Controller
             return $this->successResponse('Detail laporan berhasil diambil', $laporan);
 
         } catch (\Exception $e) {
-            return $this->errorResponse('Gagal mengambil detail laporan: ' . $e->getMessage(), 500, ['data' => null]);
+            Log::error('Gagal mengambil detail laporan', [
+                'laporan_id' => $laporan->id ?? null,
+                'error' => $e->getMessage(),
+            ]);
+
+            return $this->internalError('Gagal mengambil detail laporan');
         }
     }
 
@@ -238,15 +305,20 @@ class LaporansController extends Controller
     public function update(Request $request, Laporans $laporan): JsonResponse
     {
         try {
+            $user = $this->ensureAuthenticated($request);
+            if (!$user) {
+                return $this->unauthorized();
+            }
+
             
-            if (auth()->id() !== $laporan->id_pelapor && !auth()->user()->hasRole(['Admin', 'PetugasBPBD', 'OperatorDesa'])) {
+            if ($user->id !== $laporan->id_pelapor && !$user->hasRole(['Admin', 'PetugasBPBD', 'OperatorDesa'])) {
                 return $this->forbidden('Tidak memiliki izin untuk mengubah laporan ini');
             }
 
             $validator = Validator::make($request->all(), [
                 'judul_laporan' => 'sometimes|string|max:255',
                 'deskripsi' => 'sometimes|string',
-                'tingkat_keparahan' => 'sometimes|string|in:Rendah,Sedang,Tinggi,Sangat Tinggi',
+                'tingkat_keparahan' => 'sometimes|string|in:Rendah,Sedang,Tinggi,Kritis',
                 'latitude' => 'sometimes|numeric|between:-90,90',
                 'longitude' => 'sometimes|numeric|between:-180,180',
                 'id_kategori_bencana' => 'sometimes|exists:kategori_bencana,id',
@@ -267,7 +339,7 @@ class LaporansController extends Controller
                 return $this->validationErrorResponse($validator->errors());
             }
 
-            $data = $request->all();
+            $data = $validator->validated();
 
             
             $fileFields = ['foto_bukti_1', 'foto_bukti_2', 'foto_bukti_3', 'video_bukti'];
@@ -300,7 +372,7 @@ class LaporansController extends Controller
 
                 
                 if ($data['status'] === 'Diverifikasi') {
-                    $user_id = auth()->id(); 
+                    $user_id = $user->id;
                     $updateData['id_verifikator'] = $user_id;
                     $updateData['waktu_verifikasi'] = now();
 
@@ -328,16 +400,27 @@ class LaporansController extends Controller
             return $this->successResponse('Laporan berhasil diperbarui', $laporan);
 
         } catch (\Exception $e) {
-            return $this->errorResponse('Gagal memperbarui laporan: ' . $e->getMessage(), 500, ['data' => null]);
+            Log::error('Gagal memperbarui laporan', [
+                'laporan_id' => $laporan->id ?? null,
+                'user_id' => $user->id ?? null,
+                'error' => $e->getMessage(),
+            ]);
+
+            return $this->internalError('Gagal memperbarui laporan');
         }
     }
 
     
-    public function destroy(Laporans $laporan): JsonResponse
+    public function destroy(Request $request, Laporans $laporan): JsonResponse
     {
         try {
+            $user = $this->ensureAuthenticated($request);
+            if (!$user) {
+                return $this->unauthorized();
+            }
+
             
-            if (auth()->id() !== $laporan->id_pelapor && !auth()->user()->hasRole(['Admin', 'OperatorDesa'])) {
+            if ($user->id !== $laporan->id_pelapor && !$user->hasRole(['Admin', 'OperatorDesa'])) {
                 return $this->forbidden('Tidak memiliki izin untuk menghapus laporan ini');
             }
 
@@ -355,7 +438,13 @@ class LaporansController extends Controller
             return $this->successResponse('Laporan berhasil dihapus', null, 200, ['data' => null]);
 
         } catch (\Exception $e) {
-            return $this->errorResponse('Gagal menghapus laporan: ' . $e->getMessage(), 500, ['data' => null]);
+            Log::error('Gagal menghapus laporan', [
+                'laporan_id' => $laporan->id ?? null,
+                'user_id' => $user->id ?? null,
+                'error' => $e->getMessage(),
+            ]);
+
+            return $this->internalError('Gagal menghapus laporan');
         }
     }
 
@@ -381,40 +470,42 @@ class LaporansController extends Controller
             }
 
             
-            $total_laporan = $query->count();
+            $statusCounters = (clone $query)
+                ->selectRaw('status, COUNT(*) as total')
+                ->groupBy('status')
+                ->pluck('total', 'status');
 
-            
-            $laporan_perlu_verifikasi = $query->clone()
-                ->whereIn('status', ['Draft', 'Menunggu Verifikasi'])
-                ->count();
+            $total_laporan = (int) $statusCounters->sum();
+            $laporan_perlu_verifikasi = (int) ($statusCounters['Draft'] ?? 0) + (int) ($statusCounters['Menunggu Verifikasi'] ?? 0);
+            $laporan_ditindak = (int) ($statusCounters['Diverifikasi'] ?? 0) + (int) ($statusCounters['Diproses'] ?? 0);
+            $laporan_selesai = (int) ($statusCounters['Selesai'] ?? 0);
+            $laporan_ditolak = (int) ($statusCounters['Ditolak'] ?? 0);
 
-            
-            $laporan_ditindak = $query->clone()
-                ->whereIn('status', ['Diverifikasi', 'Diproses', 'Tindak Lanjut'])
-                ->count();
+            $weeklyBuckets = Laporans::query()
+                ->selectRaw('DATE(created_at) as day, COUNT(*) as total')
+                ->where('created_at', '>=', now()->subDays(6)->startOfDay())
+                ->groupBy('day')
+                ->pluck('total', 'day');
 
-            
-            $laporan_selesai = $query->clone()
-                ->where('status', 'Selesai')
-                ->count();
-
-            
-            $laporan_ditolak = $query->clone()
-                ->where('status', 'Ditolak')
-                ->count();
-
-            
             $weekly_stats = [];
             for ($i = 6; $i >= 0; $i--) {
-                $date = now()->subDays($i)->format('Y-m-d');
-                $count = Laporans::whereDate('created_at', $date)->count();
-                $weekly_stats[strtolower(now()->subDays($i)->format('D'))] = $count;
+                $day = now()->subDays($i);
+                $dayKey = $day->format('Y-m-d');
+                $weekly_stats[strtolower($day->format('D'))] = (int) ($weeklyBuckets[$dayKey] ?? 0);
             }
 
             
             $categories_stats = DB::table('laporans')
                 ->join('kategori_bencana', 'laporans.id_kategori_bencana', '=', 'kategori_bencana.id')
                 ->select('kategori_bencana.nama_kategori as category_name', DB::raw('count(*) as count'))
+                ->when($request->period, function ($q, $period) {
+                    return match ($period) {
+                        'weekly' => $q->where('laporans.created_at', '>=', now()->subDays(7)),
+                        'monthly' => $q->where('laporans.created_at', '>=', now()->subMonth()),
+                        'yearly' => $q->where('laporans.created_at', '>=', now()->subYear()),
+                        default => $q,
+                    };
+                })
                 ->groupBy('kategori_bencana.id', 'kategori_bencana.nama_kategori')
                 ->orderBy('count', 'desc')
                 ->get()
@@ -438,6 +529,14 @@ class LaporansController extends Controller
             $top_pengguna = DB::table('laporans')
                 ->join('pengguna', 'laporans.id_pelapor', '=', 'pengguna.id')
                 ->select('pengguna.nama as pengguna_name', DB::raw('count(*) as laporan_count'))
+                ->when($request->period, function ($q, $period) {
+                    return match ($period) {
+                        'weekly' => $q->where('laporans.created_at', '>=', now()->subDays(7)),
+                        'monthly' => $q->where('laporans.created_at', '>=', now()->subMonth()),
+                        'yearly' => $q->where('laporans.created_at', '>=', now()->subYear()),
+                        default => $q,
+                    };
+                })
                 ->groupBy('pengguna.id', 'pengguna.nama')
                 ->orderBy('laporan_count', 'desc')
                 ->limit(5)
@@ -458,7 +557,8 @@ class LaporansController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            return $this->errorResponse('Failed to retrieve statistics: ' . $e->getMessage(), 500, ['data' => null]);
+            Log::error('Gagal mengambil statistik laporan', ['error' => $e->getMessage()]);
+            return $this->internalError('Gagal mengambil statistik laporan');
         }
     }
 

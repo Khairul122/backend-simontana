@@ -18,8 +18,8 @@ use App\Http\Controllers\Laporan\LaporanWorkflowController;
 
 
 Route::prefix('auth')->group(function () {
-    Route::post('/login', [AuthController::class, 'login']);
-    Route::post('/register', [AuthController::class, 'register']);
+    Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:auth-login');
+    Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:auth-register');
     Route::get('/roles', [AuthController::class, 'getRoles']);
 
     Route::middleware('jwt.auth')->group(function () {
@@ -80,9 +80,9 @@ Route::prefix('wilayah')->group(function () {
 
     Route::get('/', [WilayahListingController::class, 'index']);
     Route::get('/{id}', [WilayahListingController::class, 'showById']);
-    Route::post('/', [WilayahCrudController::class, 'store'])->middleware('role:Admin');
-    Route::put('/{id}', [WilayahCrudController::class, 'update'])->middleware('role:Admin');
-    Route::delete('/{id}', [WilayahCrudController::class, 'destroy'])->middleware('role:Admin');
+    Route::post('/', [WilayahCrudController::class, 'store'])->middleware(['jwt.auth', 'role:Admin']);
+    Route::put('/{id}', [WilayahCrudController::class, 'update'])->middleware(['jwt.auth', 'role:Admin']);
+    Route::delete('/{id}', [WilayahCrudController::class, 'destroy'])->middleware(['jwt.auth', 'role:Admin']);
 });
 
 

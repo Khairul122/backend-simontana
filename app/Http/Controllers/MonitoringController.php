@@ -24,6 +24,10 @@ class MonitoringController extends Controller
             return $this->unauthorized();
         }
 
+        if ($user->role === 'Warga') {
+            return $this->deniedByPolicy('Warga tidak memiliki akses ke data monitoring operasional');
+        }
+
         $query = Monitoring::with(['laporan', 'operator']);
 
         if ($request->has('id_laporan')) {
@@ -34,7 +38,7 @@ class MonitoringController extends Controller
             $query->where('id_operator', $request->id_operator);
         }
 
-        $perPage = $request->get('per_page', 20);
+        $perPage = $this->clampPerPage((int) $request->get('per_page', 20), 20, 100);
         $monitorings = $query->paginate($perPage);
 
         return $this->successResponse('Data monitoring berhasil diambil', $monitorings);
@@ -65,7 +69,16 @@ class MonitoringController extends Controller
             return $this->notFoundResponse('Laporan tidak ditemukan');
         }
 
-        $monitoring = Monitoring::create($request->all());
+        if ($user->cannot('create', [Monitoring::class, $laporan, (int) $request->id_operator])) {
+            return $this->deniedByPolicy('Tidak memiliki izin untuk membuat monitoring pada laporan ini');
+        }
+
+        $payload = $validator->validated();
+        if ($user->role !== 'Admin') {
+            $payload['id_operator'] = $user->id;
+        }
+
+        $monitoring = Monitoring::create($payload);
         $monitoring->load(['laporan', 'operator']);
 
         $this->logActivityService->log($user->id, $user->role, 'Buat monitoring', '/api/monitoring', $request->ip(), $request->userAgent());
@@ -85,6 +98,10 @@ class MonitoringController extends Controller
 
         if (!$monitoring) {
             return $this->notFoundResponse('Monitoring tidak ditemukan');
+        }
+
+        if ($user->cannot('view', $monitoring)) {
+            return $this->deniedByPolicy('Tidak memiliki izin untuk melihat monitoring ini');
         }
 
         return $this->successResponse('Data monitoring berhasil diambil', $monitoring);
@@ -116,7 +133,21 @@ class MonitoringController extends Controller
             return $this->notFoundResponse('Monitoring tidak ditemukan');
         }
 
-        $monitoring->update($request->all());
+        if ($request->filled('id_operator') && (int) $request->id_operator !== $monitoring->id_operator) {
+            return $this->deniedByPolicy('Perubahan id_operator tidak diizinkan');
+        }
+
+        $operatorId = (int) ($request->input('id_operator', $monitoring->id_operator));
+        if ($user->cannot('update', [$monitoring, $operatorId])) {
+            return $this->deniedByPolicy('Tidak memiliki izin untuk mengubah monitoring ini');
+        }
+
+        $payload = $validator->validated();
+        if ($user->role !== 'Admin') {
+            $payload['id_operator'] = $user->id;
+        }
+
+        $monitoring->update($payload);
         $monitoring->load(['laporan', 'operator']);
 
         $this->logActivityService->log($user->id, $user->role, 'Update monitoring', '/api/monitoring/' . $id, $request->ip(), $request->userAgent());
@@ -136,6 +167,10 @@ class MonitoringController extends Controller
 
         if (!$monitoring) {
             return $this->notFoundResponse('Monitoring tidak ditemukan');
+        }
+
+        if ($user->cannot('delete', $monitoring)) {
+            return $this->deniedByPolicy('Tidak memiliki izin untuk menghapus monitoring ini');
         }
 
         $this->logActivityService->log($user->id, $user->role, 'Hapus monitoring', '/api/monitoring/' . $id, $request->ip(), $request->userAgent());

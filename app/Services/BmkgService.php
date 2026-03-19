@@ -8,136 +8,114 @@ use Illuminate\Support\Facades\Log;
 
 class BmkgService
 {
-    private const CACHE_DURATION = 60; // Cache duration in minutes
+    private const CACHE_DURATION = 60; 
+    private const WEATHER_CACHE_REGISTRY_KEY = 'bmkg.prakiraan_cuaca.keys';
+    private const HTTP_TIMEOUT_SECONDS = 4;
+    private const HTTP_RETRY_ATTEMPTS = 1;
+    private const HTTP_RETRY_SLEEP_MS = 150;
 
-    /**
-     * Get latest earthquake data from BMKG
-     *
-     * @return array|null
-     */
+    private function fetchJson(string $url): ?array
+    {
+        try {
+            $response = Http::retry(self::HTTP_RETRY_ATTEMPTS, self::HTTP_RETRY_SLEEP_MS)
+                ->timeout(self::HTTP_TIMEOUT_SECONDS)
+                ->acceptJson()
+                ->get($url);
+
+            if (!$response->successful()) {
+                Log::error('BMKG API Error: HTTP request failed', [
+                    'url' => $url,
+                    'status' => $response->status(),
+                    'response' => $response->body(),
+                ]);
+
+                return null;
+            }
+
+            return $response->json();
+        } catch (\Throwable $e) {
+            Log::error('BMKG API Exception: HTTP request failed', [
+                'url' => $url,
+                'error' => $e->getMessage(),
+            ]);
+
+            return null;
+        }
+    }
+
+    private function rememberWeatherCacheKey(string $cacheKey): void
+    {
+        $existing = Cache::get(self::WEATHER_CACHE_REGISTRY_KEY, []);
+
+        if (!is_array($existing)) {
+            $existing = [];
+        }
+
+        if (!in_array($cacheKey, $existing, true)) {
+            $existing[] = $cacheKey;
+        }
+
+        Cache::put(self::WEATHER_CACHE_REGISTRY_KEY, $existing, now()->addDays(7));
+    }
+
+    
     public function getGempaTerbaru(): ?array
     {
         return Cache::remember('bmkg.gempa_terbaru', now()->addMinutes(self::CACHE_DURATION), function () {
-            try {
-                $response = Http::timeout(10)->get('https://data.bmkg.go.id/DataMKG/TEWS/autogempa.json');
+            $data = $this->fetchJson('https://data.bmkg.go.id/DataMKG/TEWS/autogempa.json');
 
-                if (!$response->successful()) {
-                    Log::error('BMKG API Error: Failed to fetch gempa terbaru', [
-                        'status' => $response->status(),
-                        'response' => $response->body()
-                    ]);
-                    return null;
-                }
-
-                $data = $response->json();
-
-                // Validate response structure
-                if (!isset($data['Infogempa']) || !isset($data['Infogempa']['gempa'])) {
-                    Log::error('BMKG API Error: Invalid response structure for gempa terbaru');
-                    return null;
-                }
-
-                return $data;
-
-            } catch (\Exception $e) {
-                Log::error('BMKG API Exception: Failed to fetch gempa terbaru', [
-                    'error' => $e->getMessage()
-                ]);
+            if (!isset($data['Infogempa']['gempa'])) {
+                Log::error('BMKG API Error: Invalid response structure for gempa terbaru');
                 return null;
             }
+
+            return $data;
         });
     }
 
-    /**
-     * Get list of recent earthquakes from BMKG
-     *
-     * @return array|null
-     */
+    
     public function getDaftarGempa(): ?array
     {
         return Cache::remember('bmkg.daftar_gempa', now()->addMinutes(self::CACHE_DURATION), function () {
-            try {
-                $response = Http::timeout(10)->get('https://data.bmkg.go.id/DataMKG/TEWS/gempaterkini.json');
+            $data = $this->fetchJson('https://data.bmkg.go.id/DataMKG/TEWS/gempaterkini.json');
 
-                if (!$response->successful()) {
-                    Log::error('BMKG API Error: Failed to fetch daftar gempa', [
-                        'status' => $response->status(),
-                        'response' => $response->body()
-                    ]);
-                    return null;
-                }
-
-                $data = $response->json();
-
-                // Validate response structure
-                if (!isset($data['Infogempa']) || !isset($data['Infogempa']['gempa'])) {
-                    Log::error('BMKG API Error: Invalid response structure for daftar gempa');
-                    return null;
-                }
-
-                return $data;
-
-            } catch (\Exception $e) {
-                Log::error('BMKG API Exception: Failed to fetch daftar gempa', [
-                    'error' => $e->getMessage()
-                ]);
+            if (!isset($data['Infogempa']['gempa'])) {
+                Log::error('BMKG API Error: Invalid response structure for daftar gempa');
                 return null;
             }
+
+            return $data;
         });
     }
 
-    /**
-     * Get earthquake felt data from BMKG
-     *
-     * @return array|null
-     */
+    
     public function getGempaDirasakan(): ?array
     {
         return Cache::remember('bmkg.gempa_dirasakan', now()->addMinutes(self::CACHE_DURATION), function () {
-            try {
-                $response = Http::timeout(10)->get('https://data.bmkg.go.id/DataMKG/TEWS/gempadirasakan.json');
+            $data = $this->fetchJson('https://data.bmkg.go.id/DataMKG/TEWS/gempadirasakan.json');
 
-                if (!$response->successful()) {
-                    Log::error('BMKG API Error: Failed to fetch gempa dirasakan', [
-                        'status' => $response->status(),
-                        'response' => $response->body()
-                    ]);
-                    return null;
-                }
-
-                $data = $response->json();
-
-                // Validate response structure
-                if (!isset($data['Infogempa']) || !isset($data['Infogempa']['gempa'])) {
-                    Log::error('BMKG API Error: Invalid response structure for gempa dirasakan');
-                    return null;
-                }
-
-                return $data;
-
-            } catch (\Exception $e) {
-                Log::error('BMKG API Exception: Failed to fetch gempa dirasakan', [
-                    'error' => $e->getMessage()
-                ]);
+            if (!isset($data['Infogempa']['gempa'])) {
+                Log::error('BMKG API Error: Invalid response structure for gempa dirasakan');
                 return null;
             }
+
+            return $data;
         });
     }
 
-    /**
-     * Get weather forecast data from BMKG
-     *
-     * @param string $wilayahId
-     * @return array|null
-     */
+    
     public function getPrakiraanCuaca(string $wilayahId): ?array
     {
         $cacheKey = "bmkg.prakiraan_cuaca.{$wilayahId}";
 
+        $this->rememberWeatherCacheKey($cacheKey);
+
         return Cache::remember($cacheKey, now()->addMinutes(self::CACHE_DURATION), function () use ($wilayahId) {
             try {
                 $url = "https://data.bmkg.go.id/DataMKG/MEWS/DigitalForecast/DigitalForecast-{$wilayahId}.xml";
-                $response = Http::timeout(10)->get($url);
+                $response = Http::retry(self::HTTP_RETRY_ATTEMPTS, self::HTTP_RETRY_SLEEP_MS)
+                    ->timeout(self::HTTP_TIMEOUT_SECONDS)
+                    ->get($url);
 
                 if (!$response->successful()) {
                     Log::error('BMKG API Error: Failed to fetch prakiraan cuaca', [
@@ -148,8 +126,8 @@ class BmkgService
                     return null;
                 }
 
-                // Parse XML to array (you might need to implement XML parsing)
-                // For now, return raw response
+                
+                
                 return [
                     'xml_data' => $response->body(),
                     'wilayah_id' => $wilayahId
@@ -165,16 +143,12 @@ class BmkgService
         });
     }
 
-    /**
-     * Get tsunami warning data from BMKG
-     *
-     * @return array|null
-     */
+    
     public function getPeringatanTsunami(): ?array
     {
         return Cache::remember('bmkg.peringatan_tsunami', now()->addMinutes(5), function () {
             try {
-                $response = Http::timeout(10)->get('https://data.bmkg.go.id/DataMKG/TEWS/ipmap.txt');
+                $response = Http::timeout(self::HTTP_TIMEOUT_SECONDS)->get('https://data.bmkg.go.id/DataMKG/TEWS/ipmap.txt');
 
                 if (!$response->successful()) {
                     Log::error('BMKG API Error: Failed to fetch peringatan tsunami', [
@@ -184,7 +158,7 @@ class BmkgService
                     return null;
                 }
 
-                // Parse text data to array
+                
                 $lines = explode("\n", trim($response->body()));
                 $tsunamiData = [];
 
@@ -209,38 +183,31 @@ class BmkgService
         });
     }
 
-    /**
-     * Clear all BMKG cache
-     *
-     * @return void
-     */
+    
     public function clearCache(): void
     {
         $cacheKeys = [
             'bmkg.gempa_terbaru',
             'bmkg.daftar_gempa',
             'bmkg.gempa_dirasakan',
-            'bmkg.peringatan_tsunami'
+            'bmkg.peringatan_tsunami',
         ];
 
         foreach ($cacheKeys as $key) {
             Cache::forget($key);
         }
 
-        // Clear weather forecast cache patterns
-        $weatherCacheKeys = Cache::getRedis()?->keys('bmkg.prakiraan_cuaca.*');
-        if ($weatherCacheKeys) {
+        $weatherCacheKeys = Cache::get(self::WEATHER_CACHE_REGISTRY_KEY, []);
+        if (is_array($weatherCacheKeys)) {
             foreach ($weatherCacheKeys as $key) {
-                Cache::forget($key);
+                Cache::forget((string) $key);
             }
         }
+
+        Cache::forget(self::WEATHER_CACHE_REGISTRY_KEY);
     }
 
-    /**
-     * Get cache status and information
-     *
-     * @return array
-     */
+    
     public function getCacheStatus(): array
     {
         return [
@@ -249,6 +216,7 @@ class BmkgService
             'daftar_gempa_cached' => Cache::has('bmkg.daftar_gempa'),
             'gempa_dirasakan_cached' => Cache::has('bmkg.gempa_dirasakan'),
             'peringatan_tsunami_cached' => Cache::has('bmkg.peringatan_tsunami'),
+            'prakiraan_cuaca_keys_count' => count((array) Cache::get(self::WEATHER_CACHE_REGISTRY_KEY, [])),
         ];
     }
 }

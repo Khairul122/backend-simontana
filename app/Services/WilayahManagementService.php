@@ -8,9 +8,12 @@ use App\Models\Kecamatan;
 use App\Models\Provinsi;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 
 class WilayahManagementService
 {
+    private const CACHE_TTL_MINUTES = 30;
+
     private const MODEL_MAP = [
         'provinsi' => Provinsi::class,
         'kabupaten' => Kabupaten::class,
@@ -58,12 +61,14 @@ class WilayahManagementService
 
     public function buildAllWilayahData(): array
     {
-        return [
-            'provinsi' => Provinsi::with('kabupatens')->orderBy('nama')->get(),
-            'kabupaten' => Kabupaten::with('provinsi', 'kecamatans')->orderBy('nama')->get(),
-            'kecamatan' => Kecamatan::with('kabupaten', 'desas')->orderBy('nama')->get(),
-            'desa' => Desa::with('kecamatan')->orderBy('nama')->get(),
-        ];
+        return Cache::remember('wilayah:all-hierarchy', now()->addMinutes(self::CACHE_TTL_MINUTES), static function () {
+            return [
+                'provinsi' => Provinsi::with('kabupatens')->orderBy('nama')->get(),
+                'kabupaten' => Kabupaten::with('provinsi', 'kecamatans')->orderBy('nama')->get(),
+                'kecamatan' => Kecamatan::with('kabupaten', 'desas')->orderBy('nama')->get(),
+                'desa' => Desa::with('kecamatan')->orderBy('nama')->get(),
+            ];
+        });
     }
 
     public function search(string $q, ?string $jenis = null)
@@ -71,26 +76,50 @@ class WilayahManagementService
         $normalized = $this->normalizeJenis($jenis);
 
         if ($normalized === 'provinsi') {
-            return Provinsi::where('nama', 'LIKE', "%{$q}%")->get();
+            return Provinsi::select(['id', 'nama'])->where('nama', 'LIKE', "%{$q}%")->limit(30)->get();
         }
 
         if ($normalized === 'kabupaten') {
-            return Kabupaten::where('nama', 'LIKE', "%{$q}%")->with('provinsi')->get();
+            return Kabupaten::select(['id', 'nama', 'id_provinsi'])
+                ->where('nama', 'LIKE', "%{$q}%")
+                ->with('provinsi:id,nama')
+                ->limit(30)
+                ->get();
         }
 
         if ($normalized === 'kecamatan') {
-            return Kecamatan::where('nama', 'LIKE', "%{$q}%")->with('kabupaten')->get();
+            return Kecamatan::select(['id', 'nama', 'id_kabupaten'])
+                ->where('nama', 'LIKE', "%{$q}%")
+                ->with('kabupaten:id,nama,id_provinsi')
+                ->limit(30)
+                ->get();
         }
 
         if ($normalized === 'desa') {
-            return Desa::where('nama', 'LIKE', "%{$q}%")->with('kecamatan')->get();
+            return Desa::select(['id', 'nama', 'id_kecamatan'])
+                ->where('nama', 'LIKE', "%{$q}%")
+                ->with('kecamatan:id,nama,id_kabupaten')
+                ->limit(30)
+                ->get();
         }
 
         return collect([
-            'provinsi' => Provinsi::where('nama', 'LIKE', "%{$q}%")->get(),
-            'kabupaten' => Kabupaten::where('nama', 'LIKE', "%{$q}%")->with('provinsi')->get(),
-            'kecamatan' => Kecamatan::where('nama', 'LIKE', "%{$q}%")->with('kabupaten')->get(),
-            'desa' => Desa::where('nama', 'LIKE', "%{$q}%")->with('kecamatan')->get(),
+            'provinsi' => Provinsi::select(['id', 'nama'])->where('nama', 'LIKE', "%{$q}%")->limit(20)->get(),
+            'kabupaten' => Kabupaten::select(['id', 'nama', 'id_provinsi'])
+                ->where('nama', 'LIKE', "%{$q}%")
+                ->with('provinsi:id,nama')
+                ->limit(20)
+                ->get(),
+            'kecamatan' => Kecamatan::select(['id', 'nama', 'id_kabupaten'])
+                ->where('nama', 'LIKE', "%{$q}%")
+                ->with('kabupaten:id,nama,id_provinsi')
+                ->limit(20)
+                ->get(),
+            'desa' => Desa::select(['id', 'nama', 'id_kecamatan'])
+                ->where('nama', 'LIKE', "%{$q}%")
+                ->with('kecamatan:id,nama,id_kabupaten')
+                ->limit(20)
+                ->get(),
         ]);
     }
 

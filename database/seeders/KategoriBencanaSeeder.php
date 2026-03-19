@@ -7,9 +7,7 @@ use Illuminate\Database\Seeder;
 
 class KategoriBencanaSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
+    
     public function run(): void
     {
         $kategoriBencana = [

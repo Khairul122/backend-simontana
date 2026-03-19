@@ -11,43 +11,33 @@ class WilayahApiService
     private const BASE_URL = 'https://source.imigrasi.go.id/maestro/api-wilayah-indonesia/api';
     private const TIMEOUT = 30;
     private const MAX_RETRIES = 3;
-    private const RETRY_DELAY = 1000; // milliseconds
+    private const RETRY_DELAY = 1000; 
 
-    /**
-     * Get provinces data with retry mechanism
-     */
+    
     public function getProvinces(): array
     {
         return $this->makeRequest('/provinces.json', 'provinces');
     }
 
-    /**
-     * Get regencies by province ID
-     */
+    
     public function getRegenciesByProvince(int $provinceId): array
     {
         return $this->makeRequest("/regencies/{$provinceId}.json", "regencies for province {$provinceId}");
     }
 
-    /**
-     * Get districts by regency ID
-     */
+    
     public function getDistrictsByRegency(int $regencyId): array
     {
         return $this->makeRequest("/districts/{$regencyId}.json", "districts for regency {$regencyId}");
     }
 
-    /**
-     * Get villages by district ID
-     */
+    
     public function getVillagesByDistrict(int $districtId): array
     {
         return $this->makeRequest("/villages/{$districtId}.json", "villages for district {$districtId}");
     }
 
-    /**
-     * Make HTTP request with retry and validation
-     */
+    
     private function makeRequest(string $endpoint, string $context): array
     {
         $url = self::BASE_URL . $endpoint;
@@ -89,16 +79,14 @@ class WilayahApiService
             }
         }
 
-        // All attempts failed
+        
         $errorMessage = $lastException ? $lastException->getMessage() : "Invalid response format";
         Log::error("Failed to fetch {$context} after " . self::MAX_RETRIES . " attempts: {$errorMessage}");
 
         throw new \RuntimeException("Unable to fetch {$context}: {$errorMessage}");
     }
 
-    /**
-     * Validate if response contains valid JSON data
-     */
+    
     private function isValidJsonResponse(Response $response): bool
     {
         if (!$response->successful()) {
@@ -112,19 +100,17 @@ class WilayahApiService
 
         $body = $response->body();
 
-        // Check for HTML redirects (Cloudflare, auth pages)
+        
         if (str_contains(strtolower($body), '<html') || str_contains(strtolower($body), 'redirect')) {
             return false;
         }
 
-        // Try to decode JSON
+        
         json_decode($body);
         return json_last_error() === JSON_ERROR_NONE;
     }
 
-    /**
-     * Test API connectivity
-     */
+    
     public function testConnectivity(): array
     {
         $results = [];

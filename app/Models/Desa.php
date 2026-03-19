@@ -23,25 +23,19 @@ class Desa extends Model
         'updated_at' => 'datetime',
     ];
 
-    /**
-     * Relasi ke kecamatan
-     */
+    
     public function kecamatan()
     {
         return $this->belongsTo(Kecamatan::class, 'id_kecamatan');
     }
 
-    /**
-     * Relasi ke pengguna
-     */
+    
     public function pengguna()
     {
         return $this->hasMany(Pengguna::class, 'id_desa');
     }
 
-    /**
-     * Relasi ke laporan
-     */
+    
     public function laporan()
     {
         return $this->hasMany(Laporans::class, 'id_desa');

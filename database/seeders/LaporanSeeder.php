@@ -8,15 +8,13 @@ use App\Models\Laporans;
 
 class LaporanSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
+    
     public function run(): void
     {
         $laporans = [
             [
                 'id_pelapor' => 4,
-                'id_kategori_bencana' => 1, // Banjir
+                'id_kategori_bencana' => 1, 
                 'id_desa' => 3171010001,
                 'judul_laporan' => 'Banjir di Perumahan Sukajadi',
                 'deskripsi' => 'Terjadi banjir setelah hujan deras selama 3 jam. Air masuk ke rumah warga dengan ketinggian sekitar 50 cm.',
@@ -32,7 +30,7 @@ class LaporanSeeder extends Seeder
             ],
             [
                 'id_pelapor' => 4,
-                'id_kategori_bencana' => 2, // Gempa Bumi
+                'id_kategori_bencana' => 2, 
                 'id_desa' => 3171010001,
                 'judul_laporan' => 'Gempa Bumi Kecil',
                 'deskripsi' => 'Terjadi gempa bumi skala kecil yang menyebabkan retak-retak dinding rumah warga.',
@@ -48,7 +46,7 @@ class LaporanSeeder extends Seeder
             ],
             [
                 'id_pelapor' => 4,
-                'id_kategori_bencana' => 3, // Kebakaran Hutan
+                'id_kategori_bencana' => 3, 
                 'id_desa' => 3171010001,
                 'judul_laporan' => 'Kebakaran Hutan Kecil',
                 'deskripsi' => 'Kebakaran hutan di area perbukitan seluas 2 hektar. Api menjalar ke arah pemukiman.',
@@ -67,7 +65,7 @@ class LaporanSeeder extends Seeder
             ],
             [
                 'id_pelapor' => 4,
-                'id_kategori_bencana' => 1, // Banjir
+                'id_kategori_bencana' => 1, 
                 'id_desa' => 3171010001,
                 'judul_laporan' => 'Banjir Bandang',
                 'deskripsi' => 'Banjir bandang disertai longsor menutup akses jalan utama. Puluhan rumah terendam.',
@@ -87,7 +85,7 @@ class LaporanSeeder extends Seeder
             ],
             [
                 'id_pelapor' => 4,
-                'id_kategori_bencana' => 2, // Gempa Bumi
+                'id_kategori_bencana' => 2, 
                 'id_desa' => 3171010001,
                 'judul_laporan' => 'Gempa Kuat dan Tsunami',
                 'deskripsi' => 'Gempa bumi kuat dengan potensi tsunami. Warga panik dan berlarian mencari tempat tinggi.',
@@ -108,7 +106,7 @@ class LaporanSeeder extends Seeder
             ],
             [
                 'id_pelapor' => 4,
-                'id_kategori_bencana' => 1, // Banjir
+                'id_kategori_bencana' => 1, 
                 'id_desa' => 3171010001,
                 'judul_laporan' => 'Genangan Air di Jalan',
                 'deskripsi' => 'Genangan air setelah hujan, mengganggu lalu lintas namun tidak masuk ke rumah.',
@@ -127,7 +125,7 @@ class LaporanSeeder extends Seeder
             ],
             [
                 'id_pelapor' => 4,
-                'id_kategori_bencana' => 3, // Kebakaran Hutan
+                'id_kategori_bencana' => 3, 
                 'id_desa' => 3171010001,
                 'judul_laporan' => 'Kebakaran Lahan Gambut',
                 'deskripsi' => 'Kebakaran lahan gambut yang sulit dipadamkan, asap tebal mengganggu pernapasan.',
@@ -146,7 +144,7 @@ class LaporanSeeder extends Seeder
             ],
             [
                 'id_pelapor' => 4,
-                'id_kategori_bencana' => 2, // Gempa Bumi
+                'id_kategori_bencana' => 2, 
                 'id_desa' => 3171010001,
                 'judul_laporan' => 'Guncangan Gempa Susulan',
                 'deskripsi' => 'Gempa susulan pasca gempa utama, beberapa bangunan retak.',
@@ -162,7 +160,7 @@ class LaporanSeeder extends Seeder
             ],
             [
                 'id_pelapor' => 4,
-                'id_kategori_bencana' => 1, // Banjir
+                'id_kategori_bencana' => 1, 
                 'id_desa' => 3171010001,
                 'judul_laporan' => 'Luapan Sungai Cikapundung',
                 'deskripsi' => 'Sungai Cikapundung meluap setelah hujan lebat, air menggenangi permukiman warga.',
@@ -181,7 +179,7 @@ class LaporanSeeder extends Seeder
             ],
             [
                 'id_pelapor' => 4,
-                'id_kategori_bencana' => 3, // Kebakaran Hutan
+                'id_kategori_bencana' => 3, 
                 'id_desa' => 3171010001,
                 'judul_laporan' => 'Kebakaran Sampah dan Tumpahan Minyak',
                 'deskripsi' => 'Kebakaran tempat pembuangan sampah yang menyebar ke area industri. Terdapat tumpahan minyak.',

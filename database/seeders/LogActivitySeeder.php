@@ -7,14 +7,12 @@ use Illuminate\Database\Seeder;
 
 class LogActivitySeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
+    
     public function run(): void
     {
         $log_activity = [
             [
-                'user_id' => 4, // Warga Demo
+                'user_id' => 4, 
                 'role' => 'Warga',
                 'aktivitas' => 'Pengguna warga_demo melaporkan bencana banjir di Lebak Gede',
                 'endpoint' => '/api/laporan/create',
@@ -23,7 +21,7 @@ class LogActivitySeeder extends Seeder
                 'created_at' => '2024-12-15 10:30:00',
             ],
             [
-                'user_id' => 3, // Operator Desa Demo
+                'user_id' => 3, 
                 'role' => 'OperatorDesa',
                 'aktivitas' => 'Operator operator_desa melakukan verifikasi laporan banjir di lapangan',
                 'endpoint' => '/api/laporan/1/verify',
@@ -32,7 +30,7 @@ class LogActivitySeeder extends Seeder
                 'created_at' => '2024-12-15 10:45:00',
             ],
             [
-                'user_id' => 2, // Petugas BPBD Demo
+                'user_id' => 2, 
                 'role' => 'PetugasBPBD',
                 'aktivitas' => 'Petugas petugas_bpbd memberikan tanggapan untuk laporan banjir',
                 'endpoint' => '/api/tindaklanjut/create',

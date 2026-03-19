@@ -4,21 +4,65 @@ namespace App\Http\Controllers\Laporan;
 
 use App\Http\Controllers\Controller;
 use App\Models\Laporans;
+use App\Services\LogActivityService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class LaporanWorkflowController extends Controller
 {
+    private const TRANSITION_MAP = [
+        'Draft' => ['Diverifikasi', 'Ditolak'],
+        'Menunggu Verifikasi' => ['Diverifikasi', 'Ditolak'],
+        'Diverifikasi' => ['Diproses', 'Selesai'],
+        'Diproses' => ['Selesai'],
+        'Selesai' => [],
+        'Ditolak' => [],
+    ];
+
+    public function __construct(private readonly LogActivityService $logActivityService)
+    {
+    }
+
+    private function canTransition(string $from, string $to): bool
+    {
+        $allowedTransitions = self::TRANSITION_MAP[$from] ?? [];
+
+        return in_array($to, $allowedTransitions, true);
+    }
+
+    private function auditStatusChange(Request $request, Laporans $laporan, string $from, string $to): void
+    {
+        $user = $this->ensureAuthenticated($request);
+        if (!$user) {
+            return;
+        }
+
+        $this->logActivityService->log(
+            $user->id,
+            $user->role,
+            sprintf('Perubahan status laporan #%d: %s -> %s', $laporan->id, $from, $to),
+            '/api/laporans/' . $laporan->id . '/workflow',
+            $request->ip(),
+            $request->userAgent()
+        );
+    }
+
     public function verifikasi(Request $request, $id): JsonResponse
     {
         try {
+            $user = $this->ensureAuthenticated($request);
+            if (!$user) {
+                return $this->unauthorized();
+            }
+
             $laporan = Laporans::find($id);
             if (!$laporan) {
                 return $this->notFoundResponse('Laporan tidak ditemukan');
             }
 
-            if (!auth()->user()->hasRole(['Admin', 'PetugasBPBD', 'OperatorDesa'])) {
+            if (!$user->hasRole(['Admin', 'PetugasBPBD', 'OperatorDesa'])) {
                 return $this->forbidden('Tidak memiliki izin untuk memverifikasi laporan ini');
             }
 
@@ -31,18 +75,34 @@ class LaporanWorkflowController extends Controller
                 return $this->validationErrorResponse($validator->errors());
             }
 
+            $fromStatus = (string) $laporan->status;
+            $toStatus = (string) $request->status;
+
+            if (!$this->canTransition($fromStatus, $toStatus)) {
+                return $this->errorResponse(
+                    sprintf('Transisi status tidak valid: %s -> %s', $fromStatus, $toStatus),
+                    422,
+                    code: 'INVALID_STATUS_TRANSITION'
+                );
+            }
+
             $updateData = [
-                'status' => $request->status,
+                'status' => $toStatus,
                 'waktu_verifikasi' => now(),
-                'id_verifikator' => auth()->id(),
+                'id_verifikator' => $user->id,
                 'catatan_verifikasi' => $request->catatan_verifikasi,
             ];
 
+            if ($toStatus === 'Ditolak') {
+                $updateData['waktu_selesai'] = null;
+            }
+
             if (is_null($laporan->id_penanggung_jawab)) {
-                $updateData['id_penanggung_jawab'] = auth()->id();
+                $updateData['id_penanggung_jawab'] = $user->id;
             }
 
             $laporan->update($updateData);
+            $this->auditStatusChange($request, $laporan, $fromStatus, $toStatus);
 
             return $this->successResponse('Laporan berhasil diverifikasi', $laporan->load([
                     'pelapor:id,nama,email,alamat,no_telepon',
@@ -53,43 +113,65 @@ class LaporanWorkflowController extends Controller
                     'desa.kecamatan.kabupaten.provinsi:id,nama',
                 ]));
         } catch (\Exception $e) {
-            return $this->errorResponse('Gagal memverifikasi laporan: ' . $e->getMessage(), 500, ['data' => null]);
+            Log::error('Gagal memverifikasi laporan', [
+                'laporan_id' => $id,
+                'error' => $e->getMessage(),
+            ]);
+
+            return $this->internalError('Gagal memverifikasi laporan');
         }
     }
 
     public function proses(Request $request, $id): JsonResponse
     {
         try {
+            $user = $this->ensureAuthenticated($request);
+            if (!$user) {
+                return $this->unauthorized();
+            }
+
             $laporan = Laporans::find($id);
             if (!$laporan) {
                 return $this->notFoundResponse('Laporan tidak ditemukan');
             }
 
-            if (!auth()->user()->hasRole(['Admin', 'PetugasBPBD', 'OperatorDesa'])) {
+            if (!$user->hasRole(['Admin', 'PetugasBPBD', 'OperatorDesa'])) {
                 return $this->forbidden('Tidak memiliki izin untuk memproses laporan ini');
             }
 
             $validator = Validator::make($request->all(), [
-                'status' => 'required|in:Diproses,Tindak Lanjut,Selesai',
+                'status' => 'required|in:Diproses,Selesai',
             ]);
 
             if ($validator->fails()) {
                 return $this->validationErrorResponse($validator->errors());
             }
 
+            $fromStatus = (string) $laporan->status;
+            $toStatus = (string) $request->status;
+
+            if (!$this->canTransition($fromStatus, $toStatus)) {
+                return $this->errorResponse(
+                    sprintf('Transisi status tidak valid: %s -> %s', $fromStatus, $toStatus),
+                    422,
+                    code: 'INVALID_STATUS_TRANSITION'
+                );
+            }
+
             $updateData = [
-                'status' => $request->status,
+                'status' => $toStatus,
             ];
 
             if (is_null($laporan->id_penanggung_jawab)) {
-                $updateData['id_penanggung_jawab'] = auth()->id();
+                $updateData['id_penanggung_jawab'] = $user->id;
+            }
+
+            if ($toStatus === 'Selesai') {
+                $updateData['waktu_selesai'] = now();
             }
 
             $laporan->update($updateData);
-
-            if ($request->status === 'Selesai') {
-                $laporan->update(['waktu_selesai' => now()]);
-            }
+            $this->auditStatusChange($request, $laporan, $fromStatus, $toStatus);
 
             return $this->successResponse('Status laporan berhasil diperbarui', $laporan->load([
                     'pelapor:id,nama,email,alamat,no_telepon',
@@ -100,7 +182,12 @@ class LaporanWorkflowController extends Controller
                     'desa.kecamatan.kabupaten.provinsi:id,nama',
                 ]));
         } catch (\Exception $e) {
-            return $this->errorResponse('Gagal memproses laporan: ' . $e->getMessage(), 500, ['data' => null]);
+            Log::error('Gagal memproses laporan', [
+                'laporan_id' => $id,
+                'error' => $e->getMessage(),
+            ]);
+
+            return $this->internalError('Gagal memproses laporan');
         }
     }
 
@@ -113,13 +200,18 @@ class LaporanWorkflowController extends Controller
             }
 
             $history = $laporan->riwayatTindakan()
-                ->with('user:id,nama')
+                ->with('petugas:id,nama')
                 ->orderBy('created_at', 'desc')
                 ->get();
 
             return $this->successResponse('Riwayat laporan berhasil diambil', $history);
         } catch (\Exception $e) {
-            return $this->errorResponse('Gagal mengambil riwayat laporan: ' . $e->getMessage(), 500, ['data' => null]);
+            Log::error('Gagal mengambil riwayat laporan', [
+                'laporan_id' => $id,
+                'error' => $e->getMessage(),
+            ]);
+
+            return $this->internalError('Gagal mengambil riwayat laporan');
         }
     }
 }

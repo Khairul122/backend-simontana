@@ -22,9 +22,7 @@ class Provinsi extends Model
         'updated_at' => 'datetime',
     ];
 
-    /**
-     * Relasi ke kabupaten
-     */
+    
     public function kabupatens()
     {
         return $this->hasMany(Kabupaten::class, 'id_provinsi');

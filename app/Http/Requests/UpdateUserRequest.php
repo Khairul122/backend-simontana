@@ -6,50 +6,22 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateUserRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
-        $targetUserId = $this->route('id');
+        $targetUserId = (int) $this->route('id');
+        $user = $this->user();
 
-        // Check using Laravel auth system first
-        if (auth()->check()) {
-            // Admin can update any user
-            if (auth()->user()->role === 'Admin') {
-                return true;
-            }
-
-            // User can update their own profile
-            if (auth()->id() == $targetUserId) {
-                return true;
-            }
+        if (!$user) {
+            return false;
         }
 
-        // Fallback to session-based auth (for custom auth implementation)
-        $currentUserRole = session('user_role');
-        $currentUserId = session('user_id');
-
-        // Admin can update any user
-        if ($currentUserRole === 'Admin') {
+        if ($user->role === 'Admin') {
             return true;
         }
 
-        // User can update their own profile
-        if ($currentUserId == $targetUserId) {
-            return true;
-        }
-
-        // For development: allow if user is logged in
-        // Remove this block in production for proper security
-        return auth()->check() || session('user_id');
+        return (int) $user->id === $targetUserId;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
         $rules = [
@@ -60,7 +32,6 @@ class UpdateUserRequest extends FormRequest
             'id_desa' => 'nullable|exists:desa,id',
         ];
 
-        // Add password validation if present
         if ($this->has('password')) {
             $rules['password'] = 'required|string|min:6';
         }
@@ -68,11 +39,6 @@ class UpdateUserRequest extends FormRequest
         return $rules;
     }
 
-    /**
-     * Get custom messages for validator errors.
-     *
-     * @return array<string, string>
-     */
     public function messages(): array
     {
         return [
@@ -88,11 +54,6 @@ class UpdateUserRequest extends FormRequest
         ];
     }
 
-    /**
-     * Get custom attributes for validator errors.
-     *
-     * @return array<string, string>
-     */
     public function attributes(): array
     {
         return [

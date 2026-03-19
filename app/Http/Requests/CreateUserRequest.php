@@ -6,31 +6,13 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class CreateUserRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
-        // Check using Laravel auth system first
-        if (auth()->check() && auth()->user()->role === 'Admin') {
-            return true;
-        }
+        $user = $this->user();
 
-        // Fallback to session-based auth (for custom auth implementation)
-        if (session('user_role') === 'Admin') {
-            return true;
-        }
-
-        // For development: allow if user is logged in
-        // Remove this block in production for proper security
-        return auth()->check() || session('user_id');
+        return $user && $user->role === 'Admin';
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
         return [
@@ -45,11 +27,6 @@ class CreateUserRequest extends FormRequest
         ];
     }
 
-    /**
-     * Get custom messages for validator errors.
-     *
-     * @return array<string, string>
-     */
     public function messages(): array
     {
         return [
@@ -73,11 +50,6 @@ class CreateUserRequest extends FormRequest
         ];
     }
 
-    /**
-     * Get custom attributes for validator errors.
-     *
-     * @return array<string, string>
-     */
     public function attributes(): array
     {
         return [

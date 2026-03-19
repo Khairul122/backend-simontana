@@ -4,22 +4,19 @@ namespace App\Services;
 
 use App\Models\Pengguna;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Request;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
 
 class AuthService
 {
-    /**
-     * Register new user
-     */
+    
     public function register(array $userData): array
     {
         $pengguna = Pengguna::create([
             'nama' => $userData['nama'],
             'username' => $userData['username'],
             'email' => $userData['email'],
-            'password' => $userData['password'], // Will be hashed by model mutator
+            'password' => $userData['password'], 
             'role' => $userData['role'],
             'no_telepon' => $userData['no_telepon'] ?? null,
             'alamat' => $userData['alamat'] ?? null,
@@ -39,12 +36,21 @@ class AuthService
         ];
     }
 
-    /**
-     * Login user and create JWT token
-     */
+    
     public function login(string $username, string $password): ?array
     {
-        $pengguna = Pengguna::where('username', $username)
+        $pengguna = Pengguna::select([
+                'id',
+                'nama',
+                'username',
+                'email',
+                'password',
+                'role',
+                'no_telepon',
+                'alamat',
+                'id_desa',
+            ])
+            ->where('username', $username)
             ->orWhere('email', $username)
             ->first();
 
@@ -53,7 +59,7 @@ class AuthService
         }
 
         try {
-            // Generate JWT token
+            
             $token = JWTAuth::fromUser($pengguna);
 
             if (!$token) {
@@ -71,20 +77,18 @@ class AuthService
                     'no_telepon' => $pengguna->no_telepon,
                     'alamat' => $pengguna->alamat,
                     'id_desa' => $pengguna->id_desa,
-                    'desa' => $pengguna->desa ? $pengguna->desa->nama : null,
+                    'desa' => null,
                 ],
                 'token' => $token,
                 'token_type' => 'Bearer',
-                'expires_in' => config('jwt.ttl') * 60 // Convert minutes to seconds
+                'expires_in' => config('jwt.ttl') * 60 
             ];
         } catch (JWTException $e) {
             return null;
         }
     }
 
-    /**
-     * Logout user (invalidate token)
-     */
+    
     public function logout($user): bool
     {
         try {
@@ -95,9 +99,7 @@ class AuthService
         }
     }
 
-    /**
-     * Refresh JWT token
-     */
+    
     public function refresh()
     {
         try {
@@ -108,9 +110,7 @@ class AuthService
         }
     }
 
-    /**
-     * Get current authenticated user
-     */
+    
     public function getCurrentUser($user): array
     {
         if (!$user) {
@@ -148,9 +148,7 @@ class AuthService
         ];
     }
 
-    /**
-     * Check if user has specific role
-     */
+    
     public function hasRole($user, string $role): bool
     {
         if (!$user) {
@@ -160,9 +158,7 @@ class AuthService
         return $user->role === $role;
     }
 
-    /**
-     * Check if user has any of the given roles
-     */
+    
     public function hasAnyRole($user, array $roles): bool
     {
         if (!$user) {

@@ -95,13 +95,13 @@ class ApiSmokeTest extends TestCase
     {
         $this->seedWilayahMinimal();
         $admin = $this->createUser('Admin');
+        $token = JWTAuth::fromUser($admin);
 
-        $this->actingAs($admin);
-
-        $response = $this->postJson('/api/wilayah', [
-            'jenis' => 'kabupaten',
-            'nama' => 'Kabupaten Baru',
-        ]);
+        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+            ->postJson('/api/wilayah', [
+                'jenis' => 'kabupaten',
+                'nama' => 'Kabupaten Baru',
+            ]);
 
         $response->assertStatus(422)
             ->assertJsonPath('success', false)
