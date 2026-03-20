@@ -14,9 +14,9 @@ class PenggunaSeeder extends Seeder
             [
                 'nama' => 'Administrator SIMONTA',
                 'username' => 'admin_pusat',
-                'password' => \Hash::make('password'),
+                'password' => \Hash::make('12345678'),
                 'role' => 'Admin',
-                'email' => 'admin@simonta.id',
+                'email' => 'admin@gmail.com',
                 'no_telepon' => '081234567890',
                 'alamat' => 'Kantor BPBD Pusat',
                 'id_desa' => null,

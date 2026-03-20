@@ -15,6 +15,21 @@ use Illuminate\Support\Facades\Validator;
 class LaporansController extends Controller
 {
     private const MAX_RADIUS_KM = 100;
+    private const FULL_RELATIONS = [
+        'pelapor.desa.kecamatan.kabupaten.provinsi',
+        'kategori',
+        'desa.kecamatan.kabupaten.provinsi',
+        'verifikator.desa.kecamatan.kabupaten.provinsi',
+        'penanggungJawab.desa.kecamatan.kabupaten.provinsi',
+        'tindakLanjut.petugas.desa.kecamatan.kabupaten.provinsi',
+        'tindakLanjut.laporan.pelapor.desa.kecamatan.kabupaten.provinsi',
+        'tindakLanjut.laporan.kategori',
+        'tindakLanjut.laporan.desa.kecamatan.kabupaten.provinsi',
+        'monitoring.operator.desa.kecamatan.kabupaten.provinsi',
+        'monitoring.laporan.pelapor.desa.kecamatan.kabupaten.provinsi',
+        'monitoring.laporan.kategori',
+        'monitoring.laporan.desa.kecamatan.kabupaten.provinsi',
+    ];
 
     private const ALLOWED_ORDER_BY = [
         'id',
@@ -73,39 +88,7 @@ class LaporansController extends Controller
     public function index(Request $request): JsonResponse
     {
         try {
-            $query = Laporans::with([
-                'pelapor:id,nama,email,alamat,no_telepon',
-                'kategori:id,nama_kategori,deskripsi',
-                'desa:id,nama,id_kecamatan',
-                'desa.kecamatan:id,nama,id_kabupaten',
-                'desa.kecamatan.kabupaten:id,nama,id_provinsi',
-                'desa.kecamatan.kabupaten.provinsi:id,nama',
-                'tindakLanjut:id_tindaklanjut,laporan_id,id_petugas,tanggal_tanggapan,status,created_at',
-                'tindakLanjut.petugas:id,nama',
-                'monitoring:id_monitoring,id_laporan,id_operator,waktu_monitoring,hasil_monitoring,koordinat_gps,created_at'
-            ])->select([
-                'id',
-                'id_pelapor',
-                'id_kategori_bencana',
-                'id_desa',
-                'judul_laporan',
-                'deskripsi',
-                'tingkat_keparahan',
-                'status',
-                'latitude',
-                'longitude',
-                'alamat_lengkap',
-                'is_prioritas',
-                'view_count',
-                'jumlah_korban',
-                'jumlah_rumah_rusak',
-                'waktu_laporan',
-                'waktu_verifikasi',
-                'waktu_selesai',
-                'catatan_verifikasi',
-                'created_at',
-                'updated_at',
-            ]);
+            $query = Laporans::with(self::FULL_RELATIONS);
 
             
             if ($request->has('status') && $request->status) {
@@ -174,16 +157,7 @@ class LaporansController extends Controller
             $limit = $this->clampPerPage((int) $request->get('limit', 15), 15, 100);
             $laporans = $query->paginate($limit);
 
-            return $this->successResponse('Data laporan berhasil diambil', $laporans->items(), 200, [
-                'pagination' => [
-                    'current_page' => $laporans->currentPage(),
-                    'last_page' => $laporans->lastPage(),
-                    'per_page' => $laporans->perPage(),
-                    'total' => $laporans->total(),
-                    'from' => $laporans->firstItem(),
-                    'to' => $laporans->lastItem(),
-                ],
-            ]);
+            return $this->successResponse('Data laporan berhasil diambil', $laporans);
 
         } catch (\Exception $e) {
             Log::error('Gagal mengambil data laporan', ['error' => $e->getMessage()]);
@@ -246,14 +220,7 @@ class LaporansController extends Controller
             $data['data_tambahan'] = $request->data_tambahan ?? null;
 
             $laporan = Laporans::create($data);
-            $laporan->load([
-                'pelapor:id,nama,email,alamat,no_telepon',
-                'kategori:id,nama_kategori,deskripsi',
-                'desa:id,nama,id_kecamatan',
-                'desa.kecamatan:id,nama,id_kabupaten',
-                'desa.kecamatan.kabupaten:id,nama,id_provinsi',
-                'desa.kecamatan.kabupaten.provinsi:id,nama'
-            ]);
+            $laporan->load(self::FULL_RELATIONS);
 
             return $this->successResponse('Laporan berhasil dibuat', $laporan, 201);
 
@@ -275,19 +242,7 @@ class LaporansController extends Controller
             $laporan->incrementViewCount();
 
             
-            $laporan->load([
-                'pelapor:id,nama,email,alamat,no_telepon',
-                'kategori:id,nama_kategori,deskripsi',
-                'desa:id,nama,id_kecamatan',
-                'desa.kecamatan:id,nama,id_kabupaten',
-                'desa.kecamatan.kabupaten:id,nama,id_provinsi',
-                'desa.kecamatan.kabupaten.provinsi:id,nama',
-                'tindakLanjut:id_tindaklanjut,laporan_id,id_petugas,tanggal_tanggapan,status,created_at',
-                'tindakLanjut.petugas:id,nama',
-                'tindakLanjut.laporan:id,id_pelapor,judul_laporan,deskripsi,tingkat_keparahan,latitude,longitude,jumlah_korban,jumlah_rumah_rusak,is_prioritas,view_count,status,waktu_laporan,waktu_verifikasi,waktu_selesai,catatan_verifikasi,data_tambahan,foto_bukti_1,foto_bukti_2,foto_bukti_3,video_bukti,id_kategori_bencana,id_desa,alamat_lengkap',
-                'tindakLanjut.laporan.pelapor:id,nama,email,no_telepon',
-                'monitoring:id_monitoring,id_laporan,id_operator,waktu_monitoring,hasil_monitoring,koordinat_gps,created_at'
-            ]);
+            $laporan->load(self::FULL_RELATIONS);
 
             return $this->successResponse('Detail laporan berhasil diambil', $laporan);
 
@@ -388,14 +343,7 @@ class LaporansController extends Controller
             }
 
             
-            $laporan->load([
-                'pelapor:id,nama,email,alamat,no_telepon',
-                'kategori:id,nama_kategori,deskripsi',
-                'desa:id,nama,id_kecamatan',
-                'desa.kecamatan:id,nama,id_kabupaten',
-                'desa.kecamatan.kabupaten:id,nama,id_provinsi',
-                'desa.kecamatan.kabupaten.provinsi:id,nama'
-            ]);
+            $laporan->load(self::FULL_RELATIONS);
 
             return $this->successResponse('Laporan berhasil diperbarui', $laporan);
 
@@ -542,7 +490,7 @@ class LaporansController extends Controller
                 ->limit(5)
                 ->get();
 
-            return $this->successResponse('Statistics retrieved successfully', [
+            return $this->successResponse('Statistik laporan berhasil diambil', [
                 'total_laporan' => $total_laporan,
                 'laporan_perlu_verifikasi' => $laporan_perlu_verifikasi,
                 'laporan_ditindak' => $laporan_ditindak,

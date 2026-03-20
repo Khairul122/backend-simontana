@@ -12,6 +12,16 @@ use Illuminate\Support\Facades\Validator;
 
 class RiwayatTindakanController extends Controller
 {
+    private const FULL_RELATIONS = [
+        'petugas.desa.kecamatan.kabupaten.provinsi',
+        'tindakLanjut.petugas.desa.kecamatan.kabupaten.provinsi',
+        'tindakLanjut.laporan.pelapor.desa.kecamatan.kabupaten.provinsi',
+        'tindakLanjut.laporan.kategori',
+        'tindakLanjut.laporan.desa.kecamatan.kabupaten.provinsi',
+        'tindakLanjut.laporan.verifikator.desa.kecamatan.kabupaten.provinsi',
+        'tindakLanjut.laporan.penanggungJawab.desa.kecamatan.kabupaten.provinsi',
+    ];
+
     public function __construct(private readonly LogActivityService $logActivityService)
     {
     }
@@ -28,7 +38,7 @@ class RiwayatTindakanController extends Controller
             return $this->deniedByPolicy('Warga tidak memiliki akses ke data riwayat tindakan operasional');
         }
 
-        $query = RiwayatTindakan::with(['tindakLanjut.laporan.pelapor', 'petugas']);
+        $query = RiwayatTindakan::with(self::FULL_RELATIONS);
 
         if ($request->has('tindaklanjut_id')) {
             $query->where('tindaklanjut_id', $request->tindaklanjut_id);
@@ -78,7 +88,7 @@ class RiwayatTindakanController extends Controller
         }
 
         $riwayatTindakan = RiwayatTindakan::create($payload);
-        $riwayatTindakan->load(['tindakLanjut.laporan.pelapor', 'petugas']);
+        $riwayatTindakan->load(self::FULL_RELATIONS);
 
         $this->logActivityService->log($user->id, $user->role, 'Buat riwayat tindakan', '/api/riwayat-tindakan', $request->ip(), $request->userAgent());
 
@@ -93,7 +103,7 @@ class RiwayatTindakanController extends Controller
             return $this->unauthorized();
         }
 
-        $riwayatTindakan = RiwayatTindakan::with(['tindakLanjut.laporan.pelapor', 'petugas'])->find($id);
+        $riwayatTindakan = RiwayatTindakan::with(self::FULL_RELATIONS)->find($id);
 
         if (!$riwayatTindakan) {
             return $this->notFoundResponse('Riwayat tindakan tidak ditemukan');
@@ -134,7 +144,7 @@ class RiwayatTindakanController extends Controller
         }
 
         $riwayatTindakan->update($validator->validated());
-        $riwayatTindakan->load(['tindakLanjut.laporan.pelapor', 'petugas']);
+        $riwayatTindakan->load(self::FULL_RELATIONS);
 
         $this->logActivityService->log($user->id, $user->role, 'Update riwayat tindakan', '/api/riwayat-tindakan/' . $id, $request->ip(), $request->userAgent());
 

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 class Laporans extends Model
 {
@@ -74,9 +75,26 @@ class Laporans extends Model
     }
 
     
-    public function riwayatTindakan(): HasMany
+    public function riwayatTindakan(): HasManyThrough
     {
-        return $this->hasMany(RiwayatTindakan::class, 'id_laporan');
+        return $this->hasManyThrough(
+            RiwayatTindakan::class,
+            TindakLanjut::class,
+            'laporan_id',
+            'tindaklanjut_id',
+            'id',
+            'id_tindaklanjut'
+        );
+    }
+
+    public function verifikator(): BelongsTo
+    {
+        return $this->belongsTo(Pengguna::class, 'id_verifikator');
+    }
+
+    public function penanggungJawab(): BelongsTo
+    {
+        return $this->belongsTo(Pengguna::class, 'id_penanggung_jawab');
     }
 
     

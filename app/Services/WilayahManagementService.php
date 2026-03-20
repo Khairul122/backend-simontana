@@ -28,6 +28,13 @@ class WilayahManagementService
         'desa' => ['parent' => 'kecamatan'],
     ];
 
+    private const DEFAULT_FULL_RELATIONS = [
+        'provinsi' => ['kabupatens.kecamatans.desas'],
+        'kabupaten' => ['provinsi', 'kecamatans.desas'],
+        'kecamatan' => ['kabupaten.provinsi', 'desas'],
+        'desa' => ['kecamatan.kabupaten.provinsi'],
+    ];
+
     private const PARENT_CONFIG = [
         'kabupaten' => ['model' => Provinsi::class, 'field' => 'id_provinsi', 'message' => 'Provinsi tidak ditemukan'],
         'kecamatan' => ['model' => Kabupaten::class, 'field' => 'id_kabupaten', 'message' => 'Kabupaten tidak ditemukan'],
@@ -47,7 +54,7 @@ class WilayahManagementService
     public function buildQuery(string $jenis, ?string $include = null): Builder
     {
         $modelClass = self::MODEL_MAP[$jenis];
-        $query = $modelClass::query();
+        $query = $modelClass::query()->with(self::DEFAULT_FULL_RELATIONS[$jenis] ?? []);
 
         foreach ($this->parseIncludes($include) as $includeKey) {
             $relation = self::INCLUDE_MAP[$jenis][$includeKey] ?? null;
@@ -63,10 +70,10 @@ class WilayahManagementService
     {
         return Cache::remember('wilayah:all-hierarchy', now()->addMinutes(self::CACHE_TTL_MINUTES), static function () {
             return [
-                'provinsi' => Provinsi::with('kabupatens')->orderBy('nama')->get(),
-                'kabupaten' => Kabupaten::with('provinsi', 'kecamatans')->orderBy('nama')->get(),
-                'kecamatan' => Kecamatan::with('kabupaten', 'desas')->orderBy('nama')->get(),
-                'desa' => Desa::with('kecamatan')->orderBy('nama')->get(),
+                'provinsi' => Provinsi::with(['kabupatens.kecamatans.desas'])->orderBy('nama')->get(),
+                'kabupaten' => Kabupaten::with(['provinsi', 'kecamatans.desas'])->orderBy('nama')->get(),
+                'kecamatan' => Kecamatan::with(['kabupaten.provinsi', 'desas'])->orderBy('nama')->get(),
+                'desa' => Desa::with(['kecamatan.kabupaten.provinsi'])->orderBy('nama')->get(),
             ];
         });
     }
@@ -76,48 +83,48 @@ class WilayahManagementService
         $normalized = $this->normalizeJenis($jenis);
 
         if ($normalized === 'provinsi') {
-            return Provinsi::select(['id', 'nama'])->where('nama', 'LIKE', "%{$q}%")->limit(30)->get();
+            return Provinsi::where('nama', 'LIKE', "%{$q}%")->limit(30)->get();
         }
 
         if ($normalized === 'kabupaten') {
-            return Kabupaten::select(['id', 'nama', 'id_provinsi'])
+            return Kabupaten::query()
                 ->where('nama', 'LIKE', "%{$q}%")
-                ->with('provinsi:id,nama')
+                ->with(['provinsi'])
                 ->limit(30)
                 ->get();
         }
 
         if ($normalized === 'kecamatan') {
-            return Kecamatan::select(['id', 'nama', 'id_kabupaten'])
+            return Kecamatan::query()
                 ->where('nama', 'LIKE', "%{$q}%")
-                ->with('kabupaten:id,nama,id_provinsi')
+                ->with(['kabupaten.provinsi'])
                 ->limit(30)
                 ->get();
         }
 
         if ($normalized === 'desa') {
-            return Desa::select(['id', 'nama', 'id_kecamatan'])
+            return Desa::query()
                 ->where('nama', 'LIKE', "%{$q}%")
-                ->with('kecamatan:id,nama,id_kabupaten')
+                ->with(['kecamatan.kabupaten.provinsi'])
                 ->limit(30)
                 ->get();
         }
 
         return collect([
-            'provinsi' => Provinsi::select(['id', 'nama'])->where('nama', 'LIKE', "%{$q}%")->limit(20)->get(),
-            'kabupaten' => Kabupaten::select(['id', 'nama', 'id_provinsi'])
+            'provinsi' => Provinsi::where('nama', 'LIKE', "%{$q}%")->limit(20)->get(),
+            'kabupaten' => Kabupaten::query()
                 ->where('nama', 'LIKE', "%{$q}%")
-                ->with('provinsi:id,nama')
+                ->with(['provinsi'])
                 ->limit(20)
                 ->get(),
-            'kecamatan' => Kecamatan::select(['id', 'nama', 'id_kabupaten'])
+            'kecamatan' => Kecamatan::query()
                 ->where('nama', 'LIKE', "%{$q}%")
-                ->with('kabupaten:id,nama,id_provinsi')
+                ->with(['kabupaten.provinsi'])
                 ->limit(20)
                 ->get(),
-            'desa' => Desa::select(['id', 'nama', 'id_kecamatan'])
+            'desa' => Desa::query()
                 ->where('nama', 'LIKE', "%{$q}%")
-                ->with('kecamatan:id,nama,id_kabupaten')
+                ->with(['kecamatan.kabupaten.provinsi'])
                 ->limit(20)
                 ->get(),
         ]);

@@ -31,10 +31,10 @@ class WilayahListingController extends Controller
             return $this->successResponse('Data wilayah berhasil diambil', $data);
         }
 
-        $data = $this->wilayahManagementService
-            ->buildQuery($jenis, $include)
-            ->orderBy('nama')
-            ->paginate($perPage);
+            $data = $this->wilayahManagementService
+                ->buildQuery($jenis, $include)
+                ->orderBy('nama')
+                ->paginate($perPage);
 
         return $this->successResponse('Data wilayah berhasil diambil', $data);
     }
@@ -62,7 +62,7 @@ class WilayahListingController extends Controller
     public function getWilayahDetailByDesaId($desa_id): JsonResponse
     {
         $desa = Cache::remember('wilayah:detail:desa:' . (int) $desa_id, now()->addMinutes(15), function () use ($desa_id) {
-            return Desa::with(['kecamatan.kabupaten.provinsi'])->find($desa_id);
+            return Desa::with(['kecamatan.kabupaten.provinsi', 'laporan.pelapor.desa.kecamatan.kabupaten.provinsi', 'pengguna.desa.kecamatan.kabupaten.provinsi'])->find($desa_id);
         });
 
         if (!$desa) {

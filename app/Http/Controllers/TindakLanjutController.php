@@ -12,6 +12,16 @@ use Illuminate\Support\Facades\Validator;
 
 class TindakLanjutController extends Controller
 {
+    private const FULL_RELATIONS = [
+        'petugas.desa.kecamatan.kabupaten.provinsi',
+        'laporan.pelapor.desa.kecamatan.kabupaten.provinsi',
+        'laporan.kategori',
+        'laporan.desa.kecamatan.kabupaten.provinsi',
+        'laporan.verifikator.desa.kecamatan.kabupaten.provinsi',
+        'laporan.penanggungJawab.desa.kecamatan.kabupaten.provinsi',
+        'riwayatTindakans.petugas.desa.kecamatan.kabupaten.provinsi',
+    ];
+
     public function __construct(private readonly LogActivityService $logActivityService)
     {
     }
@@ -28,7 +38,7 @@ class TindakLanjutController extends Controller
             return $this->deniedByPolicy('Warga tidak memiliki akses ke data tindak lanjut operasional');
         }
 
-        $query = TindakLanjut::with(['laporan.pelapor', 'petugas']);
+        $query = TindakLanjut::with(self::FULL_RELATIONS);
 
         if ($request->has('laporan_id')) {
             $query->where('laporan_id', $request->laporan_id);
@@ -83,7 +93,7 @@ class TindakLanjutController extends Controller
 
         $tindakLanjut = TindakLanjut::create($payload);
 
-        $tindakLanjut->load(['laporan.pelapor', 'petugas']);
+        $tindakLanjut->load(self::FULL_RELATIONS);
 
         $this->logActivityService->log($user->id, $user->role, 'Buat tindak lanjut', '/api/tindak-lanjut', $request->ip(), $request->userAgent());
 
@@ -98,7 +108,7 @@ class TindakLanjutController extends Controller
             return $this->unauthorized();
         }
 
-        $tindakLanjut = TindakLanjut::with(['laporan.pelapor', 'petugas'])->find($id);
+        $tindakLanjut = TindakLanjut::with(self::FULL_RELATIONS)->find($id);
 
         if (!$tindakLanjut) {
             return $this->notFoundResponse('Tindak lanjut tidak ditemukan');
@@ -140,7 +150,7 @@ class TindakLanjutController extends Controller
 
         $tindakLanjut->update($validator->validated());
 
-        $tindakLanjut->load(['laporan.pelapor', 'petugas']);
+        $tindakLanjut->load(self::FULL_RELATIONS);
 
         $this->logActivityService->log($user->id, $user->role, 'Update tindak lanjut', '/api/tindak-lanjut/' . $id, $request->ip(), $request->userAgent());
 

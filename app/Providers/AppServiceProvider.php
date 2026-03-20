@@ -33,7 +33,7 @@ class AppServiceProvider extends ServiceProvider
             $identifier = strtolower((string) ($request->input('username') ?? $request->input('email') ?? 'anonymous'));
 
             return [
-                Limit::perMinute(5)->by($request->ip() . '|login'),
+                Limit::perMinute(6)->by($request->ip() . '|login'),
                 Limit::perMinute(10)->by($request->ip() . '|' . $identifier),
             ];
         });

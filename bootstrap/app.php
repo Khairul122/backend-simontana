@@ -3,6 +3,11 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Auth\AuthenticationException;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -40,5 +45,71 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        
+        $exceptions->render(function (ValidationException $e, $request) {
+            $requestId = $request->attributes->get('request_id') ?? $request->headers->get('X-Request-Id');
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Validasi gagal',
+                'code' => 'VALIDATION_ERROR',
+                'errors' => $e->errors(),
+                'details' => $e->errors(),
+                'request_id' => $requestId,
+            ], 422);
+        });
+
+        $exceptions->render(function (AuthenticationException $e, $request) {
+            $requestId = $request->attributes->get('request_id') ?? $request->headers->get('X-Request-Id');
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Tidak terautentikasi',
+                'code' => 'UNAUTHORIZED',
+                'request_id' => $requestId,
+            ], 401);
+        });
+
+        $exceptions->render(function (AuthorizationException $e, $request) {
+            $requestId = $request->attributes->get('request_id') ?? $request->headers->get('X-Request-Id');
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Akses ditolak',
+                'code' => 'FORBIDDEN',
+                'request_id' => $requestId,
+            ], 403);
+        });
+
+        $exceptions->render(function (NotFoundHttpException $e, $request) {
+            $requestId = $request->attributes->get('request_id') ?? $request->headers->get('X-Request-Id');
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Resource tidak ditemukan',
+                'code' => 'RESOURCE_NOT_FOUND',
+                'request_id' => $requestId,
+            ], 404);
+        });
+
+        $exceptions->render(function (TooManyRequestsHttpException $e, $request) {
+            $requestId = $request->attributes->get('request_id') ?? $request->headers->get('X-Request-Id');
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Terlalu banyak permintaan',
+                'code' => 'RATE_LIMITED',
+                'request_id' => $requestId,
+            ], 429);
+        });
+
+        $exceptions->render(function (\Throwable $e, $request) {
+            $requestId = $request->attributes->get('request_id') ?? $request->headers->get('X-Request-Id');
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan pada server',
+                'code' => 'INTERNAL_SERVER_ERROR',
+                'request_id' => $requestId,
+            ], 500);
+        });
     })->create();

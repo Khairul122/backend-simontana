@@ -1,224 +1,227 @@
 # SIMONTA BENCANA Backend API
 
-Backend API untuk sistem pelaporan dan penanganan bencana berbasis role (Admin, PetugasBPBD, OperatorDesa, Warga), dibangun dengan Laravel 12 dan autentikasi JWT.
+Backend API untuk sistem pelaporan dan penanganan bencana berbasis role `Admin`, `PetugasBPBD`, `OperatorDesa`, dan `Warga`.
+Stack utama: Laravel 12 + JWT + RBAC + Policy + OpenAPI/Swagger.
 
-## Fitur Utama
+Dokumen ini sudah disesuaikan dengan **breaking change kontrak API terbaru**:
+- format response terstandar global,
+- pagination selalu di `meta.pagination`,
+- endpoint GET utama mengembalikan relasi nested lengkap (bukan hanya `id_*`).
 
-- Autentikasi JWT: login, register, refresh token, logout, profil user.
-- Role-based access control: pembatasan akses endpoint berdasarkan role.
-- Manajemen laporan bencana: CRUD laporan, statistik, dan workflow verifikasi/proses.
-- Modul operasional: monitoring, tindak lanjut, riwayat tindakan.
-- Master data wilayah: provinsi, kabupaten, kecamatan, desa (listing + CRUD admin).
-- Integrasi BMKG: gempa terbaru/terkini/dirasakan, peringatan tsunami, prakiraan cuaca.
-- API documentation: OpenAPI/Swagger (`l5-swagger`).
-- Kontrak response API konsisten (`success`, `message`, `data`, `code`, `request_id`).
+## Ringkasan Fitur
+
+- Autentikasi JWT: register, login, me, refresh, logout, roles.
+- User management (Admin): CRUD user + statistik user.
+- Laporan bencana: CRUD, statistik, workflow (`verifikasi`, `proses`, `riwayat`).
+- Operasional: monitoring, tindak lanjut, riwayat tindakan.
+- Wilayah: referensi + listing + hierarchy + search + CRUD admin.
+- Kategori bencana: listing + detail + CRUD admin.
+- Integrasi BMKG: endpoint public data gempa/cuaca/tsunami + endpoint protected untuk cache.
+- OpenAPI/Swagger sudah sinkron dengan perubahan kontrak terbaru.
 
 ## Tech Stack
 
 - PHP `^8.2`
 - Laravel `^12.0`
-- JWT Auth: `tymon/jwt-auth`
+- JWT: `tymon/jwt-auth`
 - Swagger: `darkaonline/l5-swagger`
 - FCM: `edwinhoksberg/php-fcm`
-- Database: MySQL/SQLite (konfigurasi via `.env`)
+- Database: MySQL (utama) / SQLite (opsional)
 
-## Struktur Modul API
+## Struktur Endpoint
 
-Berikut grup endpoint utama dari `routes/api.php`:
+Sumber: `routes/api.php`.
 
-- `auth/*`: login, register, me, refresh, logout, roles.
-- `users/*`: profil user + manajemen user (admin).
-- `laporans/*`: CRUD laporan, statistik, workflow (`verifikasi`, `proses`, `riwayat`).
-- `monitoring/*`: CRUD monitoring operasional.
-- `tindak-lanjut/*`: CRUD tindak lanjut.
-- `riwayat-tindakan/*`: CRUD riwayat tindakan.
-- `kategori-bencana/*`: referensi kategori bencana (CRUD admin).
-- `wilayah/*`: listing/hierarchy/reference + CRUD admin.
-- `bmkg/*`: endpoint data BMKG (public + protected cache management).
+- `auth/*`: register, login, roles, me, refresh, logout.
+- `check-token`: validasi token dan ringkasan user.
+- `users/*`: profile (semua role login) + CRUD/statistik (admin only).
+- `laporans/*`: CRUD, statistik, workflow (`verifikasi`, `proses`, `riwayat`).
+- `monitoring/*`: CRUD operasional monitoring.
+- `tindak-lanjut/*`: CRUD operasional tindak lanjut.
+- `riwayat-tindakan/*`: CRUD operasional riwayat tindakan.
+- `kategori-bencana/*`: referensi kategori + CRUD admin.
+- `wilayah/*`: reference/listing/detail/search/hierarchy + CRUD admin.
+- `bmkg/*`: public feed + protected cache management.
 
 ## Prasyarat
 
 - PHP 8.2+
 - Composer 2+
-- MySQL 8+ (disarankan untuk environment dev utama)
-- Node.js 18+ dan npm (jika jalankan Vite/build frontend assets)
+- MySQL 8+ (direkomendasikan)
+- Node.js 18+ (opsional untuk asset build)
 
-## Instalasi
+## Instalasi dan Menjalankan Aplikasi
 
-1) Clone repository dan install dependency:
+1. Install dependency PHP.
 
 ```bash
 composer install
 ```
 
-2) Buat file environment:
+2. Siapkan environment.
 
 ```bash
 cp .env.example .env
-```
-
-3) Generate app key:
-
-```bash
 php artisan key:generate
 ```
 
-4) Atur koneksi database di `.env`, lalu migrate:
+3. Set DB dan CORS di `.env`.
+
+Contoh variabel penting:
+
+```env
+APP_URL=http://127.0.0.1:8000
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=simonta_bencana
+DB_USERNAME=root
+DB_PASSWORD=
+
+CORS_ALLOWED_ORIGINS=http://localhost:3000,http://127.0.0.1:3000,http://localhost:5173,http://127.0.0.1:5173
+```
+
+4. Migrasi database.
 
 ```bash
 php artisan migrate
 ```
 
-5) (Opsional) install JS dependencies:
-
-```bash
-npm install
-```
-
-## Menjalankan Aplikasi
-
-### Mode standar
+5. Jalankan server.
 
 ```bash
 php artisan serve
 ```
 
-API default akan tersedia di:
+Base API default: `http://127.0.0.1:8000/api`
 
-- `http://127.0.0.1:8000/api`
+## Kontrak Response Global (Breaking Change)
 
-### Mode development terintegrasi (composer script)
+### Success
 
-Menjalankan server + queue + logs + vite sekaligus:
-
-```bash
-composer run dev
+```json
+{
+  "success": true,
+  "message": "Data berhasil diambil",
+  "data": {},
+  "meta": {
+    "pagination": {
+      "current_page": 1,
+      "last_page": 3,
+      "per_page": 20,
+      "total": 45,
+      "from": 1,
+      "to": 20
+    }
+  },
+  "request_id": "req_01HZY2P0W7D3G4"
+}
 ```
 
-## Dokumentasi API (Swagger)
+Catatan:
+- `meta` hanya muncul saat dibutuhkan (terutama endpoint paginated).
+- untuk delete sukses, `data` bisa `null`.
 
-Generate docs:
+### Error
+
+```json
+{
+  "success": false,
+  "message": "Validasi gagal",
+  "code": "VALIDATION_ERROR",
+  "details": {},
+  "errors": {
+    "field": ["pesan error"]
+  },
+  "request_id": "req_01HZY2P0W7D3G4"
+}
+```
+
+## Standar Relasi Nested di Endpoint GET
+
+Untuk endpoint GET domain utama (`laporans`, `monitoring`, `tindak-lanjut`, `riwayat-tindakan`, `users`, sebagian `wilayah`):
+
+- field foreign key tetap ada (`id_pelapor`, `id_desa`, dll),
+- sekaligus menampilkan objek relasi lengkap (`pelapor`, `desa`, `kategori`, `petugas`, `operator`, dll),
+- termasuk nested wilayah bertingkat (`desa -> kecamatan -> kabupaten -> provinsi`).
+
+Ini adalah perubahan kontrak yang disengaja untuk kebutuhan frontend yang memerlukan payload siap pakai.
+
+## Auth dan Security
+
+- Public auth endpoint:
+  - `POST /api/auth/register`
+  - `POST /api/auth/login`
+  - `GET /api/auth/roles`
+- Throttling:
+  - login: limiter `auth-login`
+  - register: limiter `auth-register`
+- Protected endpoint: middleware `jwt.auth`.
+- Authorization menggunakan role + policy (record-level).
+- Error terstandar melalui global exception handler.
+
+## Role Matrix Singkat
+
+- `Admin`: akses penuh termasuk manajemen user, kategori, wilayah admin CRUD.
+- `PetugasBPBD`: akses operasional tinggi, tetapi bukan manajemen user admin.
+- `OperatorDesa`: akses operasional sesuai policy, bukan akses admin.
+- `Warga`: fokus laporan pribadi/profil dan referensi; tidak boleh akses data operasional sensitif.
+
+## Dokumentasi API (Swagger/OpenAPI)
+
+Generate ulang dokumen:
 
 ```bash
 php artisan l5-swagger:generate
 ```
 
-Akses docs:
+Akses UI:
 
 - `http://127.0.0.1:8000/api/documentation`
 
-## Auth dan Security
-
-- Public auth endpoint:
-  - `POST /api/auth/login`
-  - `POST /api/auth/register`
-- Kedua endpoint auth publik sudah menggunakan throttle limiter.
-- Endpoint protected menggunakan middleware JWT (`jwt.auth`).
-- Authorization berbasis role dan policy per-record pada modul operasional.
-
-## Kontrak Response API
-
-### Sukses
-
-```json
-{
-  "success": true,
-  "message": "OK",
-  "data": {},
-  "request_id": "req_xxx"
-}
-```
-
-### Gagal
-
-```json
-{
-  "success": false,
-  "message": "Error",
-  "code": "ERROR_CODE",
-  "details": {},
-  "request_id": "req_xxx"
-}
-```
+OpenAPI annotations berada di:
+- `app/OpenApi/OpenApiSpec.php`
+- `app/OpenApi/ApiSchemas.php`
+- `app/OpenApi/ApiPaths.php`
 
 ## Testing
 
-Menjalankan seluruh test:
+Jalankan seluruh test:
 
 ```bash
 php artisan test
 ```
 
-Menjalankan test tertentu:
+Jalankan test tertentu:
 
 ```bash
 php artisan test --filter=SecurityWorkflowPerformanceTest
 ```
 
 Catatan:
+- konfigurasi test ada di `phpunit.xml`,
+- gunakan DB test terpisah.
 
-- Konfigurasi test ada di `phpunit.xml`.
-- Environment test saat ini diset ke MySQL (`simonta_bencana_test`). Pastikan DB test tersedia.
+## Panduan Fetch
 
-## Optimasi Performa (Development)
+Dokumen fetch/curl dipisah per konteks role:
 
-Build cache framework:
-
-```bash
-php artisan optimize
-php artisan route:cache
-php artisan config:cache
-php artisan view:cache
-```
-
-Membersihkan cache saat debugging:
-
-```bash
-php artisan optimize:clear
-```
-
-## Benchmark Endpoint
-
-Project menyediakan script benchmark endpoint:
-
-- Script: `scripts/benchmark_endpoints.php`
-- Output CSV: `storage/logs/api-benchmark-latency.csv`
-
-Jalankan benchmark:
-
-```bash
-php scripts/benchmark_endpoints.php
-```
-
-## Panduan Fetch Endpoint
-
-Dokumentasi curl endpoint dipisah per role:
-
-- `FETCH.md` (index)
+- `FETCH.md` (index + konvensi umum)
 - `FETCH_PUBLIC.md`
 - `FETCH_WARGA.md`
 - `FETCH_OPERATOR_DESA.md`
 - `FETCH_PETUGAS_BPBD.md`
 - `FETCH_ADMIN.md`
 
-## Kontribusi
+## Troubleshooting
 
-Alur kontribusi yang disarankan:
-
-1. Buat branch fitur/perbaikan.
-2. Implementasi perubahan + test.
-3. Jalankan lint/test lokal.
-4. Buat commit yang jelas dan kecil.
-5. Ajukan PR.
-
-## Troubleshooting Singkat
-
-- `401 TOKEN_MISSING`: pastikan header `Authorization: Bearer <token>` dikirim.
-- `401 TOKEN_INVALID/TOKEN_EXPIRED`: login ulang atau refresh token.
-- `403 INSUFFICIENT_PERMISSIONS`: role user tidak sesuai endpoint.
-- `422 VALIDATION_ERROR`: cek field request sesuai validasi endpoint.
-- Swagger kosong/tidak update: jalankan `php artisan l5-swagger:generate`.
+- `401 UNAUTHORIZED`/`TOKEN_INVALID`: cek header `Authorization: Bearer <token>`.
+- `403 FORBIDDEN`/`INSUFFICIENT_PERMISSIONS`: role/policy tidak memenuhi.
+- `422 VALIDATION_ERROR`: cek field body, enum, dan tipe data.
+- `422 INVALID_STATUS_TRANSITION`: alur workflow laporan tidak valid.
+- `429 RATE_LIMITED`: terlalu banyak request auth.
+- Swagger tidak update: jalankan `php artisan l5-swagger:generate`.
 
 ## Lisensi
 
-Project ini mengikuti lisensi yang tercantum pada `composer.json` (MIT untuk skeleton Laravel).
+Mengikuti lisensi pada `composer.json` (MIT untuk skeleton Laravel).

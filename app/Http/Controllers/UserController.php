@@ -69,7 +69,7 @@ class UserController extends Controller
             ->orderBy('total', 'desc')
             ->get();
 
-        $recentUsers = Pengguna::with('desa')
+        $recentUsers = Pengguna::with('desa.kecamatan.kabupaten.provinsi')
             ->orderBy('created_at', 'desc')
             ->limit(5)
             ->get();

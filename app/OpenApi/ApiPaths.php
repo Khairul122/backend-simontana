@@ -6,6 +6,8 @@ use OpenApi\Annotations as OA;
 
 /**
  * @OA\Tag(name="Authentication", description="Authentication endpoints")
+ * @OA\Tag(name="User Management", description="Manajemen pengguna")
+ * @OA\Tag(name="Wilayah Management", description="Referensi dan manajemen wilayah")
  * @OA\Tag(name="Laporan Management", description="CRUD dan statistik laporan")
  * @OA\Tag(name="Laporan Workflow", description="Workflow status laporan")
  * @OA\Tag(name="Monitoring", description="Monitoring operasional")
@@ -16,9 +18,35 @@ use OpenApi\Annotations as OA;
 class ApiPaths
 {
     /**
+     * @OA\Get(
+     *     path="/auth/roles",
+     *     tags={"User Management"},
+     *     summary="Daftar role yang tersedia",
+     *     @OA\Response(response=200, description="Daftar role tersedia", @OA\JsonContent(ref="#/components/schemas/RoleListSuccessResponse"))
+     * )
+     */
+    public function authRolesDoc(): void
+    {
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/check-token",
+     *     tags={"User Management"},
+     *     summary="Validasi token aktif",
+     *     security={{"jwt":{}}},
+     *     @OA\Response(response=200, description="Token valid dan data user ringkas tersedia", @OA\JsonContent(ref="#/components/schemas/CheckTokenSuccessResponse")),
+     *     @OA\Response(response=401, description="Token tidak valid", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
+     * )
+     */
+    public function checkTokenDoc(): void
+    {
+    }
+
+    /**
      * @OA\Post(
      *     path="/auth/register",
-     *     tags={"Authentication"},
+     *     tags={"User Management"},
      *     summary="Registrasi pengguna baru",
      *     @OA\RequestBody(
      *         required=true,
@@ -33,7 +61,7 @@ class ApiPaths
      *             @OA\Property(property="id_desa", type="integer", nullable=true, example=1)
      *         )
      *     ),
-     *     @OA\Response(response=201, description="Registrasi berhasil", @OA\JsonContent(ref="#/components/schemas/SuccessResponse")),
+ *     @OA\Response(response=201, description="Registrasi berhasil dengan data user dan nested wilayah", @OA\JsonContent(ref="#/components/schemas/RegisterSuccessResponse")),
      *     @OA\Response(response=422, description="Validasi gagal", @OA\JsonContent(ref="#/components/schemas/ValidationErrorResponse")),
      *     @OA\Response(response=429, description="Terlalu banyak percobaan registrasi", @OA\JsonContent(ref="#/components/schemas/ErrorResponse")),
      *     @OA\Response(response=500, description="Kesalahan server", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
@@ -46,7 +74,7 @@ class ApiPaths
     /**
      * @OA\Post(
      *     path="/auth/login",
-     *     tags={"Authentication"},
+     *     tags={"User Management"},
      *     summary="Login pengguna",
      *     @OA\RequestBody(
      *         required=true,
@@ -56,7 +84,7 @@ class ApiPaths
      *             @OA\Property(property="password", type="string", format="password", example="password123")
      *         )
      *     ),
-     *     @OA\Response(response=200, description="Login berhasil", @OA\JsonContent(ref="#/components/schemas/LoginSuccessResponse")),
+ *     @OA\Response(response=200, description="Login berhasil dengan data user, token, dan expiry", @OA\JsonContent(ref="#/components/schemas/LoginSuccessResponse")),
      *     @OA\Response(response=401, description="Kredensial tidak valid", @OA\JsonContent(ref="#/components/schemas/ErrorResponse")),
      *     @OA\Response(response=422, description="Validasi gagal", @OA\JsonContent(ref="#/components/schemas/ValidationErrorResponse")),
      *     @OA\Response(response=429, description="Terlalu banyak percobaan login", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
@@ -69,10 +97,10 @@ class ApiPaths
     /**
      * @OA\Post(
      *     path="/auth/logout",
-     *     tags={"Authentication"},
+     *     tags={"User Management"},
      *     summary="Logout pengguna",
      *     security={{"jwt":{}}},
-     *     @OA\Response(response=200, description="Logout berhasil", @OA\JsonContent(ref="#/components/schemas/SuccessResponse")),
+ *     @OA\Response(response=200, description="Logout berhasil (data null)", @OA\JsonContent(ref="#/components/schemas/SuccessResponse")),
      *     @OA\Response(response=401, description="Tidak terautentikasi", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
      * )
      */
@@ -83,10 +111,10 @@ class ApiPaths
     /**
      * @OA\Post(
      *     path="/auth/refresh",
-     *     tags={"Authentication"},
+     *     tags={"User Management"},
      *     summary="Refresh token",
      *     security={{"jwt":{}}},
-     *     @OA\Response(response=200, description="Token berhasil diperbarui", @OA\JsonContent(ref="#/components/schemas/SuccessResponse")),
+ *     @OA\Response(response=200, description="Token berhasil diperbarui dengan payload token baru", @OA\JsonContent(ref="#/components/schemas/TokenRefreshSuccessResponse")),
      *     @OA\Response(response=401, description="Token tidak valid", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
      * )
      */
@@ -97,10 +125,10 @@ class ApiPaths
     /**
      * @OA\Get(
      *     path="/auth/me",
-     *     tags={"Authentication"},
+     *     tags={"User Management"},
      *     summary="Ambil profil user login",
      *     security={{"jwt":{}}},
-     *     @OA\Response(response=200, description="Data user berhasil diambil", @OA\JsonContent(ref="#/components/schemas/CurrentUserSuccessResponse")),
+ *     @OA\Response(response=200, description="Data user berhasil diambil dengan nested wilayah penuh", @OA\JsonContent(ref="#/components/schemas/CurrentUserSuccessResponse")),
      *     @OA\Response(response=401, description="Tidak terautentikasi", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
      * )
      */
@@ -111,7 +139,7 @@ class ApiPaths
     /**
      * @OA\Get(
      *     path="/laporans",
-     *     tags={"Laporan Management"},
+     *     tags={"Wilayah Management"},
      *     summary="Daftar laporan dengan filter",
      *     security={{"jwt":{}}},
      *     @OA\Parameter(name="status", in="query", @OA\Schema(type="string", enum={"Draft","Menunggu Verifikasi","Diverifikasi","Diproses","Selesai","Ditolak"})),
@@ -126,7 +154,7 @@ class ApiPaths
      *     @OA\Parameter(name="order_by", in="query", @OA\Schema(type="string")),
      *     @OA\Parameter(name="order_direction", in="query", @OA\Schema(type="string", enum={"asc","desc"})),
      *     @OA\Parameter(name="limit", in="query", @OA\Schema(type="integer", default=15)),
-     *     @OA\Response(response=200, description="Data laporan berhasil diambil", @OA\JsonContent(ref="#/components/schemas/LaporanListSuccessResponse")),
+ *     @OA\Response(response=200, description="Data laporan berhasil diambil dengan relasi nested penuh dan meta pagination", @OA\JsonContent(ref="#/components/schemas/LaporanListSuccessResponse")),
      *     @OA\Response(response=401, description="Tidak terautentikasi", @OA\JsonContent(ref="#/components/schemas/ErrorResponse")),
      *     @OA\Response(response=500, description="Kesalahan server", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
      * )
@@ -138,7 +166,7 @@ class ApiPaths
     /**
      * @OA\Post(
      *     path="/laporans",
-     *     tags={"Laporan Management"},
+     *     tags={"Wilayah Management"},
      *     summary="Buat laporan baru",
      *     security={{"jwt":{}}},
      *     @OA\RequestBody(
@@ -165,7 +193,7 @@ class ApiPaths
      *             )
      *         )
      *     ),
-     *     @OA\Response(response=201, description="Laporan berhasil dibuat", @OA\JsonContent(ref="#/components/schemas/LaporanDetailSuccessResponse")),
+ *     @OA\Response(response=201, description="Laporan berhasil dibuat dengan relasi nested penuh", @OA\JsonContent(ref="#/components/schemas/LaporanDetailSuccessResponse")),
      *     @OA\Response(response=401, description="Tidak terautentikasi", @OA\JsonContent(ref="#/components/schemas/ErrorResponse")),
      *     @OA\Response(response=422, description="Validasi gagal", @OA\JsonContent(ref="#/components/schemas/ValidationErrorResponse")),
      *     @OA\Response(response=500, description="Kesalahan server", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
@@ -182,7 +210,7 @@ class ApiPaths
      *     summary="Detail laporan",
      *     security={{"jwt":{}}},
      *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
-     *     @OA\Response(response=200, description="Detail laporan berhasil diambil", @OA\JsonContent(ref="#/components/schemas/LaporanDetailSuccessResponse")),
+ *     @OA\Response(response=200, description="Detail laporan berhasil diambil dengan nested pelapor, kategori, wilayah, monitoring, tindak lanjut", @OA\JsonContent(ref="#/components/schemas/LaporanDetailSuccessResponse")),
      *     @OA\Response(response=404, description="Laporan tidak ditemukan", @OA\JsonContent(ref="#/components/schemas/ErrorResponse")),
      *     @OA\Response(response=500, description="Kesalahan server", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
      * )
@@ -220,7 +248,7 @@ class ApiPaths
      *             )
      *         )
      *     ),
-     *     @OA\Response(response=200, description="Laporan berhasil diperbarui", @OA\JsonContent(ref="#/components/schemas/LaporanDetailSuccessResponse")),
+ *     @OA\Response(response=200, description="Laporan berhasil diperbarui dengan relasi nested penuh", @OA\JsonContent(ref="#/components/schemas/LaporanDetailSuccessResponse")),
      *     @OA\Response(response=401, description="Tidak terautentikasi", @OA\JsonContent(ref="#/components/schemas/ErrorResponse")),
      *     @OA\Response(response=403, description="Tidak memiliki izin", @OA\JsonContent(ref="#/components/schemas/ErrorResponse")),
      *     @OA\Response(response=422, description="Validasi gagal", @OA\JsonContent(ref="#/components/schemas/ValidationErrorResponse")),
@@ -255,7 +283,7 @@ class ApiPaths
      *     summary="Statistik laporan",
      *     security={{"jwt":{}}},
      *     @OA\Parameter(name="period", in="query", @OA\Schema(type="string", enum={"weekly","monthly","yearly"})),
-     *     @OA\Response(response=200, description="Statistik laporan berhasil diambil", @OA\JsonContent(ref="#/components/schemas/LaporanStatisticsSuccessResponse")),
+ *     @OA\Response(response=200, description="Statistik laporan berhasil diambil (agregasi status, tren, kategori, top pengguna)", @OA\JsonContent(ref="#/components/schemas/LaporanStatisticsSuccessResponse")),
      *     @OA\Response(response=500, description="Kesalahan server", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
      * )
      */
@@ -392,7 +420,7 @@ class ApiPaths
      *             @OA\Property(property="catatan_verifikasi", type="string", nullable=true, maxLength=1000)
      *         )
      *     ),
-     *     @OA\Response(response=200, description="Laporan berhasil diverifikasi", @OA\JsonContent(ref="#/components/schemas/LaporanWorkflowSuccessResponse")),
+ *     @OA\Response(response=200, description="Laporan berhasil diverifikasi dengan payload laporan nested penuh", @OA\JsonContent(ref="#/components/schemas/LaporanWorkflowSuccessResponse")),
      *     @OA\Response(response=401, description="Tidak terautentikasi", @OA\JsonContent(ref="#/components/schemas/ErrorResponse")),
      *     @OA\Response(response=403, description="Tidak memiliki izin", @OA\JsonContent(ref="#/components/schemas/ErrorResponse")),
      *     @OA\Response(response=404, description="Laporan tidak ditemukan", @OA\JsonContent(ref="#/components/schemas/ErrorResponse")),
@@ -417,7 +445,7 @@ class ApiPaths
      *             @OA\Property(property="status", type="string", enum={"Diproses","Selesai"}, example="Diproses")
      *         )
      *     ),
-     *     @OA\Response(response=200, description="Status laporan berhasil diperbarui", @OA\JsonContent(ref="#/components/schemas/LaporanWorkflowSuccessResponse")),
+ *     @OA\Response(response=200, description="Status laporan berhasil diperbarui dengan payload laporan nested penuh", @OA\JsonContent(ref="#/components/schemas/LaporanWorkflowSuccessResponse")),
      *     @OA\Response(response=401, description="Tidak terautentikasi", @OA\JsonContent(ref="#/components/schemas/ErrorResponse")),
      *     @OA\Response(response=403, description="Tidak memiliki izin", @OA\JsonContent(ref="#/components/schemas/ErrorResponse")),
      *     @OA\Response(response=404, description="Laporan tidak ditemukan", @OA\JsonContent(ref="#/components/schemas/ErrorResponse")),
@@ -435,7 +463,7 @@ class ApiPaths
      *     summary="Ambil riwayat tindakan laporan",
      *     security={{"jwt":{}}},
      *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
-     *     @OA\Response(response=200, description="Riwayat laporan berhasil diambil", @OA\JsonContent(ref="#/components/schemas/LaporanRiwayatSuccessResponse")),
+ *     @OA\Response(response=200, description="Riwayat laporan berhasil diambil dengan nested petugas, tindak lanjut, dan laporan", @OA\JsonContent(ref="#/components/schemas/LaporanRiwayatSuccessResponse")),
      *     @OA\Response(response=404, description="Laporan tidak ditemukan", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
      * )
      */
@@ -452,7 +480,7 @@ class ApiPaths
      *     @OA\Parameter(name="id_laporan", in="query", @OA\Schema(type="integer")),
      *     @OA\Parameter(name="id_operator", in="query", @OA\Schema(type="integer")),
      *     @OA\Parameter(name="per_page", in="query", @OA\Schema(type="integer", default=20)),
-     *     @OA\Response(response=200, description="Data monitoring berhasil diambil", @OA\JsonContent(ref="#/components/schemas/MonitoringPaginatedSuccessResponse")),
+ *     @OA\Response(response=200, description="Data monitoring berhasil diambil dengan nested laporan/operator penuh dan meta pagination", @OA\JsonContent(ref="#/components/schemas/MonitoringPaginatedSuccessResponse")),
      *     @OA\Response(response=401, description="Tidak terautentikasi", @OA\JsonContent(ref="#/components/schemas/ErrorResponse")),
      *     @OA\Response(response=403, description="Tidak memiliki izin", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
      * )
@@ -478,7 +506,7 @@ class ApiPaths
      *             @OA\Property(property="koordinat_gps", type="string", nullable=true, example="-6.2,106.8")
      *         )
      *     ),
-     *     @OA\Response(response=201, description="Monitoring berhasil dibuat", @OA\JsonContent(ref="#/components/schemas/MonitoringSuccessResponse")),
+ *     @OA\Response(response=201, description="Monitoring berhasil dibuat dengan nested laporan/operator penuh", @OA\JsonContent(ref="#/components/schemas/MonitoringSuccessResponse")),
      *     @OA\Response(response=403, description="Tidak memiliki izin", @OA\JsonContent(ref="#/components/schemas/ErrorResponse")),
      *     @OA\Response(response=422, description="Validasi gagal", @OA\JsonContent(ref="#/components/schemas/ValidationErrorResponse"))
      * )
@@ -494,7 +522,7 @@ class ApiPaths
      *     summary="Detail monitoring",
      *     security={{"jwt":{}}},
      *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
-     *     @OA\Response(response=200, description="Data monitoring berhasil diambil", @OA\JsonContent(ref="#/components/schemas/MonitoringSuccessResponse")),
+ *     @OA\Response(response=200, description="Data monitoring berhasil diambil dengan nested laporan/operator penuh", @OA\JsonContent(ref="#/components/schemas/MonitoringSuccessResponse")),
      *     @OA\Response(response=403, description="Tidak memiliki izin", @OA\JsonContent(ref="#/components/schemas/ErrorResponse")),
      *     @OA\Response(response=404, description="Monitoring tidak ditemukan", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
      * )
@@ -517,7 +545,7 @@ class ApiPaths
      *             @OA\Property(property="koordinat_gps", type="string", nullable=true)
      *         )
      *     ),
-     *     @OA\Response(response=200, description="Monitoring berhasil diupdate", @OA\JsonContent(ref="#/components/schemas/MonitoringSuccessResponse")),
+ *     @OA\Response(response=200, description="Monitoring berhasil diupdate dengan nested laporan/operator penuh", @OA\JsonContent(ref="#/components/schemas/MonitoringSuccessResponse")),
      *     @OA\Response(response=403, description="Tidak memiliki izin", @OA\JsonContent(ref="#/components/schemas/ErrorResponse")),
      *     @OA\Response(response=404, description="Monitoring tidak ditemukan", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
      * )
@@ -552,7 +580,7 @@ class ApiPaths
      *     @OA\Parameter(name="id_petugas", in="query", @OA\Schema(type="integer")),
      *     @OA\Parameter(name="status", in="query", @OA\Schema(type="string", enum={"Menuju Lokasi","Selesai"})),
      *     @OA\Parameter(name="per_page", in="query", @OA\Schema(type="integer", default=20)),
-     *     @OA\Response(response=200, description="Data tindak lanjut berhasil diambil", @OA\JsonContent(ref="#/components/schemas/TindakLanjutPaginatedSuccessResponse")),
+ *     @OA\Response(response=200, description="Data tindak lanjut berhasil diambil dengan nested laporan/petugas penuh dan meta pagination", @OA\JsonContent(ref="#/components/schemas/TindakLanjutPaginatedSuccessResponse")),
      *     @OA\Response(response=403, description="Tidak memiliki izin", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
      * )
      */
@@ -576,7 +604,7 @@ class ApiPaths
      *             @OA\Property(property="status", type="string", enum={"Menuju Lokasi","Selesai"}, example="Menuju Lokasi")
      *         )
      *     ),
-     *     @OA\Response(response=201, description="Tindak lanjut berhasil dibuat", @OA\JsonContent(ref="#/components/schemas/TindakLanjutSuccessResponse")),
+ *     @OA\Response(response=201, description="Tindak lanjut berhasil dibuat dengan nested laporan/petugas penuh", @OA\JsonContent(ref="#/components/schemas/TindakLanjutSuccessResponse")),
      *     @OA\Response(response=403, description="Tidak memiliki izin", @OA\JsonContent(ref="#/components/schemas/ErrorResponse")),
      *     @OA\Response(response=422, description="Validasi gagal", @OA\JsonContent(ref="#/components/schemas/ValidationErrorResponse"))
      * )
@@ -592,7 +620,7 @@ class ApiPaths
      *     summary="Detail tindak lanjut",
      *     security={{"jwt":{}}},
      *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
-     *     @OA\Response(response=200, description="Data tindak lanjut berhasil diambil", @OA\JsonContent(ref="#/components/schemas/TindakLanjutSuccessResponse")),
+ *     @OA\Response(response=200, description="Data tindak lanjut berhasil diambil dengan nested laporan/petugas penuh", @OA\JsonContent(ref="#/components/schemas/TindakLanjutSuccessResponse")),
      *     @OA\Response(response=403, description="Tidak memiliki izin", @OA\JsonContent(ref="#/components/schemas/ErrorResponse")),
      *     @OA\Response(response=404, description="Tindak lanjut tidak ditemukan", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
      * )
@@ -614,7 +642,7 @@ class ApiPaths
      *             @OA\Property(property="status", type="string", enum={"Menuju Lokasi","Selesai"})
      *         )
      *     ),
-     *     @OA\Response(response=200, description="Tindak lanjut berhasil diupdate", @OA\JsonContent(ref="#/components/schemas/TindakLanjutSuccessResponse")),
+ *     @OA\Response(response=200, description="Tindak lanjut berhasil diupdate dengan nested laporan/petugas penuh", @OA\JsonContent(ref="#/components/schemas/TindakLanjutSuccessResponse")),
      *     @OA\Response(response=403, description="Tidak memiliki izin", @OA\JsonContent(ref="#/components/schemas/ErrorResponse")),
      *     @OA\Response(response=404, description="Tindak lanjut tidak ditemukan", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
      * )
@@ -648,7 +676,7 @@ class ApiPaths
      *     @OA\Parameter(name="tindaklanjut_id", in="query", @OA\Schema(type="integer")),
      *     @OA\Parameter(name="id_petugas", in="query", @OA\Schema(type="integer")),
      *     @OA\Parameter(name="per_page", in="query", @OA\Schema(type="integer", default=20)),
-     *     @OA\Response(response=200, description="Data riwayat tindakan berhasil diambil", @OA\JsonContent(ref="#/components/schemas/RiwayatTindakanPaginatedSuccessResponse")),
+ *     @OA\Response(response=200, description="Data riwayat tindakan berhasil diambil dengan nested tindak lanjut/petugas penuh dan meta pagination", @OA\JsonContent(ref="#/components/schemas/RiwayatTindakanPaginatedSuccessResponse")),
      *     @OA\Response(response=403, description="Tidak memiliki izin", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
      * )
      */
@@ -672,7 +700,7 @@ class ApiPaths
      *             @OA\Property(property="waktu_tindakan", type="string", format="date-time")
      *         )
      *     ),
-     *     @OA\Response(response=201, description="Riwayat tindakan berhasil dibuat", @OA\JsonContent(ref="#/components/schemas/RiwayatTindakanSuccessResponse")),
+ *     @OA\Response(response=201, description="Riwayat tindakan berhasil dibuat dengan nested tindak lanjut/petugas penuh", @OA\JsonContent(ref="#/components/schemas/RiwayatTindakanSuccessResponse")),
      *     @OA\Response(response=403, description="Tidak memiliki izin", @OA\JsonContent(ref="#/components/schemas/ErrorResponse")),
      *     @OA\Response(response=422, description="Validasi gagal", @OA\JsonContent(ref="#/components/schemas/ValidationErrorResponse"))
      * )
@@ -688,7 +716,7 @@ class ApiPaths
      *     summary="Detail riwayat tindakan",
      *     security={{"jwt":{}}},
      *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
-     *     @OA\Response(response=200, description="Data riwayat tindakan berhasil diambil", @OA\JsonContent(ref="#/components/schemas/RiwayatTindakanSuccessResponse")),
+ *     @OA\Response(response=200, description="Data riwayat tindakan berhasil diambil dengan nested tindak lanjut/petugas penuh", @OA\JsonContent(ref="#/components/schemas/RiwayatTindakanSuccessResponse")),
      *     @OA\Response(response=403, description="Tidak memiliki izin", @OA\JsonContent(ref="#/components/schemas/ErrorResponse")),
      *     @OA\Response(response=404, description="Riwayat tindakan tidak ditemukan", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
      * )
@@ -710,7 +738,7 @@ class ApiPaths
      *             @OA\Property(property="waktu_tindakan", type="string", format="date-time")
      *         )
      *     ),
-     *     @OA\Response(response=200, description="Riwayat tindakan berhasil diupdate", @OA\JsonContent(ref="#/components/schemas/RiwayatTindakanSuccessResponse")),
+ *     @OA\Response(response=200, description="Riwayat tindakan berhasil diupdate dengan nested tindak lanjut/petugas penuh", @OA\JsonContent(ref="#/components/schemas/RiwayatTindakanSuccessResponse")),
      *     @OA\Response(response=403, description="Tidak memiliki izin", @OA\JsonContent(ref="#/components/schemas/ErrorResponse")),
      *     @OA\Response(response=404, description="Riwayat tindakan tidak ditemukan", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
      * )
@@ -732,6 +760,287 @@ class ApiPaths
      * )
      */
     public function riwayatDestroyDoc(): void
+    {
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/users/profile",
+     *     tags={"Authentication"},
+     *     summary="Profil pengguna saat ini",
+     *     security={{"jwt":{}}},
+     *     @OA\Response(response=200, description="Profil berhasil diambil dengan nested wilayah", @OA\JsonContent(ref="#/components/schemas/UserDetailSuccessResponse")),
+     *     @OA\Response(response=401, description="Tidak terautentikasi", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
+     * )
+     */
+    public function usersProfileDoc(): void
+    {
+    }
+
+    /**
+     * @OA\Put(
+     *     path="/users/profile",
+     *     tags={"Authentication"},
+     *     summary="Update profil pengguna saat ini",
+     *     security={{"jwt":{}}},
+     *     @OA\RequestBody(
+     *         @OA\JsonContent(
+     *             @OA\Property(property="nama", type="string"),
+     *             @OA\Property(property="no_telepon", type="string"),
+     *             @OA\Property(property="alamat", type="string"),
+     *             @OA\Property(property="id_desa", type="integer")
+     *         )
+     *     ),
+     *     @OA\Response(response=200, description="Profil berhasil diupdate", @OA\JsonContent(ref="#/components/schemas/UserDetailSuccessResponse")),
+     *     @OA\Response(response=401, description="Tidak terautentikasi", @OA\JsonContent(ref="#/components/schemas/ErrorResponse")),
+     *     @OA\Response(response=422, description="Validasi gagal", @OA\JsonContent(ref="#/components/schemas/ValidationErrorResponse"))
+     * )
+     */
+    public function usersProfileUpdateDoc(): void
+    {
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/users",
+     *     tags={"Authentication"},
+     *     summary="Daftar pengguna (Admin only)",
+     *     security={{"jwt":{}}},
+     *     @OA\Parameter(name="search", in="query", @OA\Schema(type="string")),
+     *     @OA\Parameter(name="role", in="query", @OA\Schema(type="string")),
+     *     @OA\Parameter(name="per_page", in="query", @OA\Schema(type="integer", default=15)),
+     *     @OA\Response(response=200, description="Data pengguna berhasil diambil dengan nested wilayah dan meta pagination", @OA\JsonContent(ref="#/components/schemas/UserListSuccessResponse")),
+     *     @OA\Response(response=403, description="Akses ditolak", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
+     * )
+     */
+    public function usersIndexDoc(): void
+    {
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/users/statistics",
+     *     tags={"Authentication"},
+     *     summary="Statistik pengguna (Admin only)",
+     *     security={{"jwt":{}}},
+     *     @OA\Response(response=200, description="Statistik pengguna berhasil diambil", @OA\JsonContent(ref="#/components/schemas/UserStatisticsSuccessResponse")),
+     *     @OA\Response(response=403, description="Akses ditolak", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
+     * )
+     */
+    public function usersStatisticsDoc(): void
+    {
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/users/{id}",
+     *     tags={"Authentication"},
+     *     summary="Detail pengguna (Admin only)",
+     *     security={{"jwt":{}}},
+     *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *     @OA\Response(response=200, description="Data pengguna berhasil diambil", @OA\JsonContent(ref="#/components/schemas/UserDetailSuccessResponse")),
+     *     @OA\Response(response=404, description="Pengguna tidak ditemukan", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
+     * )
+     */
+    public function usersShowDoc(): void
+    {
+    }
+
+    /**
+     * @OA\Post(
+     *     path="/users",
+     *     tags={"Authentication"},
+     *     summary="Buat pengguna baru (Admin only)",
+     *     security={{"jwt":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"nama","username","password","role"},
+     *             @OA\Property(property="nama", type="string"),
+     *             @OA\Property(property="username", type="string"),
+     *             @OA\Property(property="email", type="string", format="email", nullable=true),
+     *             @OA\Property(property="password", type="string", format="password"),
+     *             @OA\Property(property="role", type="string", enum={"Admin","PetugasBPBD","OperatorDesa","Warga"}),
+     *             @OA\Property(property="no_telepon", type="string", nullable=true),
+     *             @OA\Property(property="alamat", type="string", nullable=true),
+     *             @OA\Property(property="id_desa", type="integer", nullable=true)
+     *         )
+     *     ),
+     *     @OA\Response(response=201, description="Pengguna berhasil ditambahkan", @OA\JsonContent(ref="#/components/schemas/UserDetailSuccessResponse")),
+     *     @OA\Response(response=422, description="Validasi gagal", @OA\JsonContent(ref="#/components/schemas/ValidationErrorResponse"))
+     * )
+     */
+    public function usersStoreDoc(): void
+    {
+    }
+
+    /**
+     * @OA\Put(
+     *     path="/users/{id}",
+     *     tags={"Authentication"},
+     *     summary="Update pengguna (Admin only)",
+     *     security={{"jwt":{}}},
+     *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *     @OA\RequestBody(@OA\JsonContent(type="object", additionalProperties=true)),
+     *     @OA\Response(response=200, description="Pengguna berhasil diupdate", @OA\JsonContent(ref="#/components/schemas/UserDetailSuccessResponse")),
+     *     @OA\Response(response=404, description="Pengguna tidak ditemukan", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
+     * )
+     */
+    public function usersUpdateDoc(): void
+    {
+    }
+
+    /**
+     * @OA\Delete(
+     *     path="/users/{id}",
+     *     tags={"Authentication"},
+     *     summary="Hapus pengguna (Admin only)",
+     *     security={{"jwt":{}}},
+     *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *     @OA\Response(response=200, description="Pengguna berhasil dihapus", @OA\JsonContent(ref="#/components/schemas/SuccessResponse")),
+     *     @OA\Response(response=404, description="Pengguna tidak ditemukan", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
+     * )
+     */
+    public function usersDestroyDoc(): void
+    {
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/kategori-bencana",
+     *     tags={"Laporan Management"},
+     *     summary="Daftar kategori bencana",
+     *     security={{"jwt":{}}},
+     *     @OA\Parameter(name="search", in="query", @OA\Schema(type="string")),
+     *     @OA\Parameter(name="sort_field", in="query", @OA\Schema(type="string")),
+     *     @OA\Parameter(name="sort_direction", in="query", @OA\Schema(type="string", enum={"asc","desc"})),
+     *     @OA\Parameter(name="per_page", in="query", @OA\Schema(type="integer", default=15)),
+     *     @OA\Response(response=200, description="Daftar kategori bencana berhasil diambil", @OA\JsonContent(ref="#/components/schemas/KategoriBencanaListSuccessResponse"))
+     * )
+     */
+    public function kategoriIndexDoc(): void
+    {
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/kategori-bencana/{id}",
+     *     tags={"Laporan Management"},
+     *     summary="Detail kategori bencana",
+     *     security={{"jwt":{}}},
+     *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *     @OA\Response(response=200, description="Detail kategori bencana berhasil diambil", @OA\JsonContent(ref="#/components/schemas/KategoriBencanaDetailSuccessResponse")),
+     *     @OA\Response(response=404, description="Kategori bencana tidak ditemukan", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
+     * )
+     */
+    public function kategoriShowDoc(): void
+    {
+    }
+
+    /**
+     * @OA\Post(
+     *     path="/kategori-bencana",
+     *     tags={"Laporan Management"},
+     *     summary="Tambah kategori bencana (Admin only)",
+     *     security={{"jwt":{}}},
+     *     @OA\RequestBody(required=true, @OA\JsonContent(required={"nama_kategori"}, @OA\Property(property="nama_kategori", type="string"), @OA\Property(property="deskripsi", type="string", nullable=true), @OA\Property(property="icon", type="string", nullable=true))),
+     *     @OA\Response(response=201, description="Kategori bencana berhasil ditambahkan", @OA\JsonContent(ref="#/components/schemas/KategoriBencanaDetailSuccessResponse")),
+     *     @OA\Response(response=422, description="Validasi gagal", @OA\JsonContent(ref="#/components/schemas/ValidationErrorResponse"))
+     * )
+     */
+    public function kategoriStoreDoc(): void
+    {
+    }
+
+    /**
+     * @OA\Put(
+     *     path="/kategori-bencana/{id}",
+     *     tags={"Laporan Management"},
+     *     summary="Update kategori bencana (Admin only)",
+     *     security={{"jwt":{}}},
+     *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *     @OA\RequestBody(@OA\JsonContent(type="object", additionalProperties=true)),
+     *     @OA\Response(response=200, description="Kategori bencana berhasil diperbarui", @OA\JsonContent(ref="#/components/schemas/KategoriBencanaDetailSuccessResponse")),
+     *     @OA\Response(response=404, description="Kategori bencana tidak ditemukan", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
+     * )
+     */
+    public function kategoriUpdateDoc(): void
+    {
+    }
+
+    /**
+     * @OA\Delete(
+     *     path="/kategori-bencana/{id}",
+     *     tags={"Laporan Management"},
+     *     summary="Hapus kategori bencana (Admin only)",
+     *     security={{"jwt":{}}},
+     *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *     @OA\Response(response=200, description="Kategori bencana berhasil dihapus", @OA\JsonContent(ref="#/components/schemas/KategoriBencanaDetailSuccessResponse")),
+     *     @OA\Response(response=400, description="Kategori masih digunakan", @OA\JsonContent(ref="#/components/schemas/ErrorResponse")),
+     *     @OA\Response(response=404, description="Kategori bencana tidak ditemukan", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
+     * )
+     */
+    public function kategoriDestroyDoc(): void
+    {
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/wilayah",
+     *     tags={"Laporan Management"},
+     *     summary="Daftar wilayah (all jenis atau per jenis)",
+     *     @OA\Parameter(name="jenis", in="query", @OA\Schema(type="string", enum={"provinsi","kabupaten","kecamatan","desa"})),
+     *     @OA\Parameter(name="include", in="query", @OA\Schema(type="string")),
+     *     @OA\Parameter(name="per_page", in="query", @OA\Schema(type="integer", default=15)),
+     *     @OA\Response(response=200, description="Data wilayah berhasil diambil", @OA\JsonContent(ref="#/components/schemas/WilayahPaginatedSuccessResponse"))
+     * )
+     */
+    public function wilayahIndexDoc(): void
+    {
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/wilayah/{id}",
+     *     tags={"Laporan Management"},
+     *     summary="Detail wilayah by jenis",
+     *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *     @OA\Parameter(name="jenis", in="query", required=true, @OA\Schema(type="string", enum={"provinsi","kabupaten","kecamatan","desa"})),
+     *     @OA\Parameter(name="include", in="query", @OA\Schema(type="string")),
+     *     @OA\Response(response=200, description="Detail wilayah berhasil diambil", @OA\JsonContent(ref="#/components/schemas/WilayahDetailSuccessResponse")),
+     *     @OA\Response(response=404, description="Wilayah tidak ditemukan", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
+     * )
+     */
+    public function wilayahShowDoc(): void
+    {
+    }
+
+    /**
+     * @OA\Get(path="/wilayah/provinsi", tags={"Wilayah Management"}, summary="Daftar provinsi", @OA\Response(response=200, description="Data provinsi berhasil diambil", @OA\JsonContent(ref="#/components/schemas/WilayahCollectionSuccessResponse")))
+     * @OA\Get(path="/wilayah/provinsi/{id}", tags={"Wilayah Management"}, summary="Detail provinsi", @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")), @OA\Response(response=200, description="Data provinsi berhasil diambil", @OA\JsonContent(ref="#/components/schemas/WilayahDetailSuccessResponse")), @OA\Response(response=404, description="Provinsi tidak ditemukan", @OA\JsonContent(ref="#/components/schemas/ErrorResponse")))
+     * @OA\Get(path="/wilayah/kabupaten/{provinsi_id}", tags={"Wilayah Management"}, summary="Daftar kabupaten by provinsi", @OA\Parameter(name="provinsi_id", in="path", required=true, @OA\Schema(type="integer")), @OA\Response(response=200, description="Data kabupaten berhasil diambil", @OA\JsonContent(ref="#/components/schemas/WilayahCollectionSuccessResponse")), @OA\Response(response=404, description="Provinsi tidak ditemukan", @OA\JsonContent(ref="#/components/schemas/ErrorResponse")))
+     * @OA\Get(path="/wilayah/kecamatan/{kabupaten_id}", tags={"Wilayah Management"}, summary="Daftar kecamatan by kabupaten", @OA\Parameter(name="kabupaten_id", in="path", required=true, @OA\Schema(type="integer")), @OA\Response(response=200, description="Data kecamatan berhasil diambil", @OA\JsonContent(ref="#/components/schemas/WilayahCollectionSuccessResponse")), @OA\Response(response=404, description="Kabupaten tidak ditemukan", @OA\JsonContent(ref="#/components/schemas/ErrorResponse")))
+     * @OA\Get(path="/wilayah/desa/{kecamatan_id}", tags={"Wilayah Management"}, summary="Daftar desa by kecamatan", @OA\Parameter(name="kecamatan_id", in="path", required=true, @OA\Schema(type="integer")), @OA\Response(response=200, description="Data desa berhasil diambil", @OA\JsonContent(ref="#/components/schemas/WilayahCollectionSuccessResponse")), @OA\Response(response=404, description="Kecamatan tidak ditemukan", @OA\JsonContent(ref="#/components/schemas/ErrorResponse")))
+     */
+    public function wilayahReferenceDoc(): void
+    {
+    }
+
+    /**
+     * @OA\Get(path="/wilayah/detail/{desa_id}", tags={"Wilayah Management"}, summary="Detail wilayah by desa", @OA\Parameter(name="desa_id", in="path", required=true, @OA\Schema(type="integer")), @OA\Response(response=200, description="Detail wilayah berhasil diambil", @OA\JsonContent(ref="#/components/schemas/WilayahDetailSuccessResponse")), @OA\Response(response=404, description="Desa tidak ditemukan", @OA\JsonContent(ref="#/components/schemas/ErrorResponse")))
+     * @OA\Get(path="/wilayah/hierarchy/{desa_id}", tags={"Wilayah Management"}, summary="Hierarchy wilayah by desa", @OA\Parameter(name="desa_id", in="path", required=true, @OA\Schema(type="integer")), @OA\Response(response=200, description="Hirarki wilayah berhasil diambil", @OA\JsonContent(ref="#/components/schemas/WilayahHierarchySuccessResponse")), @OA\Response(response=404, description="Desa tidak ditemukan", @OA\JsonContent(ref="#/components/schemas/ErrorResponse")))
+     * @OA\Get(path="/wilayah/search", tags={"Wilayah Management"}, summary="Pencarian wilayah", @OA\Parameter(name="q", in="query", required=true, @OA\Schema(type="string")), @OA\Parameter(name="jenis", in="query", @OA\Schema(type="string", enum={"provinsi","kabupaten","kecamatan","desa"})), @OA\Response(response=200, description="Hasil pencarian wilayah", @OA\JsonContent(ref="#/components/schemas/WilayahSearchSuccessResponse")), @OA\Response(response=400, description="Parameter q wajib", @OA\JsonContent(ref="#/components/schemas/ErrorResponse")))
+     */
+    public function wilayahUtilityDoc(): void
+    {
+    }
+
+    /**
+     * @OA\Post(path="/wilayah", tags={"Wilayah Management"}, summary="Tambah wilayah (Admin only)", security={{"jwt":{}}}, @OA\RequestBody(required=true, @OA\JsonContent(required={"jenis","nama"}, @OA\Property(property="jenis", type="string", enum={"provinsi","kabupaten","kecamatan","desa"}), @OA\Property(property="nama", type="string"), @OA\Property(property="id_parent", type="integer", nullable=true))), @OA\Response(response=201, description="Wilayah berhasil ditambahkan", @OA\JsonContent(ref="#/components/schemas/WilayahCrudSuccessResponse")), @OA\Response(response=422, description="Validasi gagal", @OA\JsonContent(ref="#/components/schemas/ValidationErrorResponse")))
+     * @OA\Put(path="/wilayah/{id}", tags={"Wilayah Management"}, summary="Update wilayah (Admin only)", security={{"jwt":{}}}, @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")), @OA\RequestBody(required=true, @OA\JsonContent(required={"jenis","nama"}, @OA\Property(property="jenis", type="string", enum={"provinsi","kabupaten","kecamatan","desa"}), @OA\Property(property="nama", type="string"), @OA\Property(property="id_parent", type="integer", nullable=true))), @OA\Response(response=200, description="Wilayah berhasil diperbarui", @OA\JsonContent(ref="#/components/schemas/WilayahCrudSuccessResponse")), @OA\Response(response=404, description="Wilayah tidak ditemukan", @OA\JsonContent(ref="#/components/schemas/ErrorResponse")))
+     * @OA\Delete(path="/wilayah/{id}", tags={"Wilayah Management"}, summary="Hapus wilayah (Admin only)", security={{"jwt":{}}}, @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")), @OA\Parameter(name="jenis", in="query", required=true, @OA\Schema(type="string", enum={"provinsi","kabupaten","kecamatan","desa"})), @OA\Response(response=200, description="Wilayah berhasil dihapus", @OA\JsonContent(ref="#/components/schemas/SuccessResponse")), @OA\Response(response=400, description="Gagal menghapus wilayah", @OA\JsonContent(ref="#/components/schemas/ErrorResponse")), @OA\Response(response=404, description="Wilayah tidak ditemukan", @OA\JsonContent(ref="#/components/schemas/ErrorResponse")))
+     */
+    public function wilayahCrudDoc(): void
     {
     }
 }

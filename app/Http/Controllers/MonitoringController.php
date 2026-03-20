@@ -12,6 +12,15 @@ use Illuminate\Support\Facades\Validator;
 
 class MonitoringController extends Controller
 {
+    private const FULL_RELATIONS = [
+        'operator.desa.kecamatan.kabupaten.provinsi',
+        'laporan.pelapor.desa.kecamatan.kabupaten.provinsi',
+        'laporan.kategori',
+        'laporan.desa.kecamatan.kabupaten.provinsi',
+        'laporan.verifikator.desa.kecamatan.kabupaten.provinsi',
+        'laporan.penanggungJawab.desa.kecamatan.kabupaten.provinsi',
+    ];
+
     public function __construct(private readonly LogActivityService $logActivityService)
     {
     }
@@ -28,7 +37,7 @@ class MonitoringController extends Controller
             return $this->deniedByPolicy('Warga tidak memiliki akses ke data monitoring operasional');
         }
 
-        $query = Monitoring::with(['laporan', 'operator']);
+        $query = Monitoring::with(self::FULL_RELATIONS);
 
         if ($request->has('id_laporan')) {
             $query->where('id_laporan', $request->id_laporan);
@@ -79,7 +88,7 @@ class MonitoringController extends Controller
         }
 
         $monitoring = Monitoring::create($payload);
-        $monitoring->load(['laporan', 'operator']);
+        $monitoring->load(self::FULL_RELATIONS);
 
         $this->logActivityService->log($user->id, $user->role, 'Buat monitoring', '/api/monitoring', $request->ip(), $request->userAgent());
 
@@ -94,7 +103,7 @@ class MonitoringController extends Controller
             return $this->unauthorized();
         }
 
-        $monitoring = Monitoring::with(['laporan', 'operator'])->find($id);
+        $monitoring = Monitoring::with(self::FULL_RELATIONS)->find($id);
 
         if (!$monitoring) {
             return $this->notFoundResponse('Monitoring tidak ditemukan');
@@ -148,7 +157,7 @@ class MonitoringController extends Controller
         }
 
         $monitoring->update($payload);
-        $monitoring->load(['laporan', 'operator']);
+        $monitoring->load(self::FULL_RELATIONS);
 
         $this->logActivityService->log($user->id, $user->role, 'Update monitoring', '/api/monitoring/' . $id, $request->ip(), $request->userAgent());
 

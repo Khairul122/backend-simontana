@@ -7,7 +7,7 @@ use OpenApi\Annotations as OA;
 /**
  * @OA\Info(
  *     title="SIMONTA BENCANA API",
- *     version="2.2.0",
+ *     version="3.0.0",
  *     description="Dokumentasi OpenAPI untuk backend SIMONTA BENCANA."
  * )
  * @OA\Server(

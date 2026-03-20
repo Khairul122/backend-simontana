@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Pengguna;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Routing\Controller as BaseController;
 
 abstract class Controller extends BaseController
@@ -28,7 +29,19 @@ abstract class Controller extends BaseController
             'message' => $message,
         ];
 
-        if ($data !== null) {
+        if ($data instanceof LengthAwarePaginator) {
+            $payload['data'] = $data->items();
+            $payload['meta'] = [
+                'pagination' => [
+                    'current_page' => $data->currentPage(),
+                    'last_page' => $data->lastPage(),
+                    'per_page' => $data->perPage(),
+                    'total' => $data->total(),
+                    'from' => $data->firstItem(),
+                    'to' => $data->lastItem(),
+                ],
+            ];
+        } elseif ($data !== null) {
             $payload['data'] = $data;
         }
 

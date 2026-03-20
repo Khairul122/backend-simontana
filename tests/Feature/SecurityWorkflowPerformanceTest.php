@@ -12,6 +12,8 @@ use App\Models\Pengguna;
 use App\Models\Provinsi;
 use App\Models\TindakLanjut;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\RateLimiter;
 use Tests\TestCase;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
@@ -72,10 +74,21 @@ class SecurityWorkflowPerformanceTest extends TestCase
 
     public function test_login_endpoint_is_throttled_after_too_many_attempts(): void
     {
-        $user = $this->createUser('Warga');
+        Cache::flush();
 
-        for ($attempt = 1; $attempt <= 5; $attempt++) {
-            $this->withHeader('X-Forwarded-For', '10.10.10.10')
+        $user = $this->createUser('Warga');
+        $ip = '10.10.10.10';
+        $identifier = strtolower($user->username);
+
+        RateLimiter::clear($ip . '|login');
+        RateLimiter::clear($ip . '|' . $identifier);
+        RateLimiter::clear('127.0.0.1|login');
+        RateLimiter::clear('127.0.0.1|' . $identifier);
+        RateLimiter::clear('::1|login');
+        RateLimiter::clear('::1|' . $identifier);
+
+        for ($attempt = 1; $attempt <= 6; $attempt++) {
+            $this->withServerVariables(['REMOTE_ADDR' => $ip])
                 ->postJson('/api/auth/login', [
                     'username' => $user->username,
                     'password' => 'wrong-password',
@@ -83,7 +96,7 @@ class SecurityWorkflowPerformanceTest extends TestCase
                 ->assertStatus(401);
         }
 
-        $this->withHeader('X-Forwarded-For', '10.10.10.10')
+        $this->withServerVariables(['REMOTE_ADDR' => $ip])
             ->postJson('/api/auth/login', [
                 'username' => $user->username,
                 'password' => 'wrong-password',
@@ -93,8 +106,15 @@ class SecurityWorkflowPerformanceTest extends TestCase
 
     public function test_register_endpoint_is_throttled_after_too_many_attempts(): void
     {
+        Cache::flush();
+
+        $ip = '10.10.10.20';
+        RateLimiter::clear($ip . '|register');
+        RateLimiter::clear('127.0.0.1|register');
+        RateLimiter::clear('::1|register');
+
         for ($attempt = 1; $attempt <= 5; $attempt++) {
-            $this->withHeader('X-Forwarded-For', '10.10.10.20')
+            $this->withServerVariables(['REMOTE_ADDR' => $ip])
                 ->postJson('/api/auth/register', [
                     'nama' => 'Registrant ' . $attempt,
                     'username' => 'registrant_' . $attempt,
@@ -106,7 +126,7 @@ class SecurityWorkflowPerformanceTest extends TestCase
                 ->assertStatus(201);
         }
 
-        $this->withHeader('X-Forwarded-For', '10.10.10.20')
+        $this->withServerVariables(['REMOTE_ADDR' => $ip])
             ->postJson('/api/auth/register', [
                 'nama' => 'Registrant 6',
                 'username' => 'registrant_6',

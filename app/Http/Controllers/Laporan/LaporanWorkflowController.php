@@ -12,6 +12,16 @@ use Illuminate\Support\Facades\Validator;
 
 class LaporanWorkflowController extends Controller
 {
+    private const FULL_RELATIONS = [
+        'pelapor.desa.kecamatan.kabupaten.provinsi',
+        'kategori',
+        'desa.kecamatan.kabupaten.provinsi',
+        'verifikator.desa.kecamatan.kabupaten.provinsi',
+        'penanggungJawab.desa.kecamatan.kabupaten.provinsi',
+        'tindakLanjut.petugas.desa.kecamatan.kabupaten.provinsi',
+        'monitoring.operator.desa.kecamatan.kabupaten.provinsi',
+    ];
+
     private const TRANSITION_MAP = [
         'Draft' => ['Diverifikasi', 'Ditolak'],
         'Menunggu Verifikasi' => ['Diverifikasi', 'Ditolak'],
@@ -104,14 +114,7 @@ class LaporanWorkflowController extends Controller
             $laporan->update($updateData);
             $this->auditStatusChange($request, $laporan, $fromStatus, $toStatus);
 
-            return $this->successResponse('Laporan berhasil diverifikasi', $laporan->load([
-                    'pelapor:id,nama,email,alamat,no_telepon',
-                    'kategori:id,nama_kategori,deskripsi',
-                    'desa:id,nama,id_kecamatan',
-                    'desa.kecamatan:id,nama,id_kabupaten',
-                    'desa.kecamatan.kabupaten:id,nama,id_provinsi',
-                    'desa.kecamatan.kabupaten.provinsi:id,nama',
-                ]));
+            return $this->successResponse('Laporan berhasil diverifikasi', $laporan->load(self::FULL_RELATIONS));
         } catch (\Exception $e) {
             Log::error('Gagal memverifikasi laporan', [
                 'laporan_id' => $id,
@@ -173,14 +176,7 @@ class LaporanWorkflowController extends Controller
             $laporan->update($updateData);
             $this->auditStatusChange($request, $laporan, $fromStatus, $toStatus);
 
-            return $this->successResponse('Status laporan berhasil diperbarui', $laporan->load([
-                    'pelapor:id,nama,email,alamat,no_telepon',
-                    'kategori:id,nama_kategori,deskripsi',
-                    'desa:id,nama,id_kecamatan',
-                    'desa.kecamatan:id,nama,id_kabupaten',
-                    'desa.kecamatan.kabupaten:id,nama,id_provinsi',
-                    'desa.kecamatan.kabupaten.provinsi:id,nama',
-                ]));
+            return $this->successResponse('Status laporan berhasil diperbarui', $laporan->load(self::FULL_RELATIONS));
         } catch (\Exception $e) {
             Log::error('Gagal memproses laporan', [
                 'laporan_id' => $id,
@@ -200,7 +196,15 @@ class LaporanWorkflowController extends Controller
             }
 
             $history = $laporan->riwayatTindakan()
-                ->with('petugas:id,nama')
+                ->with([
+                    'petugas.desa.kecamatan.kabupaten.provinsi',
+                    'tindakLanjut.petugas.desa.kecamatan.kabupaten.provinsi',
+                    'tindakLanjut.laporan.pelapor.desa.kecamatan.kabupaten.provinsi',
+                    'tindakLanjut.laporan.kategori',
+                    'tindakLanjut.laporan.desa.kecamatan.kabupaten.provinsi',
+                    'tindakLanjut.laporan.verifikator.desa.kecamatan.kabupaten.provinsi',
+                    'tindakLanjut.laporan.penanggungJawab.desa.kecamatan.kabupaten.provinsi',
+                ])
                 ->orderBy('created_at', 'desc')
                 ->get();
 

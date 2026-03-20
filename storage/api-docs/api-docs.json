@@ -3,7 +3,7 @@
     "info": {
         "title": "SIMONTA BENCANA API",
         "description": "Dokumentasi OpenAPI untuk backend SIMONTA BENCANA.",
-        "version": "2.2.0"
+        "version": "3.0.0"
     },
     "servers": [
         {
@@ -13,10 +13,67 @@
     ],
     "paths": {
         "/": {},
+        "/auth/roles": {
+            "get": {
+                "tags": [
+                    "User Management"
+                ],
+                "summary": "Daftar role yang tersedia",
+                "operationId": "a76ad526f72e021374dc9546ab2ab6e8",
+                "responses": {
+                    "200": {
+                        "description": "Daftar role tersedia",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RoleListSuccessResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/check-token": {
+            "get": {
+                "tags": [
+                    "User Management"
+                ],
+                "summary": "Validasi token aktif",
+                "operationId": "2b136e32dc23fdad7ec5afcf96e02de8",
+                "responses": {
+                    "200": {
+                        "description": "Token valid dan data user ringkas tersedia",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CheckTokenSuccessResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Token tidak valid",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            }
+        },
         "/auth/register": {
             "post": {
                 "tags": [
-                    "Authentication"
+                    "User Management"
                 ],
                 "summary": "Registrasi pengguna baru",
                 "operationId": "dbc9e711b01cef19e38cc24a43aefda8",
@@ -80,11 +137,11 @@
                 },
                 "responses": {
                     "201": {
-                        "description": "Registrasi berhasil",
+                        "description": "Registrasi berhasil dengan data user dan nested wilayah",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/SuccessResponse"
+                                    "$ref": "#/components/schemas/RegisterSuccessResponse"
                                 }
                             }
                         }
@@ -125,7 +182,7 @@
         "/auth/login": {
             "post": {
                 "tags": [
-                    "Authentication"
+                    "User Management"
                 ],
                 "summary": "Login pengguna",
                 "operationId": "ae523cda9aa0c2a202f13b3fc01fd063",
@@ -156,7 +213,7 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Login berhasil",
+                        "description": "Login berhasil dengan data user, token, dan expiry",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -201,13 +258,13 @@
         "/auth/logout": {
             "post": {
                 "tags": [
-                    "Authentication"
+                    "User Management"
                 ],
                 "summary": "Logout pengguna",
                 "operationId": "daa94e12eb34625697158f9670fad332",
                 "responses": {
                     "200": {
-                        "description": "Logout berhasil",
+                        "description": "Logout berhasil (data null)",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -237,17 +294,17 @@
         "/auth/refresh": {
             "post": {
                 "tags": [
-                    "Authentication"
+                    "User Management"
                 ],
                 "summary": "Refresh token",
                 "operationId": "a2afc1f7c904cbaa09c87cb0fe307162",
                 "responses": {
                     "200": {
-                        "description": "Token berhasil diperbarui",
+                        "description": "Token berhasil diperbarui dengan payload token baru",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/SuccessResponse"
+                                    "$ref": "#/components/schemas/TokenRefreshSuccessResponse"
                                 }
                             }
                         }
@@ -273,13 +330,13 @@
         "/auth/me": {
             "get": {
                 "tags": [
-                    "Authentication"
+                    "User Management"
                 ],
                 "summary": "Ambil profil user login",
                 "operationId": "abdab0d54c0995b4688d1567a40263ee",
                 "responses": {
                     "200": {
-                        "description": "Data user berhasil diambil",
+                        "description": "Data user berhasil diambil dengan nested wilayah penuh",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -309,7 +366,7 @@
         "/laporans": {
             "get": {
                 "tags": [
-                    "Laporan Management"
+                    "Wilayah Management"
                 ],
                 "summary": "Daftar laporan dengan filter",
                 "operationId": "0df8512c6656ec7b18d3ee7268950658",
@@ -417,7 +474,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Data laporan berhasil diambil",
+                        "description": "Data laporan berhasil diambil dengan relasi nested penuh dan meta pagination",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -455,7 +512,7 @@
             },
             "post": {
                 "tags": [
-                    "Laporan Management"
+                    "Wilayah Management"
                 ],
                 "summary": "Buat laporan baru",
                 "operationId": "9c118eb39bdcca4300fe597218dce7cc",
@@ -547,7 +604,7 @@
                 },
                 "responses": {
                     "201": {
-                        "description": "Laporan berhasil dibuat",
+                        "description": "Laporan berhasil dibuat dengan relasi nested penuh",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -613,7 +670,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Detail laporan berhasil diambil",
+                        "description": "Detail laporan berhasil diambil dengan nested pelapor, kategori, wilayah, monitoring, tindak lanjut",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -743,7 +800,7 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Laporan berhasil diperbarui",
+                        "description": "Laporan berhasil diperbarui dengan relasi nested penuh",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -887,7 +944,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Statistik laporan berhasil diambil",
+                        "description": "Statistik laporan berhasil diambil (agregasi status, tren, kategori, top pengguna)",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1294,7 +1351,7 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Laporan berhasil diverifikasi",
+                        "description": "Laporan berhasil diverifikasi dengan payload laporan nested penuh",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1393,7 +1450,7 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Status laporan berhasil diperbarui",
+                        "description": "Status laporan berhasil diperbarui dengan payload laporan nested penuh",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1469,7 +1526,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Riwayat laporan berhasil diambil",
+                        "description": "Riwayat laporan berhasil diambil dengan nested petugas, tindak lanjut, dan laporan",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1529,7 +1586,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Data monitoring berhasil diambil",
+                        "description": "Data monitoring berhasil diambil dengan nested laporan/operator penuh dan meta pagination",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1612,7 +1669,7 @@
                 },
                 "responses": {
                     "201": {
-                        "description": "Monitoring berhasil dibuat",
+                        "description": "Monitoring berhasil dibuat dengan nested laporan/operator penuh",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1668,7 +1725,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Data monitoring berhasil diambil",
+                        "description": "Data monitoring berhasil diambil dengan nested laporan/operator penuh",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1744,7 +1801,7 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Monitoring berhasil diupdate",
+                        "description": "Monitoring berhasil diupdate dengan nested laporan/operator penuh",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1879,7 +1936,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Data tindak lanjut berhasil diambil",
+                        "description": "Data tindak lanjut berhasil diambil dengan nested laporan/petugas penuh dan meta pagination",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1950,7 +2007,7 @@
                 },
                 "responses": {
                     "201": {
-                        "description": "Tindak lanjut berhasil dibuat",
+                        "description": "Tindak lanjut berhasil dibuat dengan nested laporan/petugas penuh",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -2006,7 +2063,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Data tindak lanjut berhasil diambil",
+                        "description": "Data tindak lanjut berhasil diambil dengan nested laporan/petugas penuh",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -2082,7 +2139,7 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Tindak lanjut berhasil diupdate",
+                        "description": "Tindak lanjut berhasil diupdate dengan nested laporan/petugas penuh",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -2206,7 +2263,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Data riwayat tindakan berhasil diambil",
+                        "description": "Data riwayat tindakan berhasil diambil dengan nested tindak lanjut/petugas penuh dan meta pagination",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -2274,7 +2331,7 @@
                 },
                 "responses": {
                     "201": {
-                        "description": "Riwayat tindakan berhasil dibuat",
+                        "description": "Riwayat tindakan berhasil dibuat dengan nested tindak lanjut/petugas penuh",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -2330,7 +2387,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Data riwayat tindakan berhasil diambil",
+                        "description": "Data riwayat tindakan berhasil diambil dengan nested tindak lanjut/petugas penuh",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -2402,7 +2459,7 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Riwayat tindakan berhasil diupdate",
+                        "description": "Riwayat tindakan berhasil diupdate dengan nested tindak lanjut/petugas penuh",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -2492,10 +2549,1399 @@
                     }
                 ]
             }
+        },
+        "/users/profile": {
+            "get": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Profil pengguna saat ini",
+                "operationId": "819e580380a5c949ea610457f3b32516",
+                "responses": {
+                    "200": {
+                        "description": "Profil berhasil diambil dengan nested wilayah",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserDetailSuccessResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Tidak terautentikasi",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Update profil pengguna saat ini",
+                "operationId": "e1917e79698ac18711ad52ac293fe06d",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "nama": {
+                                        "type": "string"
+                                    },
+                                    "no_telepon": {
+                                        "type": "string"
+                                    },
+                                    "alamat": {
+                                        "type": "string"
+                                    },
+                                    "id_desa": {
+                                        "type": "integer"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Profil berhasil diupdate",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserDetailSuccessResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Tidak terautentikasi",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validasi gagal",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            }
+        },
+        "/users": {
+            "get": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Daftar pengguna (Admin only)",
+                "operationId": "2b69a275c5a5b445798df34e22386525",
+                "parameters": [
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "role",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 15
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Data pengguna berhasil diambil dengan nested wilayah dan meta pagination",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserListSuccessResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Akses ditolak",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Buat pengguna baru (Admin only)",
+                "operationId": "798777a0feb84b0c6e8fe62f647cfbf5",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "nama",
+                                    "username",
+                                    "password",
+                                    "role"
+                                ],
+                                "properties": {
+                                    "nama": {
+                                        "type": "string"
+                                    },
+                                    "username": {
+                                        "type": "string"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "nullable": true
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password"
+                                    },
+                                    "role": {
+                                        "type": "string",
+                                        "enum": [
+                                            "Admin",
+                                            "PetugasBPBD",
+                                            "OperatorDesa",
+                                            "Warga"
+                                        ]
+                                    },
+                                    "no_telepon": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "alamat": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "id_desa": {
+                                        "type": "integer",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Pengguna berhasil ditambahkan",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserDetailSuccessResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validasi gagal",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            }
+        },
+        "/users/statistics": {
+            "get": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Statistik pengguna (Admin only)",
+                "operationId": "4d9f17907a9865fd36f9e9b49ebefd66",
+                "responses": {
+                    "200": {
+                        "description": "Statistik pengguna berhasil diambil",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserStatisticsSuccessResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Akses ditolak",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            }
+        },
+        "/users/{id}": {
+            "get": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Detail pengguna (Admin only)",
+                "operationId": "f84d4ab5effc063225aafc0cef9a849d",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Data pengguna berhasil diambil",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserDetailSuccessResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Pengguna tidak ditemukan",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Update pengguna (Admin only)",
+                "operationId": "bdd132f7af213264952b5eb27242078c",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "additionalProperties": true
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Pengguna berhasil diupdate",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserDetailSuccessResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Pengguna tidak ditemukan",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Hapus pengguna (Admin only)",
+                "operationId": "3106770d4058ecceb7900cee8c6e9aee",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Pengguna berhasil dihapus",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SuccessResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Pengguna tidak ditemukan",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            }
+        },
+        "/kategori-bencana": {
+            "get": {
+                "tags": [
+                    "Laporan Management"
+                ],
+                "summary": "Daftar kategori bencana",
+                "operationId": "cec65868c2606c0a551b9153fc08b409",
+                "parameters": [
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "sort_field",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "sort_direction",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "asc",
+                                "desc"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 15
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Daftar kategori bencana berhasil diambil",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/KategoriBencanaListSuccessResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Laporan Management"
+                ],
+                "summary": "Tambah kategori bencana (Admin only)",
+                "operationId": "d8e9dce54398594b3b3ff305640a8e2e",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "nama_kategori"
+                                ],
+                                "properties": {
+                                    "nama_kategori": {
+                                        "type": "string"
+                                    },
+                                    "deskripsi": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "icon": {
+                                        "type": "string",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Kategori bencana berhasil ditambahkan",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/KategoriBencanaDetailSuccessResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validasi gagal",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            }
+        },
+        "/kategori-bencana/{id}": {
+            "get": {
+                "tags": [
+                    "Laporan Management"
+                ],
+                "summary": "Detail kategori bencana",
+                "operationId": "3755600cde4d36ac0cc7bd925ffa11ae",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Detail kategori bencana berhasil diambil",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/KategoriBencanaDetailSuccessResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Kategori bencana tidak ditemukan",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Laporan Management"
+                ],
+                "summary": "Update kategori bencana (Admin only)",
+                "operationId": "c122c82bf58f6e11e2526169e98becbe",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "additionalProperties": true
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Kategori bencana berhasil diperbarui",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/KategoriBencanaDetailSuccessResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Kategori bencana tidak ditemukan",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Laporan Management"
+                ],
+                "summary": "Hapus kategori bencana (Admin only)",
+                "operationId": "e79a14aade6f3320b143258751ecaabd",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Kategori bencana berhasil dihapus",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/KategoriBencanaDetailSuccessResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Kategori masih digunakan",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Kategori bencana tidak ditemukan",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            }
+        },
+        "/wilayah": {
+            "get": {
+                "tags": [
+                    "Laporan Management"
+                ],
+                "summary": "Daftar wilayah (all jenis atau per jenis)",
+                "operationId": "225813b70be19a9770b7e13e2da8ccbf",
+                "parameters": [
+                    {
+                        "name": "jenis",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "provinsi",
+                                "kabupaten",
+                                "kecamatan",
+                                "desa"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "include",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 15
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Data wilayah berhasil diambil",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/WilayahPaginatedSuccessResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Wilayah Management"
+                ],
+                "summary": "Tambah wilayah (Admin only)",
+                "operationId": "aab58bca3e2de1234d2233231b3af33e",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "jenis",
+                                    "nama"
+                                ],
+                                "properties": {
+                                    "jenis": {
+                                        "type": "string",
+                                        "enum": [
+                                            "provinsi",
+                                            "kabupaten",
+                                            "kecamatan",
+                                            "desa"
+                                        ]
+                                    },
+                                    "nama": {
+                                        "type": "string"
+                                    },
+                                    "id_parent": {
+                                        "type": "integer",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Wilayah berhasil ditambahkan",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/WilayahCrudSuccessResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validasi gagal",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            }
+        },
+        "/wilayah/{id}": {
+            "get": {
+                "tags": [
+                    "Laporan Management"
+                ],
+                "summary": "Detail wilayah by jenis",
+                "operationId": "81b12105164cdf3eff2ea1b14612ad13",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "jenis",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "provinsi",
+                                "kabupaten",
+                                "kecamatan",
+                                "desa"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "include",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Detail wilayah berhasil diambil",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/WilayahDetailSuccessResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Wilayah tidak ditemukan",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Wilayah Management"
+                ],
+                "summary": "Update wilayah (Admin only)",
+                "operationId": "181b86832eec2feba7eab1f521d20513",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "jenis",
+                                    "nama"
+                                ],
+                                "properties": {
+                                    "jenis": {
+                                        "type": "string",
+                                        "enum": [
+                                            "provinsi",
+                                            "kabupaten",
+                                            "kecamatan",
+                                            "desa"
+                                        ]
+                                    },
+                                    "nama": {
+                                        "type": "string"
+                                    },
+                                    "id_parent": {
+                                        "type": "integer",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Wilayah berhasil diperbarui",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/WilayahCrudSuccessResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Wilayah tidak ditemukan",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Wilayah Management"
+                ],
+                "summary": "Hapus wilayah (Admin only)",
+                "operationId": "4a4b14a4bbb89d3ca1b38fb33f435bf7",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "jenis",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "provinsi",
+                                "kabupaten",
+                                "kecamatan",
+                                "desa"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Wilayah berhasil dihapus",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SuccessResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Gagal menghapus wilayah",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Wilayah tidak ditemukan",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            }
+        },
+        "/wilayah/provinsi": {
+            "get": {
+                "tags": [
+                    "Wilayah Management"
+                ],
+                "summary": "Daftar provinsi",
+                "operationId": "37a3b8bc48e85a5f70025e9cbe13e26e",
+                "responses": {
+                    "200": {
+                        "description": "Data provinsi berhasil diambil",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/WilayahCollectionSuccessResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/wilayah/provinsi/{id}": {
+            "get": {
+                "tags": [
+                    "Wilayah Management"
+                ],
+                "summary": "Detail provinsi",
+                "operationId": "ba3155817b5b551c8c4e7fb846fc0121",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Data provinsi berhasil diambil",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/WilayahDetailSuccessResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Provinsi tidak ditemukan",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/wilayah/kabupaten/{provinsi_id}": {
+            "get": {
+                "tags": [
+                    "Wilayah Management"
+                ],
+                "summary": "Daftar kabupaten by provinsi",
+                "operationId": "f57e73447c7e94ff954ff015596de500",
+                "parameters": [
+                    {
+                        "name": "provinsi_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Data kabupaten berhasil diambil",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/WilayahCollectionSuccessResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Provinsi tidak ditemukan",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/wilayah/kecamatan/{kabupaten_id}": {
+            "get": {
+                "tags": [
+                    "Wilayah Management"
+                ],
+                "summary": "Daftar kecamatan by kabupaten",
+                "operationId": "ce92f64b3cf2771998a8096e94931a7c",
+                "parameters": [
+                    {
+                        "name": "kabupaten_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Data kecamatan berhasil diambil",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/WilayahCollectionSuccessResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Kabupaten tidak ditemukan",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/wilayah/desa/{kecamatan_id}": {
+            "get": {
+                "tags": [
+                    "Wilayah Management"
+                ],
+                "summary": "Daftar desa by kecamatan",
+                "operationId": "d0d2210d175ab4bf5f9f4b3376731da7",
+                "parameters": [
+                    {
+                        "name": "kecamatan_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Data desa berhasil diambil",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/WilayahCollectionSuccessResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Kecamatan tidak ditemukan",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/wilayah/detail/{desa_id}": {
+            "get": {
+                "tags": [
+                    "Wilayah Management"
+                ],
+                "summary": "Detail wilayah by desa",
+                "operationId": "a19450f13defe6d37cc2a20ac424e6fd",
+                "parameters": [
+                    {
+                        "name": "desa_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Detail wilayah berhasil diambil",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/WilayahDetailSuccessResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Desa tidak ditemukan",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/wilayah/hierarchy/{desa_id}": {
+            "get": {
+                "tags": [
+                    "Wilayah Management"
+                ],
+                "summary": "Hierarchy wilayah by desa",
+                "operationId": "8ed8cfe049e6ddcfa581e0e0f6acc1c5",
+                "parameters": [
+                    {
+                        "name": "desa_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Hirarki wilayah berhasil diambil",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/WilayahHierarchySuccessResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Desa tidak ditemukan",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/wilayah/search": {
+            "get": {
+                "tags": [
+                    "Wilayah Management"
+                ],
+                "summary": "Pencarian wilayah",
+                "operationId": "6479a61e35e644dc8866b3b9412e5945",
+                "parameters": [
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "jenis",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "provinsi",
+                                "kabupaten",
+                                "kecamatan",
+                                "desa"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Hasil pencarian wilayah",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/WilayahSearchSuccessResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Parameter q wajib",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "components": {
         "schemas": {
+            "PaginationMeta": {
+                "properties": {
+                    "current_page": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "last_page": {
+                        "type": "integer",
+                        "example": 8
+                    },
+                    "per_page": {
+                        "type": "integer",
+                        "example": 15
+                    },
+                    "total": {
+                        "type": "integer",
+                        "example": 120
+                    },
+                    "from": {
+                        "type": "integer",
+                        "example": 1,
+                        "nullable": true
+                    },
+                    "to": {
+                        "type": "integer",
+                        "example": 15,
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "MetaResponse": {
+                "properties": {
+                    "pagination": {
+                        "$ref": "#/components/schemas/PaginationMeta"
+                    }
+                },
+                "type": "object"
+            },
             "SuccessResponse": {
                 "required": [
                     "success",
@@ -2511,6 +3957,14 @@
                         "example": "Permintaan berhasil"
                     },
                     "data": {
+                        "nullable": true
+                    },
+                    "meta": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/MetaResponse"
+                            }
+                        ],
                         "nullable": true
                     },
                     "request_id": {
@@ -2543,6 +3997,9 @@
                     "details": {
                         "nullable": true
                     },
+                    "errors": {
+                        "nullable": true
+                    },
                     "request_id": {
                         "type": "string",
                         "example": "req_01HZY2P0W7D3G4",
@@ -2567,6 +4024,39 @@
                     }
                 ]
             },
+            "WilayahNested": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "nama": {
+                        "type": "string",
+                        "example": "Sukamaju"
+                    },
+                    "provinsi": {
+                        "type": "object",
+                        "nullable": true,
+                        "additionalProperties": true
+                    },
+                    "kabupaten": {
+                        "type": "object",
+                        "nullable": true,
+                        "additionalProperties": true
+                    },
+                    "kecamatan": {
+                        "type": "object",
+                        "nullable": true,
+                        "additionalProperties": true
+                    },
+                    "desa": {
+                        "type": "object",
+                        "nullable": true,
+                        "additionalProperties": true
+                    }
+                },
+                "type": "object"
+            },
             "UserLite": {
                 "properties": {
                     "id": {
@@ -2589,6 +4079,47 @@
                     "role": {
                         "type": "string",
                         "example": "Admin"
+                    },
+                    "no_telepon": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "alamat": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "id_desa": {
+                        "type": "integer",
+                        "nullable": true
+                    },
+                    "desa": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/WilayahNested"
+                            }
+                        ],
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "KategoriBencanaNested": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 2
+                    },
+                    "nama_kategori": {
+                        "type": "string",
+                        "example": "Banjir"
+                    },
+                    "deskripsi": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "icon": {
+                        "type": "string",
+                        "nullable": true
                     }
                 },
                 "type": "object"
@@ -2599,9 +4130,30 @@
                         "type": "integer",
                         "example": 10
                     },
+                    "id_pelapor": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "id_kategori_bencana": {
+                        "type": "integer",
+                        "example": 2,
+                        "nullable": true
+                    },
+                    "id_desa": {
+                        "type": "integer",
+                        "example": 31,
+                        "nullable": true
+                    },
                     "judul_laporan": {
                         "type": "string",
                         "example": "Banjir di Desa Sukamaju"
+                    },
+                    "deskripsi": {
+                        "type": "string"
+                    },
+                    "tingkat_keparahan": {
+                        "type": "string",
+                        "example": "Tinggi"
                     },
                     "status": {
                         "type": "string",
@@ -2614,6 +4166,74 @@
                             "Ditolak"
                         ],
                         "example": "Diproses"
+                    },
+                    "latitude": {
+                        "type": "number",
+                        "format": "double",
+                        "example": -6.2
+                    },
+                    "longitude": {
+                        "type": "number",
+                        "format": "double",
+                        "example": 106.8
+                    },
+                    "alamat_lengkap": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "pelapor": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/UserLite"
+                            }
+                        ],
+                        "nullable": true
+                    },
+                    "kategori": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/KategoriBencanaNested"
+                            }
+                        ],
+                        "nullable": true
+                    },
+                    "desa": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/WilayahNested"
+                            }
+                        ],
+                        "nullable": true
+                    },
+                    "verifikator": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/UserLite"
+                            }
+                        ],
+                        "nullable": true
+                    },
+                    "penanggungJawab": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/UserLite"
+                            }
+                        ],
+                        "nullable": true
+                    },
+                    "monitoring": {
+                        "type": "array",
+                        "items": {
+                            "type": "object"
+                        },
+                        "nullable": true
+                    },
+                    "tindak_lanjut": {
+                        "type": "array",
+                        "items": {
+                            "type": "object"
+                        },
+                        "nullable": true
                     }
                 },
                 "type": "object"
@@ -2634,26 +4254,13 @@
                     },
                     "waktu_monitoring": {
                         "type": "string",
-                        "format": "date-time",
-                        "example": "2026-03-19T08:00:00Z"
+                        "format": "date-time"
                     },
                     "hasil_monitoring": {
-                        "type": "string",
-                        "example": "Kondisi terkendali"
+                        "type": "string"
                     },
                     "koordinat_gps": {
                         "type": "string",
-                        "example": "-6.2,106.8",
-                        "nullable": true
-                    },
-                    "created_at": {
-                        "type": "string",
-                        "format": "date-time",
-                        "nullable": true
-                    },
-                    "updated_at": {
-                        "type": "string",
-                        "format": "date-time",
                         "nullable": true
                     },
                     "laporan": {
@@ -2691,8 +4298,7 @@
                     },
                     "tanggal_tanggapan": {
                         "type": "string",
-                        "format": "date-time",
-                        "example": "2026-03-19T09:00:00Z"
+                        "format": "date-time"
                     },
                     "status": {
                         "type": "string",
@@ -2701,16 +4307,6 @@
                             "Selesai"
                         ],
                         "example": "Menuju Lokasi"
-                    },
-                    "created_at": {
-                        "type": "string",
-                        "format": "date-time",
-                        "nullable": true
-                    },
-                    "updated_at": {
-                        "type": "string",
-                        "format": "date-time",
-                        "nullable": true
                     },
                     "laporan": {
                         "oneOf": [
@@ -2726,6 +4322,13 @@
                                 "$ref": "#/components/schemas/UserLite"
                             }
                         ],
+                        "nullable": true
+                    },
+                    "riwayat_tindakans": {
+                        "type": "array",
+                        "items": {
+                            "type": "object"
+                        },
                         "nullable": true
                     }
                 },
@@ -2751,18 +4354,7 @@
                     },
                     "waktu_tindakan": {
                         "type": "string",
-                        "format": "date-time",
-                        "example": "2026-03-19T10:00:00Z"
-                    },
-                    "created_at": {
-                        "type": "string",
-                        "format": "date-time",
-                        "nullable": true
-                    },
-                    "updated_at": {
-                        "type": "string",
-                        "format": "date-time",
-                        "nullable": true
+                        "format": "date-time"
                     },
                     "tindakLanjut": {
                         "oneOf": [
@@ -2784,85 +4376,22 @@
                 "type": "object"
             },
             "PaginatedMonitoringData": {
-                "properties": {
-                    "current_page": {
-                        "type": "integer",
-                        "example": 1
-                    },
-                    "data": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/MonitoringItem"
-                        }
-                    },
-                    "per_page": {
-                        "type": "integer",
-                        "example": 20
-                    },
-                    "total": {
-                        "type": "integer",
-                        "example": 120
-                    },
-                    "last_page": {
-                        "type": "integer",
-                        "example": 6
-                    }
-                },
-                "type": "object"
+                "type": "array",
+                "items": {
+                    "$ref": "#/components/schemas/MonitoringItem"
+                }
             },
             "PaginatedTindakLanjutData": {
-                "properties": {
-                    "current_page": {
-                        "type": "integer",
-                        "example": 1
-                    },
-                    "data": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/TindakLanjutItem"
-                        }
-                    },
-                    "per_page": {
-                        "type": "integer",
-                        "example": 20
-                    },
-                    "total": {
-                        "type": "integer",
-                        "example": 80
-                    },
-                    "last_page": {
-                        "type": "integer",
-                        "example": 4
-                    }
-                },
-                "type": "object"
+                "type": "array",
+                "items": {
+                    "$ref": "#/components/schemas/TindakLanjutItem"
+                }
             },
             "PaginatedRiwayatTindakanData": {
-                "properties": {
-                    "current_page": {
-                        "type": "integer",
-                        "example": 1
-                    },
-                    "data": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/RiwayatTindakanItem"
-                        }
-                    },
-                    "per_page": {
-                        "type": "integer",
-                        "example": 20
-                    },
-                    "total": {
-                        "type": "integer",
-                        "example": 200
-                    },
-                    "last_page": {
-                        "type": "integer",
-                        "example": 10
-                    }
-                },
-                "type": "object"
+                "type": "array",
+                "items": {
+                    "$ref": "#/components/schemas/RiwayatTindakanItem"
+                }
             },
             "MonitoringSuccessResponse": {
                 "allOf": [
@@ -2951,9 +4480,43 @@
                         "properties": {
                             "data": {
                                 "$ref": "#/components/schemas/PaginatedMonitoringData"
+                            },
+                            "meta": {
+                                "$ref": "#/components/schemas/MetaResponse"
                             }
                         },
-                        "type": "object"
+                        "type": "object",
+                        "example": {
+                            "success": true,
+                            "message": "Data monitoring berhasil diambil",
+                            "data": [
+                                {
+                                    "id_monitoring": 99,
+                                    "id_laporan": 10,
+                                    "id_operator": 7,
+                                    "waktu_monitoring": "2026-03-20T09:00:00+07:00",
+                                    "hasil_monitoring": "Debit air mulai turun",
+                                    "operator": {
+                                        "id": 7,
+                                        "nama": "Operator Desa"
+                                    },
+                                    "laporan": {
+                                        "id": 10,
+                                        "judul_laporan": "Banjir di Desa Sukamaju"
+                                    }
+                                }
+                            ],
+                            "meta": {
+                                "pagination": {
+                                    "current_page": 1,
+                                    "last_page": 3,
+                                    "per_page": 20,
+                                    "total": 45,
+                                    "from": 1,
+                                    "to": 20
+                                }
+                            }
+                        }
                     }
                 ]
             },
@@ -2966,9 +4529,42 @@
                         "properties": {
                             "data": {
                                 "$ref": "#/components/schemas/PaginatedTindakLanjutData"
+                            },
+                            "meta": {
+                                "$ref": "#/components/schemas/MetaResponse"
                             }
                         },
-                        "type": "object"
+                        "type": "object",
+                        "example": {
+                            "success": true,
+                            "message": "Data tindak lanjut berhasil diambil",
+                            "data": [
+                                {
+                                    "id_tindaklanjut": 7,
+                                    "laporan_id": 10,
+                                    "id_petugas": 4,
+                                    "status": "Menuju Lokasi",
+                                    "petugas": {
+                                        "id": 4,
+                                        "nama": "Petugas BPBD"
+                                    },
+                                    "laporan": {
+                                        "id": 10,
+                                        "judul_laporan": "Banjir di Desa Sukamaju"
+                                    }
+                                }
+                            ],
+                            "meta": {
+                                "pagination": {
+                                    "current_page": 1,
+                                    "last_page": 2,
+                                    "per_page": 20,
+                                    "total": 31,
+                                    "from": 1,
+                                    "to": 20
+                                }
+                            }
+                        }
                     }
                 ]
             },
@@ -2981,142 +4577,120 @@
                         "properties": {
                             "data": {
                                 "$ref": "#/components/schemas/PaginatedRiwayatTindakanData"
+                            },
+                            "meta": {
+                                "$ref": "#/components/schemas/MetaResponse"
+                            }
+                        },
+                        "type": "object",
+                        "example": {
+                            "success": true,
+                            "message": "Data riwayat tindakan berhasil diambil",
+                            "data": [
+                                {
+                                    "id": 15,
+                                    "tindaklanjut_id": 7,
+                                    "id_petugas": 4,
+                                    "keterangan": "Evakuasi selesai",
+                                    "petugas": {
+                                        "id": 4,
+                                        "nama": "Petugas BPBD"
+                                    },
+                                    "tindakLanjut": {
+                                        "id_tindaklanjut": 7,
+                                        "status": "Selesai"
+                                    }
+                                }
+                            ],
+                            "meta": {
+                                "pagination": {
+                                    "current_page": 1,
+                                    "last_page": 5,
+                                    "per_page": 20,
+                                    "total": 96,
+                                    "from": 1,
+                                    "to": 20
+                                }
+                            }
+                        }
+                    }
+                ]
+            },
+            "LaporanItem": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/LaporanLite"
+                    },
+                    {
+                        "properties": {
+                            "is_prioritas": {
+                                "type": "boolean",
+                                "example": true
+                            },
+                            "view_count": {
+                                "type": "integer",
+                                "example": 12
+                            },
+                            "jumlah_korban": {
+                                "type": "integer",
+                                "example": 4,
+                                "nullable": true
+                            },
+                            "jumlah_rumah_rusak": {
+                                "type": "integer",
+                                "example": 9,
+                                "nullable": true
+                            },
+                            "waktu_laporan": {
+                                "type": "string",
+                                "format": "date-time",
+                                "example": "2026-03-20T08:30:00+07:00"
+                            },
+                            "waktu_verifikasi": {
+                                "type": "string",
+                                "format": "date-time",
+                                "nullable": true
+                            },
+                            "waktu_selesai": {
+                                "type": "string",
+                                "format": "date-time",
+                                "nullable": true
+                            },
+                            "catatan_verifikasi": {
+                                "type": "string",
+                                "nullable": true
+                            },
+                            "foto_bukti_1_url": {
+                                "type": "string",
+                                "example": "http://localhost:8000/storage/laporans/sample1.jpg",
+                                "nullable": true
+                            },
+                            "foto_bukti_2_url": {
+                                "type": "string",
+                                "example": "http://localhost:8000/storage/laporans/sample2.jpg",
+                                "nullable": true
+                            },
+                            "foto_bukti_3_url": {
+                                "type": "string",
+                                "example": "http://localhost:8000/storage/laporans/sample3.jpg",
+                                "nullable": true
+                            },
+                            "video_bukti_url": {
+                                "type": "string",
+                                "example": "http://localhost:8000/storage/laporans/sample.mp4",
+                                "nullable": true
                             }
                         },
                         "type": "object"
                     }
                 ]
             },
-            "LaporanItem": {
-                "properties": {
-                    "id": {
-                        "type": "integer",
-                        "example": 10
-                    },
-                    "id_pelapor": {
-                        "type": "integer",
-                        "example": 1
-                    },
-                    "id_kategori_bencana": {
-                        "type": "integer",
-                        "example": 2
-                    },
-                    "id_desa": {
-                        "type": "integer",
-                        "example": 31
-                    },
-                    "judul_laporan": {
-                        "type": "string",
-                        "example": "Banjir di Desa Sukamaju"
-                    },
-                    "deskripsi": {
-                        "type": "string",
-                        "example": "Air meluap ke permukiman"
-                    },
-                    "tingkat_keparahan": {
-                        "type": "string",
-                        "enum": [
-                            "Rendah",
-                            "Sedang",
-                            "Tinggi",
-                            "Kritis"
-                        ],
-                        "example": "Tinggi"
-                    },
-                    "status": {
-                        "type": "string",
-                        "enum": [
-                            "Draft",
-                            "Menunggu Verifikasi",
-                            "Diverifikasi",
-                            "Diproses",
-                            "Selesai",
-                            "Ditolak"
-                        ],
-                        "example": "Diproses"
-                    },
-                    "latitude": {
-                        "type": "number",
-                        "format": "double",
-                        "example": -6.2
-                    },
-                    "longitude": {
-                        "type": "number",
-                        "format": "double",
-                        "example": 106.8
-                    },
-                    "alamat_lengkap": {
-                        "type": "string",
-                        "nullable": true
-                    },
-                    "is_prioritas": {
-                        "type": "boolean",
-                        "example": false
-                    },
-                    "view_count": {
-                        "type": "integer",
-                        "example": 12
-                    },
-                    "jumlah_korban": {
-                        "type": "integer",
-                        "nullable": true
-                    },
-                    "jumlah_rumah_rusak": {
-                        "type": "integer",
-                        "nullable": true
-                    },
-                    "waktu_laporan": {
-                        "type": "string",
-                        "format": "date-time",
-                        "nullable": true
-                    },
-                    "waktu_verifikasi": {
-                        "type": "string",
-                        "format": "date-time",
-                        "nullable": true
-                    },
-                    "waktu_selesai": {
-                        "type": "string",
-                        "format": "date-time",
-                        "nullable": true
-                    },
-                    "catatan_verifikasi": {
-                        "type": "string",
-                        "nullable": true
-                    }
-                },
-                "type": "object"
-            },
             "LaporanPaginationMeta": {
-                "properties": {
-                    "current_page": {
-                        "type": "integer",
-                        "example": 1
-                    },
-                    "last_page": {
-                        "type": "integer",
-                        "example": 8
-                    },
-                    "per_page": {
-                        "type": "integer",
-                        "example": 15
-                    },
-                    "total": {
-                        "type": "integer",
-                        "example": 120
-                    },
-                    "from": {
-                        "type": "integer",
-                        "example": 1,
-                        "nullable": true
-                    },
-                    "to": {
-                        "type": "integer",
-                        "example": 15,
-                        "nullable": true
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/PaginationMeta"
                     }
-                },
-                "type": "object"
+                ]
             },
             "LaporanListSuccessResponse": {
                 "allOf": [
@@ -3131,11 +4705,46 @@
                                     "$ref": "#/components/schemas/LaporanItem"
                                 }
                             },
-                            "pagination": {
-                                "$ref": "#/components/schemas/LaporanPaginationMeta"
+                            "meta": {
+                                "$ref": "#/components/schemas/MetaResponse"
                             }
                         },
-                        "type": "object"
+                        "type": "object",
+                        "example": {
+                            "success": true,
+                            "message": "Data laporan berhasil diambil",
+                            "data": [
+                                {
+                                    "id": 10,
+                                    "id_pelapor": 5,
+                                    "judul_laporan": "Banjir di Desa Sukamaju",
+                                    "status": "Diproses",
+                                    "pelapor": {
+                                        "id": 5,
+                                        "nama": "Andi Warga"
+                                    },
+                                    "kategori": {
+                                        "id": 2,
+                                        "nama_kategori": "Banjir"
+                                    },
+                                    "desa": {
+                                        "id": 31,
+                                        "nama": "Sukamaju"
+                                    }
+                                }
+                            ],
+                            "meta": {
+                                "pagination": {
+                                    "current_page": 1,
+                                    "last_page": 8,
+                                    "per_page": 15,
+                                    "total": 120,
+                                    "from": 1,
+                                    "to": 15
+                                }
+                            },
+                            "request_id": "req_01HZY2P0W7D3G4"
+                        }
                     }
                 ]
             },
@@ -3199,7 +4808,8 @@
                     "top_pengguna": {
                         "type": "array",
                         "items": {
-                            "type": "object"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     }
                 },
@@ -3230,13 +4840,15 @@
                     "daftar_gempa": {
                         "type": "array",
                         "items": {
-                            "type": "object"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     },
                     "gempa_dirasakan": {
                         "type": "array",
                         "items": {
-                            "type": "object"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     },
                     "cache_status": {
@@ -3272,7 +4884,8 @@
                             "data": {
                                 "type": "array",
                                 "items": {
-                                    "type": "object"
+                                    "type": "object",
+                                    "additionalProperties": true
                                 }
                             }
                         },
@@ -3341,6 +4954,382 @@
                         "type": "object"
                     }
                 ]
+            },
+            "RegisterSuccessResponse": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/SuccessResponse"
+                    },
+                    {
+                        "properties": {
+                            "data": {
+                                "$ref": "#/components/schemas/UserLite"
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
+            "TokenRefreshSuccessResponse": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/SuccessResponse"
+                    },
+                    {
+                        "properties": {
+                            "data": {
+                                "properties": {
+                                    "token": {
+                                        "type": "string",
+                                        "example": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
+                                    },
+                                    "token_type": {
+                                        "type": "string",
+                                        "example": "Bearer"
+                                    },
+                                    "expires_in": {
+                                        "type": "integer",
+                                        "example": 3600
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
+            "RoleListSuccessResponse": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/SuccessResponse"
+                    },
+                    {
+                        "properties": {
+                            "data": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string",
+                                    "example": "Admin"
+                                }
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
+            "CheckTokenSuccessResponse": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/SuccessResponse"
+                    },
+                    {
+                        "properties": {
+                            "data": {
+                                "properties": {
+                                    "user_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "user_role": {
+                                        "type": "string",
+                                        "example": "Admin"
+                                    },
+                                    "user_name": {
+                                        "type": "string",
+                                        "example": "Admin Simonta"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
+            "UserListSuccessResponse": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/SuccessResponse"
+                    },
+                    {
+                        "properties": {
+                            "data": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/UserLite"
+                                }
+                            },
+                            "meta": {
+                                "$ref": "#/components/schemas/MetaResponse"
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
+            "UserDetailSuccessResponse": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/SuccessResponse"
+                    },
+                    {
+                        "properties": {
+                            "data": {
+                                "$ref": "#/components/schemas/UserLite"
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
+            "UserStatisticsSuccessResponse": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/SuccessResponse"
+                    },
+                    {
+                        "properties": {
+                            "data": {
+                                "properties": {
+                                    "total_users": {
+                                        "type": "integer",
+                                        "example": 120
+                                    },
+                                    "by_role": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
+                                            "additionalProperties": true
+                                        }
+                                    },
+                                    "recent_users": {
+                                        "type": "array",
+                                        "items": {
+                                            "$ref": "#/components/schemas/UserLite"
+                                        }
+                                    },
+                                    "users_this_month": {
+                                        "type": "integer",
+                                        "example": 15
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
+            "KategoriBencanaItem": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "nama_kategori": {
+                        "type": "string",
+                        "example": "Banjir"
+                    },
+                    "deskripsi": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "icon": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "KategoriBencanaListSuccessResponse": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/SuccessResponse"
+                    },
+                    {
+                        "properties": {
+                            "data": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/KategoriBencanaItem"
+                                }
+                            },
+                            "meta": {
+                                "$ref": "#/components/schemas/MetaResponse"
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
+            "KategoriBencanaDetailSuccessResponse": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/SuccessResponse"
+                    },
+                    {
+                        "properties": {
+                            "data": {
+                                "$ref": "#/components/schemas/KategoriBencanaItem"
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
+            "WilayahBasicItem": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "nama": {
+                        "type": "string",
+                        "example": "Sukamaju"
+                    },
+                    "jenis": {
+                        "type": "string",
+                        "example": "desa",
+                        "nullable": true
+                    },
+                    "id_parent": {
+                        "type": "integer",
+                        "example": 10,
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "WilayahCollectionSuccessResponse": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/SuccessResponse"
+                    },
+                    {
+                        "properties": {
+                            "data": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "additionalProperties": true
+                                }
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
+            "WilayahPaginatedSuccessResponse": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/SuccessResponse"
+                    },
+                    {
+                        "properties": {
+                            "data": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "additionalProperties": true
+                                }
+                            },
+                            "meta": {
+                                "$ref": "#/components/schemas/MetaResponse"
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
+            "WilayahDetailSuccessResponse": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/SuccessResponse"
+                    },
+                    {
+                        "properties": {
+                            "data": {
+                                "type": "object",
+                                "additionalProperties": true
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
+            "WilayahHierarchySuccessResponse": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/SuccessResponse"
+                    },
+                    {
+                        "properties": {
+                            "data": {
+                                "properties": {
+                                    "desa": {
+                                        "type": "object",
+                                        "additionalProperties": true
+                                    },
+                                    "kecamatan": {
+                                        "type": "object",
+                                        "additionalProperties": true
+                                    },
+                                    "kabupaten": {
+                                        "type": "object",
+                                        "additionalProperties": true
+                                    },
+                                    "provinsi": {
+                                        "type": "object",
+                                        "additionalProperties": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
+            "WilayahSearchSuccessResponse": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/SuccessResponse"
+                    },
+                    {
+                        "properties": {
+                            "data": {
+                                "nullable": true
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
+            "WilayahCrudSuccessResponse": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/SuccessResponse"
+                    },
+                    {
+                        "properties": {
+                            "data": {
+                                "$ref": "#/components/schemas/WilayahBasicItem"
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
             }
         },
         "securitySchemes": {
@@ -3356,6 +5345,14 @@
         {
             "name": "Authentication",
             "description": "Authentication endpoints"
+        },
+        {
+            "name": "User Management",
+            "description": "Manajemen pengguna"
+        },
+        {
+            "name": "Wilayah Management",
+            "description": "Referensi dan manajemen wilayah"
         },
         {
             "name": "Laporan Management",
