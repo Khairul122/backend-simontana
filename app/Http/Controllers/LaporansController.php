@@ -3,33 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Models\Laporans;
+use App\Http\Requests\StoreLaporanRequest;
+use App\Http\Requests\UpdateLaporanRequest;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Validator;
 
 
 
 class LaporansController extends Controller
 {
     private const MAX_RADIUS_KM = 100;
-    private const FULL_RELATIONS = [
-        'pelapor.desa.kecamatan.kabupaten.provinsi',
-        'kategori',
-        'desa.kecamatan.kabupaten.provinsi',
-        'verifikator.desa.kecamatan.kabupaten.provinsi',
-        'penanggungJawab.desa.kecamatan.kabupaten.provinsi',
-        'tindakLanjut.petugas.desa.kecamatan.kabupaten.provinsi',
-        'tindakLanjut.laporan.pelapor.desa.kecamatan.kabupaten.provinsi',
-        'tindakLanjut.laporan.kategori',
-        'tindakLanjut.laporan.desa.kecamatan.kabupaten.provinsi',
-        'monitoring.operator.desa.kecamatan.kabupaten.provinsi',
-        'monitoring.laporan.pelapor.desa.kecamatan.kabupaten.provinsi',
-        'monitoring.laporan.kategori',
-        'monitoring.laporan.desa.kecamatan.kabupaten.provinsi',
-    ];
 
     private const ALLOWED_ORDER_BY = [
         'id',
@@ -56,7 +43,6 @@ class LaporansController extends Controller
             try {
                 Storage::disk('public')->delete('laporans/' . $oldFile);
             } catch (\Exception $e) {
-                
                 Log::warning("Failed to delete old file: {$oldFile}", ['error' => $e->getMessage()]);
             }
         }
@@ -78,17 +64,17 @@ class LaporansController extends Controller
                 try {
                     Storage::disk('public')->delete('laporans/' . $file);
                 } catch (\Exception $e) {
-                    
                     Log::warning("Failed to delete file: {$file}", ['error' => $e->getMessage()]);
                 }
             }
         }
     }
+
     
     public function index(Request $request): JsonResponse
     {
         try {
-            $query = Laporans::with(self::FULL_RELATIONS);
+            $query = Laporans::with(Laporans::FULL_RELATIONS);
 
             
             if ($request->has('status') && $request->status) {
@@ -166,7 +152,7 @@ class LaporansController extends Controller
     }
 
     
-    public function store(Request $request): JsonResponse
+    public function store(StoreLaporanRequest $request): JsonResponse
     {
         try {
             $user = $this->ensureAuthenticated($request);
@@ -174,31 +160,7 @@ class LaporansController extends Controller
                 return $this->unauthorized();
             }
 
-            $validator = Validator::make($request->all(), [
-                'judul_laporan' => 'required|string|max:255',
-                'deskripsi' => 'required|string',
-                'tingkat_keparahan' => 'required|string|in:Rendah,Sedang,Tinggi,Kritis',
-                'latitude' => 'required|numeric|between:-90,90',
-                'longitude' => 'required|numeric|between:-180,180',
-                'id_kategori_bencana' => 'required|exists:kategori_bencana,id',
-                'id_desa' => 'required|exists:desa,id',
-                'alamat' => 'nullable|string|max:500',
-                'jumlah_korban' => 'nullable|integer|min:0',
-                'jumlah_rumah_rusak' => 'nullable|integer|min:0',
-                'is_prioritas' => 'nullable|boolean',
-                'data_tambahan' => 'nullable|array',
-                'foto_bukti_1' => 'nullable|image|mimes:jpeg,jpg,png|max:5120',
-                'foto_bukti_2' => 'nullable|image|mimes:jpeg,jpg,png|max:5120',
-                'foto_bukti_3' => 'nullable|image|mimes:jpeg,jpg,png|max:5120',
-                'video_bukti' => 'nullable|file|mimes:mp4,avi,mov|max:10240',
-                'waktu_laporan' => 'nullable|date',
-            ]);
-
-            if ($validator->fails()) {
-                return $this->validationErrorResponse($validator->errors());
-            }
-
-            $data = $validator->validated();
+            $data = $request->validated();
             $data['id_pelapor'] = $user->id;
             $data['waktu_laporan'] = $request->waktu_laporan ?? now();
             $data['status'] = 'Draft';
@@ -220,7 +182,7 @@ class LaporansController extends Controller
             $data['data_tambahan'] = $request->data_tambahan ?? null;
 
             $laporan = Laporans::create($data);
-            $laporan->load(self::FULL_RELATIONS);
+            $laporan->load(Laporans::FULL_RELATIONS);
 
             return $this->successResponse('Laporan berhasil dibuat', $laporan, 201);
 
@@ -242,7 +204,7 @@ class LaporansController extends Controller
             $laporan->incrementViewCount();
 
             
-            $laporan->load(self::FULL_RELATIONS);
+            $laporan->load(Laporans::FULL_RELATIONS);
 
             return $this->successResponse('Detail laporan berhasil diambil', $laporan);
 
@@ -257,7 +219,7 @@ class LaporansController extends Controller
     }
 
     
-    public function update(Request $request, Laporans $laporan): JsonResponse
+    public function update(UpdateLaporanRequest $request, Laporans $laporan): JsonResponse
     {
         try {
             $user = $this->ensureAuthenticated($request);
@@ -270,31 +232,7 @@ class LaporansController extends Controller
                 return $this->forbidden('Tidak memiliki izin untuk mengubah laporan ini');
             }
 
-            $validator = Validator::make($request->all(), [
-                'judul_laporan' => 'sometimes|string|max:255',
-                'deskripsi' => 'sometimes|string',
-                'tingkat_keparahan' => 'sometimes|string|in:Rendah,Sedang,Tinggi,Kritis',
-                'latitude' => 'sometimes|numeric|between:-90,90',
-                'longitude' => 'sometimes|numeric|between:-180,180',
-                'id_kategori_bencana' => 'sometimes|exists:kategori_bencana,id',
-                'id_desa' => 'sometimes|exists:desa,id',
-                'alamat' => 'nullable|string|max:500',
-                'jumlah_korban' => 'nullable|integer|min:0',
-                'jumlah_rumah_rusak' => 'nullable|integer|min:0',
-                'is_prioritas' => 'nullable|boolean',
-                'data_tambahan' => 'nullable|array',
-                'foto_bukti_1' => 'nullable|image|mimes:jpeg,jpg,png|max:5120',
-                'foto_bukti_2' => 'nullable|image|mimes:jpeg,jpg,png|max:5120',
-                'foto_bukti_3' => 'nullable|image|mimes:jpeg,jpg,png|max:5120',
-                'video_bukti' => 'nullable|file|mimes:mp4,avi,mov|max:10240',
-                'waktu_laporan' => 'nullable|date',
-            ]);
-
-            if ($validator->fails()) {
-                return $this->validationErrorResponse($validator->errors());
-            }
-
-            $data = $validator->validated();
+            $data = $request->validated();
 
             
             $fileFields = ['foto_bukti_1', 'foto_bukti_2', 'foto_bukti_3', 'video_bukti'];
@@ -322,16 +260,13 @@ class LaporansController extends Controller
             $isStatusChanging = isset($data['status']) && $data['status'] !== $laporan->status;
 
             if ($isStatusChanging) {
-                
                 $updateData = $data;
 
-                
                 if ($data['status'] === 'Diverifikasi') {
                     $user_id = $user->id;
                     $updateData['id_verifikator'] = $user_id;
                     $updateData['waktu_verifikasi'] = now();
 
-                    
                     if (is_null($laporan->id_penanggung_jawab)) {
                         $updateData['id_penanggung_jawab'] = $user_id;
                     }
@@ -343,7 +278,7 @@ class LaporansController extends Controller
             }
 
             
-            $laporan->load(self::FULL_RELATIONS);
+            $laporan->load(Laporans::FULL_RELATIONS);
 
             return $this->successResponse('Laporan berhasil diperbarui', $laporan);
 
@@ -381,7 +316,7 @@ class LaporansController extends Controller
             ];
             $this->deleteFiles($filesToDelete);
 
-            $laporan->delete();
+            $laporan->delete(); // Soft delete — baris tetap ada di DB dengan deleted_at terisi
 
             return $this->successResponse('Laporan berhasil dihapus', null, 200, ['data' => null]);
 
@@ -400,115 +335,122 @@ class LaporansController extends Controller
     public function statistics(Request $request): JsonResponse
     {
         try {
-            $query = Laporans::query();
+            $period = $request->get('period', 'all');
+            $cacheKey = 'laporans.statistics.' . $period;
 
-            
-            if ($request->has('period') && $request->period) {
-                switch ($request->period) {
-                    case 'weekly':
-                        $query->where('created_at', '>=', now()->subDays(7));
-                        break;
-                    case 'monthly':
-                        $query->where('created_at', '>=', now()->subMonth());
-                        break;
-                    case 'yearly':
-                        $query->where('created_at', '>=', now()->subYear());
-                        break;
+            $data = Cache::remember($cacheKey, 300, function () use ($request, $period) {
+                $query = Laporans::query();
+
+                
+                if ($period && $period !== 'all') {
+                    switch ($period) {
+                        case 'weekly':
+                            $query->where('created_at', '>=', now()->subDays(7));
+                            break;
+                        case 'monthly':
+                            $query->where('created_at', '>=', now()->subMonth());
+                            break;
+                        case 'yearly':
+                            $query->where('created_at', '>=', now()->subYear());
+                            break;
+                    }
                 }
-            }
 
-            
-            $statusCounters = (clone $query)
-                ->selectRaw('status, COUNT(*) as total')
-                ->groupBy('status')
-                ->pluck('total', 'status');
+                
+                $statusCounters = (clone $query)
+                    ->selectRaw('status, COUNT(*) as total')
+                    ->groupBy('status')
+                    ->pluck('total', 'status');
 
-            $total_laporan = (int) $statusCounters->sum();
-            $laporan_perlu_verifikasi = (int) ($statusCounters['Draft'] ?? 0) + (int) ($statusCounters['Menunggu Verifikasi'] ?? 0);
-            $laporan_ditindak = (int) ($statusCounters['Diverifikasi'] ?? 0) + (int) ($statusCounters['Diproses'] ?? 0);
-            $laporan_selesai = (int) ($statusCounters['Selesai'] ?? 0);
-            $laporan_ditolak = (int) ($statusCounters['Ditolak'] ?? 0);
+                $total_laporan = (int) $statusCounters->sum();
+                $laporan_perlu_verifikasi = (int) ($statusCounters['Draft'] ?? 0) + (int) ($statusCounters['Menunggu Verifikasi'] ?? 0);
+                $laporan_ditindak = (int) ($statusCounters['Diverifikasi'] ?? 0) + (int) ($statusCounters['Diproses'] ?? 0);
+                $laporan_selesai = (int) ($statusCounters['Selesai'] ?? 0);
+                $laporan_ditolak = (int) ($statusCounters['Ditolak'] ?? 0);
 
-            $weeklyBuckets = Laporans::query()
-                ->selectRaw('DATE(created_at) as day, COUNT(*) as total')
-                ->where('created_at', '>=', now()->subDays(6)->startOfDay())
-                ->groupBy('day')
-                ->pluck('total', 'day');
+                $weeklyBuckets = Laporans::query()
+                    ->selectRaw('DATE(created_at) as day, COUNT(*) as total')
+                    ->where('created_at', '>=', now()->subDays(6)->startOfDay())
+                    ->groupBy('day')
+                    ->pluck('total', 'day');
 
-            $weekly_stats = [];
-            for ($i = 6; $i >= 0; $i--) {
-                $day = now()->subDays($i);
-                $dayKey = $day->format('Y-m-d');
-                $weekly_stats[strtolower($day->format('D'))] = (int) ($weeklyBuckets[$dayKey] ?? 0);
-            }
+                $weekly_stats = [];
+                for ($i = 6; $i >= 0; $i--) {
+                    $day = now()->subDays($i);
+                    $dayKey = $day->format('Y-m-d');
+                    $weekly_stats[strtolower($day->format('D'))] = (int) ($weeklyBuckets[$dayKey] ?? 0);
+                }
 
-            
-            $categories_stats = DB::table('laporans')
-                ->join('kategori_bencana', 'laporans.id_kategori_bencana', '=', 'kategori_bencana.id')
-                ->select('kategori_bencana.nama_kategori as category_name', DB::raw('count(*) as count'))
-                ->when($request->period, function ($q, $period) {
-                    return match ($period) {
-                        'weekly' => $q->where('laporans.created_at', '>=', now()->subDays(7)),
-                        'monthly' => $q->where('laporans.created_at', '>=', now()->subMonth()),
-                        'yearly' => $q->where('laporans.created_at', '>=', now()->subYear()),
-                        default => $q,
-                    };
-                })
-                ->groupBy('kategori_bencana.id', 'kategori_bencana.nama_kategori')
-                ->orderBy('count', 'desc')
-                ->get()
-                ->keyBy('category_name')
-                ->map(function ($item) {
-                    return $item->count;
-                })
-                ->toArray();
+                
+                $categories_stats = DB::table('laporans')
+                    ->join('kategori_bencana', 'laporans.id_kategori_bencana', '=', 'kategori_bencana.id')
+                    ->select('kategori_bencana.nama_kategori as category_name', DB::raw('count(*) as count'))
+                    ->when($period && $period !== 'all', function ($q) use ($period) {
+                        return match ($period) {
+                            'weekly' => $q->where('laporans.created_at', '>=', now()->subDays(7)),
+                            'monthly' => $q->where('laporans.created_at', '>=', now()->subMonth()),
+                            'yearly' => $q->where('laporans.created_at', '>=', now()->subYear()),
+                            default => $q,
+                        };
+                    })
+                    ->whereNull('laporans.deleted_at')
+                    ->groupBy('kategori_bencana.id', 'kategori_bencana.nama_kategori')
+                    ->orderBy('count', 'desc')
+                    ->get()
+                    ->keyBy('category_name')
+                    ->map(fn($item) => $item->count)
+                    ->toArray();
 
-            
-            $monthly_trend = DB::table('laporans')
-                ->select(DB::raw('DATE_FORMAT(created_at, "%Y-%m") as month'), DB::raw('count(*) as count'))
-                ->where('created_at', '>=', now()->subYear())
-                ->groupBy('month')
-                ->orderBy('month')
-                ->get()
-                ->pluck('count', 'month')
-                ->toArray();
+                
+                $monthly_trend = DB::table('laporans')
+                    ->select(DB::raw('DATE_FORMAT(created_at, "%Y-%m") as month'), DB::raw('count(*) as count'))
+                    ->where('created_at', '>=', now()->subYear())
+                    ->whereNull('deleted_at')
+                    ->groupBy('month')
+                    ->orderBy('month')
+                    ->get()
+                    ->pluck('count', 'month')
+                    ->toArray();
 
-            
-            $top_pengguna = DB::table('laporans')
-                ->join('pengguna', 'laporans.id_pelapor', '=', 'pengguna.id')
-                ->select('pengguna.nama as pengguna_name', DB::raw('count(*) as laporan_count'))
-                ->when($request->period, function ($q, $period) {
-                    return match ($period) {
-                        'weekly' => $q->where('laporans.created_at', '>=', now()->subDays(7)),
-                        'monthly' => $q->where('laporans.created_at', '>=', now()->subMonth()),
-                        'yearly' => $q->where('laporans.created_at', '>=', now()->subYear()),
-                        default => $q,
-                    };
-                })
-                ->groupBy('pengguna.id', 'pengguna.nama')
-                ->orderBy('laporan_count', 'desc')
-                ->limit(5)
-                ->get();
+                
+                $top_pengguna = DB::table('laporans')
+                    ->join('pengguna', 'laporans.id_pelapor', '=', 'pengguna.id')
+                    ->select('pengguna.nama as pengguna_name', DB::raw('count(*) as laporan_count'))
+                    ->when($period && $period !== 'all', function ($q) use ($period) {
+                        return match ($period) {
+                            'weekly' => $q->where('laporans.created_at', '>=', now()->subDays(7)),
+                            'monthly' => $q->where('laporans.created_at', '>=', now()->subMonth()),
+                            'yearly' => $q->where('laporans.created_at', '>=', now()->subYear()),
+                            default => $q,
+                        };
+                    })
+                    ->whereNull('laporans.deleted_at')
+                    ->whereNull('pengguna.deleted_at')
+                    ->groupBy('pengguna.id', 'pengguna.nama')
+                    ->orderBy('laporan_count', 'desc')
+                    ->limit(5)
+                    ->get();
 
-            return $this->successResponse('Statistik laporan berhasil diambil', [
-                'total_laporan' => $total_laporan,
-                'laporan_perlu_verifikasi' => $laporan_perlu_verifikasi,
-                'laporan_ditindak' => $laporan_ditindak,
-                'laporan_selesai' => $laporan_selesai,
-                'laporan_ditolak' => $laporan_ditolak,
-                'laporan_baru' => $laporan_perlu_verifikasi,
-                'laporan_ditangani' => $laporan_ditindak,
-                'weekly_stats' => $weekly_stats,
-                'categories_stats' => $categories_stats,
-                'monthly_trend' => $monthly_trend,
-                'top_pengguna' => $top_pengguna,
-            ]);
+                return [
+                    'total_laporan'             => $total_laporan,
+                    'laporan_perlu_verifikasi'  => $laporan_perlu_verifikasi,
+                    'laporan_ditindak'          => $laporan_ditindak,
+                    'laporan_selesai'           => $laporan_selesai,
+                    'laporan_ditolak'           => $laporan_ditolak,
+                    'laporan_baru'              => $laporan_perlu_verifikasi,
+                    'laporan_ditangani'         => $laporan_ditindak,
+                    'weekly_stats'              => $weekly_stats,
+                    'categories_stats'          => $categories_stats,
+                    'monthly_trend'             => $monthly_trend,
+                    'top_pengguna'              => $top_pengguna,
+                ];
+            });
+
+            return $this->successResponse('Statistik laporan berhasil diambil', $data);
 
         } catch (\Exception $e) {
             Log::error('Gagal mengambil statistik laporan', ['error' => $e->getMessage()]);
             return $this->internalError('Gagal mengambil statistik laporan');
         }
     }
-
-    
 }

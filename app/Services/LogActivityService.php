@@ -2,9 +2,14 @@
 
 namespace App\Services;
 
-use Illuminate\Support\Facades\DB;
+use App\Jobs\LogActivityJob;
 use Illuminate\Support\Facades\Log;
 
+/**
+ * Service untuk mencatat aktivitas pengguna.
+ * Logging dilakukan secara ASYNC via queue job agar tidak
+ * memperlambat response API (fire-and-forget pattern).
+ */
 class LogActivityService
 {
     public function log(
@@ -20,21 +25,21 @@ class LogActivityService
         }
 
         try {
-            DB::table('log_activity')->insert([
-                'user_id' => $userId,
-                'role' => $role,
-                'aktivitas' => $aktivitas,
-                'endpoint' => $endpoint,
-                'ip_address' => $ipAddress ?? '-',
-                'device_info' => $deviceInfo ?? '-',
-                'created_at' => now(),
-            ]);
+            LogActivityJob::dispatch(
+                $userId,
+                $role,
+                $aktivitas,
+                $endpoint,
+                $ipAddress ?? '-',
+                $deviceInfo ?? '-',
+            );
         } catch (\Throwable $e) {
-            Log::error('Gagal menyimpan log_activity', [
-                'user_id' => $userId,
-                'role' => $role,
-                'endpoint' => $endpoint,
-                'error' => $e->getMessage(),
+            // Jika queue tidak tersedia, fallback ke log file
+            Log::error('Gagal mendispatch LogActivityJob', [
+                'user_id'   => $userId,
+                'role'      => $role,
+                'endpoint'  => $endpoint,
+                'error'     => $e->getMessage(),
             ]);
         }
     }

@@ -5,114 +5,68 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 
+/**
+ * SimpleCors — versi ringan dari DynamicCors untuk endpoint yang memerlukan
+ * CORS tanpa credential (misalnya endpoint publik).
+ *
+ * Production: baca whitelist dari CORS_ALLOWED_ORIGINS di .env.
+ * Development: izinkan localhost dan LAN (tidak ada tunnel services).
+ */
 class SimpleCors
 {
-    
+    private const ALLOWED_METHODS = 'GET, POST, PUT, PATCH, DELETE, OPTIONS';
+    private const ALLOWED_HEADERS = 'Content-Type, Authorization, X-Requested-With, X-CSRF-Token, Accept, Origin, X-Device-Platform, X-App-Version, X-Mobile-Platform';
+    private const EXPOSED_HEADERS = 'X-Total-Count, X-Per-Page, X-Current-Page, X-Total-Pages, Content-Disposition, X-API-Version, X-Response-Time, X-Request-Id';
+
     public function handle(Request $request, Closure $next)
     {
-        
         $origin = $request->header('Origin');
 
-        
-        $env = config('app.env', 'local');
-        if ($env === 'local' || $env === 'development') {
-            
-            header('Access-Control-Allow-Origin: *');
-            header('Access-Control-Allow-Methods: GET, POST, PUT, PATCH, DELETE, OPTIONS');
-            header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With, X-CSRF-Token, Accept, Origin, Access-Control-Request-Method, Access-Control-Request-Headers, X-Device-Platform, X-App-Version, X-Client-Info, X-Mobile-Platform');
-            header('Access-Control-Allow-Credentials: false'); 
-            header('Access-Control-Max-Age: 86400');
-        } else {
-            
-            if ($origin && $this->isOriginAllowed($origin)) {
-                header('Access-Control-Allow-Origin: ' . $origin);
-                header('Vary: Origin');
-                header('Access-Control-Allow-Credentials: true');
-            }
-        }
-
-        
         if ($request->isMethod('OPTIONS')) {
-            if ($env === 'local' || $env === 'development' || ($origin && $this->isOriginAllowed($origin))) {
-                header('Access-Control-Allow-Origin: *');
-                header('Access-Control-Allow-Methods: GET, POST, PUT, PATCH, DELETE, OPTIONS');
-                header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With, X-CSRF-Token, Accept, Origin, Access-Control-Request-Method, Access-Control-Request-Headers, X-Device-Platform, X-App-Version, X-Client-Info, X-Mobile-Platform');
-                header('Access-Control-Max-Age: 86400');
-                header('Access-Control-Allow-Credentials: false');
-                header('Access-Control-Expose-Headers: X-Total-Count, X-Per-Page, X-Current-Page, X-Total-Pages, Content-Disposition, X-API-Version, X-Response-Time');
-                header('Content-Length: 0');
-                header('Content-Type: text/plain');
+            $response = response('', 200);
+            if ($origin && $this->isOriginAllowed($origin)) {
+                $response->headers->set('Access-Control-Allow-Origin', $origin);
+                $response->headers->set('Access-Control-Allow-Methods', self::ALLOWED_METHODS);
+                $response->headers->set('Access-Control-Allow-Headers', self::ALLOWED_HEADERS);
+                $response->headers->set('Access-Control-Max-Age', '86400');
+                $response->headers->set('Access-Control-Allow-Credentials', 'true');
+                $response->headers->set('Access-Control-Expose-Headers', self::EXPOSED_HEADERS);
+                $response->headers->set('Vary', 'Origin');
             }
-
-            return response('', 200);
+            return $response;
         }
 
-        
         $response = $next($request);
 
-        
-        if ($env === 'local' || $env === 'development') {
-            
-            $response->header('Access-Control-Allow-Origin', '*');
-            $response->header('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
-            $response->header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, X-CSRF-Token, Accept, Origin, Access-Control-Request-Method, Access-Control-Request-Headers, X-Device-Platform, X-App-Version, X-Client-Info, X-Mobile-Platform');
-            $response->header('Access-Control-Allow-Credentials', 'false');
-            $response->header('Access-Control-Expose-Headers', 'X-Total-Count, X-Per-Page, X-Current-Page, X-Total-Pages, Content-Disposition, X-API-Version, X-Response-Time');
-        } else if ($origin && $this->isOriginAllowed($origin)) {
-            
-            $response->header('Access-Control-Allow-Origin', $origin);
-            $response->header('Vary', 'Origin');
-            $response->header('Access-Control-Allow-Credentials', 'true');
-            $response->header('Access-Control-Expose-Headers', 'X-Total-Count, X-Per-Page, X-Current-Page, X-Total-Pages, Content-Disposition, X-API-Version, X-Response-Time');
+        if ($origin && $this->isOriginAllowed($origin)) {
+            $response->headers->set('Access-Control-Allow-Origin', $origin);
+            $response->headers->set('Access-Control-Allow-Credentials', 'true');
+            $response->headers->set('Access-Control-Expose-Headers', self::EXPOSED_HEADERS);
+            $response->headers->set('Vary', 'Origin');
         }
 
         return $response;
     }
 
-    
-    protected function isOriginAllowed($origin)
+    protected function isOriginAllowed(string $origin): bool
     {
-        
-        $allowedDomains = [
-            'simonta-bencana.com',
-            'www.simonta-bencana.com',
-            'app.simonta-bencana.com',
-            'simonta.id',
-            'www.simonta.id'
-        ];
+        $env = config('app.env', 'production');
 
-        
-        foreach ($allowedDomains as $domain) {
-            if (str_contains($origin, $domain)) {
+        // Development: izinkan localhost dan LAN (tidak ada tunnel services)
+        if (in_array($env, ['local', 'development'], true)) {
+            if (preg_match('/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/', $origin)) {
+                return true;
+            }
+            if (preg_match('/^https?:\/\/(192\.168\.|10\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)\d+\.\d+(:\d+)?$/', $origin)) {
                 return true;
             }
         }
 
-        
-        if (preg_match('/^https?:\/\/(localhost|127\.0\.0\.1):\d+$/', $origin)) {
-            return true;
-        }
+        // Baca whitelist dari .env — berlaku di semua environment
+        $allowedOrigins = array_filter(
+            array_map('trim', explode(',', (string) config('app.cors_allowed_origins', env('CORS_ALLOWED_ORIGINS', ''))))
+        );
 
-        
-        $tunnelServices = ['ngrok.io', 'xip.io', 'localto.net', 'serveo.net'];
-        foreach ($tunnelServices as $service) {
-            if (str_contains($origin, $service)) {
-                return true;
-            }
-        }
-
-        
-        $patterns = [
-            '/^exp:\/\/.*$/',          
-            '/^simonta:\/\/.*$/',     
-        ];
-
-        foreach ($patterns as $pattern) {
-            if (preg_match($pattern, $origin)) {
-                return true;
-            }
-        }
-
-        return false;
+        return in_array($origin, $allowedOrigins, true);
     }
 }

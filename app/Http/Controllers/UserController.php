@@ -24,10 +24,6 @@ class UserController extends Controller
             return $this->unauthorized();
         }
 
-        if ($user->role !== 'Admin') {
-            return $this->forbidden();
-        }
-
         $query = Pengguna::with(['desa.kecamatan.kabupaten.provinsi']);
 
         if ($request->has('search') && !empty($request->search)) {
@@ -56,10 +52,6 @@ class UserController extends Controller
 
         if (!$user) {
             return $this->unauthorized();
-        }
-
-        if ($user->role !== 'Admin') {
-            return $this->forbidden();
         }
 
         $totalUsers = Pengguna::count();
@@ -171,10 +163,6 @@ class UserController extends Controller
             return $this->unauthorized();
         }
 
-        if ($currentUser->role !== 'Admin') {
-            return $this->forbidden();
-        }
-
         $user = Pengguna::with(['desa.kecamatan.kabupaten.provinsi'])->find($id);
 
         if (!$user) {
@@ -193,10 +181,6 @@ class UserController extends Controller
             return $this->unauthorized();
         }
 
-        if ($currentUser->role !== 'Admin') {
-            return $this->forbidden();
-        }
-
         $user = Pengguna::create($request->validated());
 
         $user->load(['desa.kecamatan.kabupaten.provinsi']);
@@ -213,10 +197,6 @@ class UserController extends Controller
 
         if (!$currentUser) {
             return $this->unauthorized();
-        }
-
-        if ($currentUser->role !== 'Admin') {
-            return $this->forbidden();
         }
 
         $user = Pengguna::find($id);
@@ -241,10 +221,6 @@ class UserController extends Controller
 
         if (!$currentUser) {
             return $this->unauthorized();
-        }
-
-        if ($currentUser->role !== 'Admin') {
-            return $this->forbidden();
         }
 
         $user = Pengguna::find($id);

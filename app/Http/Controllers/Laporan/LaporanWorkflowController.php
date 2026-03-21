@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Laporan;
 
 use App\Http\Controllers\Controller;
 use App\Models\Laporans;
+use App\Services\LaporanStatusService;
 use App\Services\LogActivityService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -12,35 +13,10 @@ use Illuminate\Support\Facades\Validator;
 
 class LaporanWorkflowController extends Controller
 {
-    private const FULL_RELATIONS = [
-        'pelapor.desa.kecamatan.kabupaten.provinsi',
-        'kategori',
-        'desa.kecamatan.kabupaten.provinsi',
-        'verifikator.desa.kecamatan.kabupaten.provinsi',
-        'penanggungJawab.desa.kecamatan.kabupaten.provinsi',
-        'tindakLanjut.petugas.desa.kecamatan.kabupaten.provinsi',
-        'monitoring.operator.desa.kecamatan.kabupaten.provinsi',
-    ];
-
-    private const TRANSITION_MAP = [
-        'Draft' => ['Diverifikasi', 'Ditolak'],
-        'Menunggu Verifikasi' => ['Diverifikasi', 'Ditolak'],
-        'Diverifikasi' => ['Diproses', 'Selesai'],
-        'Diproses' => ['Selesai'],
-        'Selesai' => [],
-        'Ditolak' => [],
-    ];
-
-    public function __construct(private readonly LogActivityService $logActivityService)
-    {
-    }
-
-    private function canTransition(string $from, string $to): bool
-    {
-        $allowedTransitions = self::TRANSITION_MAP[$from] ?? [];
-
-        return in_array($to, $allowedTransitions, true);
-    }
+    public function __construct(
+        private readonly LogActivityService $logActivityService,
+        private readonly LaporanStatusService $statusService,
+    ) {}
 
     private function auditStatusChange(Request $request, Laporans $laporan, string $from, string $to): void
     {
@@ -77,8 +53,8 @@ class LaporanWorkflowController extends Controller
             }
 
             $validator = Validator::make($request->all(), [
-                'status' => 'required|in:Diverifikasi,Ditolak',
-                'catatan_verifikasi' => 'nullable|string|max:1000',
+                'status'              => 'required|in:Diverifikasi,Ditolak',
+                'catatan_verifikasi'  => 'nullable|string|max:1000',
             ]);
 
             if ($validator->fails()) {
@@ -86,9 +62,9 @@ class LaporanWorkflowController extends Controller
             }
 
             $fromStatus = (string) $laporan->status;
-            $toStatus = (string) $request->status;
+            $toStatus   = (string) $request->status;
 
-            if (!$this->canTransition($fromStatus, $toStatus)) {
+            if (!$this->statusService->canTransition($fromStatus, $toStatus)) {
                 return $this->errorResponse(
                     sprintf('Transisi status tidak valid: %s -> %s', $fromStatus, $toStatus),
                     422,
@@ -97,9 +73,9 @@ class LaporanWorkflowController extends Controller
             }
 
             $updateData = [
-                'status' => $toStatus,
-                'waktu_verifikasi' => now(),
-                'id_verifikator' => $user->id,
+                'status'             => $toStatus,
+                'waktu_verifikasi'   => now(),
+                'id_verifikator'     => $user->id,
                 'catatan_verifikasi' => $request->catatan_verifikasi,
             ];
 
@@ -114,11 +90,11 @@ class LaporanWorkflowController extends Controller
             $laporan->update($updateData);
             $this->auditStatusChange($request, $laporan, $fromStatus, $toStatus);
 
-            return $this->successResponse('Laporan berhasil diverifikasi', $laporan->load(self::FULL_RELATIONS));
+            return $this->successResponse('Laporan berhasil diverifikasi', $laporan->load(Laporans::FULL_RELATIONS));
         } catch (\Exception $e) {
             Log::error('Gagal memverifikasi laporan', [
                 'laporan_id' => $id,
-                'error' => $e->getMessage(),
+                'error'      => $e->getMessage(),
             ]);
 
             return $this->internalError('Gagal memverifikasi laporan');
@@ -151,9 +127,9 @@ class LaporanWorkflowController extends Controller
             }
 
             $fromStatus = (string) $laporan->status;
-            $toStatus = (string) $request->status;
+            $toStatus   = (string) $request->status;
 
-            if (!$this->canTransition($fromStatus, $toStatus)) {
+            if (!$this->statusService->canTransition($fromStatus, $toStatus)) {
                 return $this->errorResponse(
                     sprintf('Transisi status tidak valid: %s -> %s', $fromStatus, $toStatus),
                     422,
@@ -161,9 +137,7 @@ class LaporanWorkflowController extends Controller
                 );
             }
 
-            $updateData = [
-                'status' => $toStatus,
-            ];
+            $updateData = ['status' => $toStatus];
 
             if (is_null($laporan->id_penanggung_jawab)) {
                 $updateData['id_penanggung_jawab'] = $user->id;
@@ -176,11 +150,11 @@ class LaporanWorkflowController extends Controller
             $laporan->update($updateData);
             $this->auditStatusChange($request, $laporan, $fromStatus, $toStatus);
 
-            return $this->successResponse('Status laporan berhasil diperbarui', $laporan->load(self::FULL_RELATIONS));
+            return $this->successResponse('Status laporan berhasil diperbarui', $laporan->load(Laporans::FULL_RELATIONS));
         } catch (\Exception $e) {
             Log::error('Gagal memproses laporan', [
                 'laporan_id' => $id,
-                'error' => $e->getMessage(),
+                'error'      => $e->getMessage(),
             ]);
 
             return $this->internalError('Gagal memproses laporan');
@@ -212,7 +186,7 @@ class LaporanWorkflowController extends Controller
         } catch (\Exception $e) {
             Log::error('Gagal mengambil riwayat laporan', [
                 'laporan_id' => $id,
-                'error' => $e->getMessage(),
+                'error'      => $e->getMessage(),
             ]);
 
             return $this->internalError('Gagal mengambil riwayat laporan');

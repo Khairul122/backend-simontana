@@ -22,7 +22,8 @@ return Application::configure(basePath: dirname(__DIR__))
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
         ]);
 
-        
+        // Security headers — harus sebelum HandleCors agar CORS + security terkirim bersama
+        $middleware->append(\App\Http\Middleware\SecurityHeaders::class);
         $middleware->append(\Illuminate\Http\Middleware\HandleCors::class);
         $middleware->append(\App\Http\Middleware\RequestIdMiddleware::class);
 

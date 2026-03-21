@@ -7,10 +7,31 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Laporans extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
+
+    /**
+     * Relasi lengkap yang digunakan oleh LaporansController dan LaporanWorkflowController.
+     * Sentralisasi di model untuk menghindari duplikasi (DRY).
+     */
+    public const FULL_RELATIONS = [
+        'pelapor.desa.kecamatan.kabupaten.provinsi',
+        'kategori',
+        'desa.kecamatan.kabupaten.provinsi',
+        'verifikator.desa.kecamatan.kabupaten.provinsi',
+        'penanggungJawab.desa.kecamatan.kabupaten.provinsi',
+        'tindakLanjut.petugas.desa.kecamatan.kabupaten.provinsi',
+        'tindakLanjut.laporan.pelapor.desa.kecamatan.kabupaten.provinsi',
+        'tindakLanjut.laporan.kategori',
+        'tindakLanjut.laporan.desa.kecamatan.kabupaten.provinsi',
+        'monitoring.operator.desa.kecamatan.kabupaten.provinsi',
+        'monitoring.laporan.pelapor.desa.kecamatan.kabupaten.provinsi',
+        'monitoring.laporan.kategori',
+        'monitoring.laporan.desa.kecamatan.kabupaten.provinsi',
+    ];
 
     
     protected $table = 'laporans';

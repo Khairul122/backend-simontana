@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Facades\Hash;
@@ -9,7 +10,7 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
 
 class Pengguna extends Authenticatable implements JWTSubject
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $table = 'pengguna';
     protected $primaryKey = 'id';

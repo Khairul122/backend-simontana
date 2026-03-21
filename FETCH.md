@@ -13,7 +13,7 @@ Dokumen ini adalah indeks utama fetch API dengan contoh response body yang lengk
 ## Base URL dan Header Standar
 
 ```bash
-BASE_URL="http://127.0.0.1:8000/api"
+BASE_URL="http://127.0.0.1:8000/api/v1"
 TOKEN="isi_token_jwt"
 ```
 
