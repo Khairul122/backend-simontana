@@ -365,15 +365,15 @@ class ApiPaths
 
     /**
      * @OA\Get(
-     *     path="/bmkg/peringatan-tsunami",
+     *     path="/bmkg/peringatan-dini-cuaca",
      *     tags={"BMKG Integration"},
-     *     summary="Peringatan tsunami",
-     *     @OA\Response(response=200, description="Data peringatan tsunami berhasil diambil", @OA\JsonContent(ref="#/components/schemas/BmkgObjectSuccessResponse")),
+     *     summary="Peringatan dini cuaca (Nowcast)",
+     *     @OA\Response(response=200, description="Data peringatan dini cuaca berhasil diambil", @OA\JsonContent(ref="#/components/schemas/BmkgObjectSuccessResponse")),
      *     @OA\Response(response=404, description="Data tidak tersedia", @OA\JsonContent(ref="#/components/schemas/ErrorResponse")),
      *     @OA\Response(response=500, description="Kesalahan server", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
      * )
      */
-    public function bmkgPeringatanTsunamiDoc(): void
+    public function bmkgPeringatanDiniCuacaDoc(): void
     {
     }
 

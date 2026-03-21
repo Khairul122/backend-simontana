@@ -193,48 +193,49 @@ curl -X GET "$BASE_URL/bmkg/gempa/dirasakan" \
 
 ---
 
-## 5) GET `/bmkg/prakiraan-cuaca?wilayah_id=XXX`
+## 5) GET `/bmkg/prakiraan-cuaca?wilayah_id={adm4}`
 
-Menampilkan prakiraan cuaca komplit untuk suatu wilayah berdasarkan ID Kabupaten dari database lokal yang dipetakan ke kode wilayah BMKG.
+Menampilkan prakiraan cuaca komplit untuk wilayah kelurahan/desa (3 hari, per 3 jam) menggunakan kode Kemendagri BPS tingkat IV.
 
 **Parameter:**
-- `wilayah_id` (integer) - ID kabupaten/kota dari tabel `kabupatens`.
+- `wilayah_id` (string) - Kode wilayah tingkat IV (Contoh: `31.71.03.1001` untuk Kelurahan Gunung Sahari Utara).
 
 ```bash
-# Contoh 3171 adalah ID untuk Jakarta Pusat (tergantung master data DB)
-curl -X GET "$BASE_URL/bmkg/prakiraan-cuaca?wilayah_id=3171" \
+curl -X GET "$BASE_URL/bmkg/prakiraan-cuaca?wilayah_id=31.71.03.1001" \
   -H "Accept: application/json"
 ```
 
-### 200 Response Body
+### 200 Response Body (Open API Format)
 
 ```json
 {
   "success": true,
   "message": "Data prakiraan cuaca berhasil diambil",
   "data": {
-    "wilayah": "Jakarta Pusat",
-    "provinsi": "DKI Jakarta",
-    "timezone": "WIB",
+    "lokasi": {
+      "provinsi": "DKI Jakarta",
+      "kotkab": "Kota Jakarta Pusat",
+      "kecamatan": "Sawah Besar",
+      "desa": "Gunung Sahari Utara",
+      "lat": -6.1555,
+      "lon": 106.8344,
+      "timezone": "Asia/Jakarta"
+    },
     "cuaca": [
-      {
-        "jam": "2026-03-21 12:00:00",
-        "cuaca": "Cerah Berawan",
-        "suhu": "32",
-        "kelembapan": "65",
-        "angin_kecepatan": "10",
-        "angin_arah": "Barat Laut",
-        "icon": "http://example-cdn.com/icon/cerah-berawan.png"
-      },
-      {
-        "jam": "2026-03-21 18:00:00",
-        "cuaca": "Hujan Ringan",
-        "suhu": "28",
-        "kelembapan": "80",
-        "angin_kecepatan": "10",
-        "angin_arah": "Barat Daya",
-        "icon": "http://example-cdn.com/icon/hujan.png"
-      }
+      [
+        {
+          "datetime": "2026-03-21T06:00:00+00:00",
+          "local_datetime": "2026-03-21 13:00:00",
+          "t": 32,
+          "hu": 65,
+          "weather_desc": "Cerah Berawan",
+          "weather_desc_en": "Partly Cloudy",
+          "ws": 10,
+          "wd": "Barat Laut",
+          "tcc": 25,
+          "vs_text": "> 10 km"
+        }
+      ]
     ]
   },
   "request_id": "req_01HZY2P0W7D3G4"
@@ -259,12 +260,12 @@ curl -X GET "$BASE_URL/bmkg/prakiraan-cuaca?wilayah_id=3171" \
 
 ---
 
-## 6) GET `/bmkg/peringatan-tsunami`
+## 6) GET `/bmkg/peringatan-dini-cuaca`
 
-Mengambil peringatan tsunami terbaru jika ada.
+Mengambil peringatan dini cuaca (Nowcast) terbaru untuk semua wilayah provinsi di Indonesia. (RSS XML Feed parsed ke JSON Array).
 
 ```bash
-curl -X GET "$BASE_URL/bmkg/peringatan-tsunami" \
+curl -X GET "$BASE_URL/bmkg/peringatan-dini-cuaca" \
   -H "Accept: application/json"
 ```
 
@@ -273,10 +274,19 @@ curl -X GET "$BASE_URL/bmkg/peringatan-tsunami" \
 ```json
 {
   "success": true,
-  "message": "Data peringatan tsunami berhasil diambil",
+  "message": "Data peringatan dini cuaca berhasil diambil",
   "data": {
-    "status": "Tidak Ada Peringatan",
-    "keterangan": "Saat ini tidak tercatat adanya peringatan dini tsunami dari BMKG."
+    "alerts": [
+      {
+        "title": "Peringatan Dini Cuaca DKI Jakarta",
+        "link": "https://www.bmkg.go.id/cuaca/peringatan-dini.bmkg?prov=DKI",
+        "description": "Berpotensi terjadi hujan sedang-lebat yang dapat disertai kilat/petir dan angin kencang di wilayah Kota Jakarta Pusat dan sekitarnya.",
+        "author": "BMKG",
+        "pubDate": "Sat, 21 Mar 2026 14:10:00 +0700",
+        "lastBuildDate": "Sat, 21 Mar 2026 07:10:00 UTC"
+      }
+    ],
+    "updated_at": "2026-03-21T07:15:30Z"
   },
   "request_id": "req_01HZY2P0W7D3G4"
 }

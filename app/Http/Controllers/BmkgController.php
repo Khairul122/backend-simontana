@@ -118,20 +118,20 @@ class BmkgController extends Controller
     }
 
     
-    public function getPeringatanTsunami(): JsonResponse
+    public function getPeringatanDiniCuaca(): JsonResponse
     {
         try {
-            $data = $this->bmkgService->getPeringatanTsunami();
+            $data = $this->bmkgService->getPeringatanDiniCuaca();
 
             if (!$data) {
-                return $this->notFoundResponse('Data peringatan tsunami tidak tersedia');
+                return $this->notFoundResponse('Data peringatan dini cuaca tidak tersedia');
             }
 
-            return $this->successResponse('Data peringatan tsunami berhasil diambil', $data);
+            return $this->successResponse('Data peringatan dini cuaca berhasil diambil', $data);
 
         } catch (\Exception $e) {
-            Log::error('Gagal mengambil data peringatan tsunami', ['error' => $e->getMessage()]);
-            return $this->internalError('Gagal mengambil data peringatan tsunami');
+            Log::error('Gagal mengambil data peringatan dini cuaca', ['error' => $e->getMessage()]);
+            return $this->internalError('Gagal mengambil data peringatan dini cuaca');
         }
     }
 

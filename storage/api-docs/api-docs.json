@@ -1191,16 +1191,16 @@
                 }
             }
         },
-        "/bmkg/peringatan-tsunami": {
+        "/bmkg/peringatan-dini-cuaca": {
             "get": {
                 "tags": [
                     "BMKG Integration"
                 ],
-                "summary": "Peringatan tsunami",
-                "operationId": "aad162519cc6c8dcb757e88058da3730",
+                "summary": "Peringatan dini cuaca (Nowcast)",
+                "operationId": "2a4e60e7048e2246a115640a9edc63a1",
                 "responses": {
                     "200": {
-                        "description": "Data peringatan tsunami berhasil diambil",
+                        "description": "Data peringatan dini cuaca berhasil diambil",
                         "content": {
                             "application/json": {
                                 "schema": {

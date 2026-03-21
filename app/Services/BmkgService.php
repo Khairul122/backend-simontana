@@ -69,6 +69,10 @@ class BmkgService
                 return null;
             }
 
+            if (isset($data['Infogempa']['gempa']['Shakemap'])) {
+                $data['Infogempa']['gempa']['Shakemap'] = 'https://static.bmkg.go.id/' . $data['Infogempa']['gempa']['Shakemap'];
+            }
+
             return $data;
         });
     }
@@ -111,71 +115,57 @@ class BmkgService
         $this->rememberWeatherCacheKey($cacheKey);
 
         return Cache::remember($cacheKey, now()->addMinutes(self::CACHE_DURATION), function () use ($wilayahId) {
-            try {
-                $url = "https://data.bmkg.go.id/DataMKG/MEWS/DigitalForecast/DigitalForecast-{$wilayahId}.xml";
-                $response = Http::retry(self::HTTP_RETRY_ATTEMPTS, self::HTTP_RETRY_SLEEP_MS)
-                    ->timeout(self::HTTP_TIMEOUT_SECONDS)
-                    ->get($url);
+            $url = "https://api.bmkg.go.id/publik/prakiraan-cuaca?adm4={$wilayahId}";
+            $data = $this->fetchJson($url);
 
-                if (!$response->successful()) {
-                    Log::error('BMKG API Error: Failed to fetch prakiraan cuaca', [
-                        'wilayah_id' => $wilayahId,
-                        'status' => $response->status(),
-                        'response' => $response->body()
-                    ]);
-                    return null;
-                }
-
-                
-                
-                return [
-                    'xml_data' => $response->body(),
-                    'wilayah_id' => $wilayahId
-                ];
-
-            } catch (\Exception $e) {
-                Log::error('BMKG API Exception: Failed to fetch prakiraan cuaca', [
-                    'wilayah_id' => $wilayahId,
-                    'error' => $e->getMessage()
-                ]);
+            if (!$data) {
                 return null;
             }
+
+            return $data;
         });
     }
 
     
-    public function getPeringatanTsunami(): ?array
+    public function getPeringatanDiniCuaca(): ?array
     {
-        return Cache::remember('bmkg.peringatan_tsunami', now()->addMinutes(5), function () {
+        return Cache::remember('bmkg.peringatan_dini_cuaca', now()->addMinutes(15), function () {
             try {
-                $response = Http::timeout(self::HTTP_TIMEOUT_SECONDS)->get('https://data.bmkg.go.id/DataMKG/TEWS/ipmap.txt');
+                $response = Http::timeout(self::HTTP_TIMEOUT_SECONDS)->get('https://www.bmkg.go.id/alerts/nowcast/id');
 
                 if (!$response->successful()) {
-                    Log::error('BMKG API Error: Failed to fetch peringatan tsunami', [
+                    Log::error('BMKG API Error: Failed to fetch peringatan dini cuaca', [
                         'status' => $response->status(),
                         'response' => $response->body()
                     ]);
                     return null;
                 }
 
-                
-                $lines = explode("\n", trim($response->body()));
-                $tsunamiData = [];
+                $xml = simplexml_load_string($response->body(), 'SimpleXMLElement', LIBXML_NOCDATA);
+                if (!$xml || !isset($xml->channel->item)) {
+                    Log::error('BMKG API Error: Invalid RSS XML format for peringatan dini cuaca');
+                    return null;
+                }
 
-                foreach ($lines as $line) {
-                    if (!empty(trim($line))) {
-                        $tsunamiData[] = trim($line);
-                    }
+                $alerts = [];
+                foreach ($xml->channel->item as $item) {
+                    $alerts[] = [
+                        'title' => (string) $item->title,
+                        'link' => (string) $item->link,
+                        'description' => strip_tags((string) $item->description),
+                        'author' => (string) $item->author,
+                        'pubDate' => (string) $item->pubDate,
+                        'lastBuildDate' => isset($xml->channel->lastBuildDate) ? (string) $xml->channel->lastBuildDate : null,
+                    ];
                 }
 
                 return [
-                    'raw_data' => $response->body(),
-                    'parsed_data' => $tsunamiData,
-                    'updated_at' => now()
+                    'alerts' => $alerts,
+                    'updated_at' => now()->toIso8601String()
                 ];
 
             } catch (\Exception $e) {
-                Log::error('BMKG API Exception: Failed to fetch peringatan tsunami', [
+                Log::error('BMKG API Exception: Failed to fetch peringatan dini cuaca', [
                     'error' => $e->getMessage()
                 ]);
                 return null;
@@ -190,7 +180,7 @@ class BmkgService
             'bmkg.gempa_terbaru',
             'bmkg.daftar_gempa',
             'bmkg.gempa_dirasakan',
-            'bmkg.peringatan_tsunami',
+            'bmkg.peringatan_dini_cuaca',
         ];
 
         foreach ($cacheKeys as $key) {
@@ -215,7 +205,7 @@ class BmkgService
             'gempa_terbaru_cached' => Cache::has('bmkg.gempa_terbaru'),
             'daftar_gempa_cached' => Cache::has('bmkg.daftar_gempa'),
             'gempa_dirasakan_cached' => Cache::has('bmkg.gempa_dirasakan'),
-            'peringatan_tsunami_cached' => Cache::has('bmkg.peringatan_tsunami'),
+            'peringatan_dini_cuaca_cached' => Cache::has('bmkg.peringatan_dini_cuaca'),
             'prakiraan_cuaca_keys_count' => count((array) Cache::get(self::WEATHER_CACHE_REGISTRY_KEY, [])),
         ];
     }

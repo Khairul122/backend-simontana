@@ -118,7 +118,7 @@ Route::prefix('v1')->group(function () {
             Route::get('/dirasakan', [BmkgController::class, 'getGempaDirasakan']);
         });
 
-        Route::get('/peringatan-tsunami', [BmkgController::class, 'getPeringatanTsunami']);
+        Route::get('/peringatan-dini-cuaca', [BmkgController::class, 'getPeringatanDiniCuaca']);
         Route::get('/prakiraan-cuaca', [BmkgController::class, 'getPrakiraanCuaca']);
 
         Route::middleware('jwt.auth')->group(function () {
@@ -231,7 +231,7 @@ Route::group([], function () {
             Route::get('/terkini', [BmkgController::class, 'getDaftarGempa']);
             Route::get('/dirasakan', [BmkgController::class, 'getGempaDirasakan']);
         });
-        Route::get('/peringatan-tsunami', [BmkgController::class, 'getPeringatanTsunami']);
+        Route::get('/peringatan-dini-cuaca', [BmkgController::class, 'getPeringatanDiniCuaca']);
         Route::get('/prakiraan-cuaca', [BmkgController::class, 'getPrakiraanCuaca']);
         Route::middleware('jwt.auth')->group(function () {
             Route::get('/', [BmkgController::class, 'index']);
