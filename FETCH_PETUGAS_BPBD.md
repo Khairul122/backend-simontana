@@ -178,7 +178,7 @@ Endpoint:
 - `GET /check-token`
   - `200`, `401`
 
-- `GET /laporans`, `GET /laporans/{id}`, `GET /laporans/statistics`
+- `GET /laporans`, `GET /laporans/pelapor/{pelaporId}`, `GET /laporans/{id}`, `GET /laporans/statistics`
   - `200`
   - `404` khusus endpoint detail
 

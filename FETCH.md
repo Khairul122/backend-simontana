@@ -10,6 +10,12 @@ Dokumen ini adalah indeks utama fetch API dengan contoh response body yang lengk
 - `FETCH_PETUGAS_BPBD.md` -> endpoint role `PetugasBPBD`
 - `FETCH_ADMIN.md` -> endpoint role `Admin`
 
+## Update Terbaru
+
+- Ditambahkan endpoint laporan berdasarkan pelapor: `GET /laporans/pelapor/{pelaporId}`
+- Endpoint ini tersedia untuk role berizin JWT (Admin, PetugasBPBD, OperatorDesa, Warga)
+- Untuk role `Warga`, hanya boleh mengakses `pelaporId` milik dirinya sendiri
+
 ## Base URL dan Header Standar
 
 ```bash

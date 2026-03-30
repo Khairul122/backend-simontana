@@ -130,6 +130,7 @@ curl -X GET "$BASE_URL/users?per_page=20" \
 
 Endpoint:
 - `GET /laporans`
+- `GET /laporans/pelapor/{pelaporId}`
 - `POST /laporans`
 - `GET /laporans/{id}`
 - `PUT /laporans/{id}`
@@ -142,6 +143,46 @@ Contoh `GET /laporans?limit=15`:
 curl -X GET "$BASE_URL/laporans?limit=15" \
   -H "Accept: application/json" \
   -H "Authorization: Bearer $TOKEN"
+```
+
+Contoh `GET /laporans/pelapor/{pelaporId}`:
+
+```bash
+curl -X GET "$BASE_URL/laporans/pelapor/5?status=Draft&limit=10" \
+  -H "Accept: application/json" \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+### 200 Response Body (By Pelapor)
+
+```json
+{
+  "success": true,
+  "message": "Data laporan pelapor berhasil diambil",
+  "data": [
+    {
+      "id": 1,
+      "id_pelapor": 5,
+      "judul_laporan": "Banjir RT 03",
+      "status": "Draft",
+      "pelapor": {
+        "id": 5,
+        "nama": "Andi Warga"
+      }
+    }
+  ],
+  "meta": {
+    "pagination": {
+      "current_page": 1,
+      "last_page": 1,
+      "per_page": 10,
+      "total": 1,
+      "from": 1,
+      "to": 1
+    }
+  },
+  "request_id": "req_01HZY2P0W7D3G4"
+}
 ```
 
 ### 200 Response Body (Nested + Pagination)

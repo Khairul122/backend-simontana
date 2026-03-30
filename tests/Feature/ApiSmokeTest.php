@@ -162,4 +162,22 @@ class ApiSmokeTest extends TestCase
             ->assertJsonPath('success', false)
             ->assertJsonPath('message', 'Validasi gagal');
     }
+
+    public function test_laporan_by_pelapor_returns_200(): void
+    {
+        $wilayah = $this->seedWilayahMinimal();
+        $admin = $this->createUser('Admin', $wilayah['desa']->id);
+        $pelapor = $this->createUser('Warga', $wilayah['desa']->id);
+        $laporan = $this->makeLaporan($pelapor, $wilayah['desa']->id);
+
+        $token = JWTAuth::fromUser($admin);
+
+        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+            ->getJson('/api/laporans/pelapor/' . $pelapor->id);
+
+        $response->assertStatus(200)
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('message', 'Data laporan pelapor berhasil diambil')
+            ->assertJsonPath('data.0.id', $laporan->id);
+    }
 }

@@ -164,6 +164,30 @@ class ApiPaths
     }
 
     /**
+     * @OA\Get(
+     *     path="/laporans/pelapor/{pelaporId}",
+     *     tags={"Laporan Management"},
+     *     summary="Daftar laporan berdasarkan ID pelapor",
+     *     security={{"jwt":{}}},
+     *     @OA\Parameter(name="pelaporId", in="path", required=true, @OA\Schema(type="integer")),
+     *     @OA\Parameter(name="status", in="query", @OA\Schema(type="string", enum={"Draft","Menunggu Verifikasi","Diverifikasi","Diproses","Selesai","Ditolak"})),
+     *     @OA\Parameter(name="kategori_id", in="query", @OA\Schema(type="integer")),
+     *     @OA\Parameter(name="start_date", in="query", @OA\Schema(type="string", format="date")),
+     *     @OA\Parameter(name="end_date", in="query", @OA\Schema(type="string", format="date")),
+     *     @OA\Parameter(name="order_by", in="query", @OA\Schema(type="string")),
+     *     @OA\Parameter(name="order_direction", in="query", @OA\Schema(type="string", enum={"asc","desc"})),
+     *     @OA\Parameter(name="limit", in="query", @OA\Schema(type="integer", default=15)),
+ *     @OA\Response(response=200, description="Data laporan pelapor berhasil diambil dengan relasi nested penuh dan meta pagination", @OA\JsonContent(ref="#/components/schemas/LaporanListSuccessResponse")),
+     *     @OA\Response(response=401, description="Tidak terautentikasi", @OA\JsonContent(ref="#/components/schemas/ErrorResponse")),
+     *     @OA\Response(response=403, description="Warga hanya boleh mengakses laporan milik sendiri", @OA\JsonContent(ref="#/components/schemas/ErrorResponse")),
+     *     @OA\Response(response=500, description="Kesalahan server", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
+     * )
+     */
+    public function laporanByPelaporDoc(): void
+    {
+    }
+
+    /**
      * @OA\Post(
      *     path="/laporans",
      *     tags={"Wilayah Management"},

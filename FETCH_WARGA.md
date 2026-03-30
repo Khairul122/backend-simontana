@@ -77,6 +77,7 @@ curl -X GET "$BASE_URL/auth/me" \
 
 Endpoint:
 - `GET /laporans`
+- `GET /laporans/pelapor/{pelaporId}`
 - `POST /laporans`
 - `GET /laporans/{id}`
 - `PUT /laporans/{id}`
@@ -90,6 +91,46 @@ Contoh `GET /laporans?status=Diproses&limit=10`:
 curl -X GET "$BASE_URL/laporans?status=Diproses&limit=10" \
   -H "Accept: application/json" \
   -H "Authorization: Bearer $TOKEN"
+```
+
+Contoh `GET /laporans/pelapor/{pelaporId}`:
+
+```bash
+curl -X GET "$BASE_URL/laporans/pelapor/5?status=Draft&limit=10" \
+  -H "Accept: application/json" \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+### 200 Response Body (By Pelapor + Pagination)
+
+```json
+{
+  "success": true,
+  "message": "Data laporan pelapor berhasil diambil",
+  "data": [
+    {
+      "id": 10,
+      "id_pelapor": 5,
+      "judul_laporan": "Banjir RT 03",
+      "status": "Draft",
+      "pelapor": {
+        "id": 5,
+        "nama": "Andi Warga"
+      }
+    }
+  ],
+  "meta": {
+    "pagination": {
+      "current_page": 1,
+      "last_page": 1,
+      "per_page": 10,
+      "total": 1,
+      "from": 1,
+      "to": 1
+    }
+  },
+  "request_id": "req_01HZY2P0W7D3G4"
+}
 ```
 
 ### 200 Response Body (List + Nested)
@@ -324,6 +365,10 @@ curl -X POST "$BASE_URL/laporans" \
 
 - `GET /laporans`
   - `200` -> lihat section `200 Response Body (List + Nested)`
+
+- `GET /laporans/pelapor/{pelaporId}`
+  - `200` -> lihat section `200 Response Body (By Pelapor + Pagination)`
+  - `403` -> jika role Warga mengakses `pelaporId` milik user lain
 
 - `POST /laporans`
   - `201` -> lihat section `201 Response Body`

@@ -196,6 +196,9 @@ Endpoint:
 - `GET /laporans`
   - `200` -> list nested + `meta.pagination`
 
+- `GET /laporans/pelapor/{pelaporId}`
+  - `200` -> list laporan berdasarkan pelapor + `meta.pagination`
+
 - `GET /laporans/{id}`
   - `200` -> detail nested lengkap
   - `404` -> resource not found

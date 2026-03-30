@@ -151,6 +151,59 @@ class LaporansController extends Controller
         }
     }
 
+    public function byPelapor(Request $request, int $pelaporId): JsonResponse
+    {
+        try {
+            $user = $this->ensureAuthenticated($request);
+            if (!$user) {
+                return $this->unauthorized();
+            }
+
+            if ($user->role === 'Warga' && (int) $user->id !== $pelaporId) {
+                return $this->deniedByPolicy('Warga hanya dapat melihat laporan miliknya sendiri');
+            }
+
+            $query = Laporans::with(Laporans::FULL_RELATIONS)
+                ->byUser($pelaporId);
+
+            if ($request->has('status') && $request->status) {
+                $query->byStatus($request->status);
+            }
+
+            if ($request->has('kategori_id') && $request->kategori_id) {
+                $query->byCategory($request->kategori_id);
+            }
+
+            if ($request->has('start_date') && $request->has('end_date')) {
+                $query->dateRange($request->start_date, $request->end_date);
+            }
+
+            $orderBy = $request->get('order_by', 'created_at');
+            if (!in_array($orderBy, self::ALLOWED_ORDER_BY, true)) {
+                $orderBy = 'created_at';
+            }
+
+            $orderDirection = strtolower((string) $request->get('order_direction', 'desc'));
+            if (!in_array($orderDirection, ['asc', 'desc'], true)) {
+                $orderDirection = 'desc';
+            }
+
+            $query->orderBy($orderBy, $orderDirection);
+
+            $limit = $this->clampPerPage((int) $request->get('limit', 15), 15, 100);
+            $laporans = $query->paginate($limit);
+
+            return $this->successResponse('Data laporan pelapor berhasil diambil', $laporans);
+        } catch (\Exception $e) {
+            Log::error('Gagal mengambil data laporan berdasarkan pelapor', [
+                'pelapor_id' => $pelaporId,
+                'error' => $e->getMessage(),
+            ]);
+
+            return $this->internalError('Gagal mengambil data laporan berdasarkan pelapor');
+        }
+    }
+
     
     public function store(StoreLaporanRequest $request): JsonResponse
     {

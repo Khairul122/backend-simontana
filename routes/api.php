@@ -132,6 +132,7 @@ Route::prefix('v1')->group(function () {
     Route::middleware('jwt.auth')->group(function () {
         Route::controller(LaporansController::class)->prefix('laporans')->group(function () {
             Route::get('statistics', 'statistics');
+            Route::get('pelapor/{pelaporId}', 'byPelapor')->whereNumber('pelaporId');
         });
 
         Route::controller(LaporanWorkflowController::class)->prefix('laporans')->group(function () {
@@ -243,6 +244,7 @@ Route::group([], function () {
     Route::middleware('jwt.auth')->group(function () {
         Route::controller(LaporansController::class)->prefix('laporans')->group(function () {
             Route::get('statistics', 'statistics');
+            Route::get('pelapor/{pelaporId}', 'byPelapor')->whereNumber('pelaporId');
         });
         Route::controller(LaporanWorkflowController::class)->prefix('laporans')->group(function () {
             Route::post('{id}/verifikasi', 'verifikasi');
