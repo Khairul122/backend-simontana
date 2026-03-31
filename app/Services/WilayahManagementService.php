@@ -54,9 +54,15 @@ class WilayahManagementService
     public function buildQuery(string $jenis, ?string $include = null): Builder
     {
         $modelClass = self::MODEL_MAP[$jenis];
-        $query = $modelClass::query()->with(self::DEFAULT_FULL_RELATIONS[$jenis] ?? []);
+        $query = $modelClass::query();
 
-        foreach ($this->parseIncludes($include) as $includeKey) {
+        $includes = $this->parseIncludes($include);
+
+        if (in_array('full', $includes, true)) {
+            $query->with(self::DEFAULT_FULL_RELATIONS[$jenis] ?? []);
+        }
+
+        foreach ($includes as $includeKey) {
             $relation = self::INCLUDE_MAP[$jenis][$includeKey] ?? null;
             if ($relation) {
                 $query->with($relation);

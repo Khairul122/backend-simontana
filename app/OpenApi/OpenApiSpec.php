@@ -11,8 +11,8 @@ use OpenApi\Annotations as OA;
  *     description="Dokumentasi OpenAPI untuk backend SIMONTA BENCANA."
  * )
  * @OA\Server(
- *     url="http://localhost:8000/api",
- *     description="Local API server"
+ *     url="http://localhost:8000/api/v1",
+ *     description="Local API server (v1)"
  * )
  * @OA\SecurityScheme(
  *     securityScheme="jwt",

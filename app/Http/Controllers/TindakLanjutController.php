@@ -34,11 +34,13 @@ class TindakLanjutController extends Controller
             return $this->unauthorized();
         }
 
-        if ($user->role === 'Warga') {
-            return $this->deniedByPolicy('Warga tidak memiliki akses ke data tindak lanjut operasional');
-        }
-
         $query = TindakLanjut::with(self::FULL_RELATIONS);
+
+        if ($user->role === 'Warga') {
+            $query->whereHas('laporan', function ($laporanQuery) use ($user) {
+                $laporanQuery->where('id_pelapor', $user->id);
+            });
+        }
 
         if ($request->has('laporan_id')) {
             $query->where('laporan_id', $request->laporan_id);

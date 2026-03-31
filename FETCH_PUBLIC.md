@@ -1,4 +1,7 @@
-# FETCH Public Endpoints (Full Response)
+# FETCH Public Endpoints (Lengkap)
+
+Dokumen ini membahas endpoint public (tanpa JWT) yang bisa diakses langsung oleh client.
+Semua contoh memakai base URL `v1`.
 
 ## Setup
 
@@ -6,7 +9,30 @@
 BASE_URL="http://127.0.0.1:8000/api/v1"
 ```
 
+Header minimum:
+
+- `Accept: application/json`
+- `Content-Type: application/json` (khusus body JSON)
+
 ## 1) POST `/auth/register`
+
+Mendaftarkan user baru.
+
+### Full Request Body (JSON)
+
+```json
+{
+  "nama": "Warga Baru",
+  "username": "warga_baru",
+  "email": "warga@example.com",
+  "password": "password123",
+  "password_confirmation": "password123",
+  "role": "Warga",
+  "id_desa": 1
+}
+```
+
+### CURL
 
 ```bash
 curl -X POST "$BASE_URL/auth/register" \
@@ -23,7 +49,7 @@ curl -X POST "$BASE_URL/auth/register" \
   }'
 ```
 
-### 201 Response Body
+### 201 Full Response Body
 
 ```json
 {
@@ -35,16 +61,34 @@ curl -X POST "$BASE_URL/auth/register" \
     "username": "warga_baru",
     "email": "warga@example.com",
     "role": "Warga",
+    "role_label": "Warga",
     "no_telepon": null,
     "alamat": null,
     "id_desa": 1,
-    "created_at": "2026-03-20T09:10:11.000000Z"
+    "desa": {
+      "id": 1,
+      "nama": "Sukamaju",
+      "kecamatan": {
+        "id": 12,
+        "nama": "Kec. Tengah",
+        "kabupaten": {
+          "id": 5,
+          "nama": "Kab. Maju",
+          "provinsi": {
+            "id": 2,
+            "nama": "Jawa Barat"
+          }
+        }
+      }
+    },
+    "created_at": "2026-03-31T10:10:11.000000Z",
+    "updated_at": "2026-03-31T10:10:11.000000Z"
   },
   "request_id": "req_01HZY2P0W7D3G4"
 }
 ```
 
-### 422 Response Body
+### 422 Full Response Body
 
 ```json
 {
@@ -71,7 +115,7 @@ curl -X POST "$BASE_URL/auth/register" \
 }
 ```
 
-### 429 Response Body
+### 429 Full Response Body
 
 ```json
 {
@@ -84,6 +128,19 @@ curl -X POST "$BASE_URL/auth/register" \
 
 ## 2) POST `/auth/login`
 
+Login menerima `username` (username atau email alias).
+
+### Full Request Body (JSON)
+
+```json
+{
+  "username": "admin",
+  "password": "password123"
+}
+```
+
+### CURL
+
 ```bash
 curl -X POST "$BASE_URL/auth/login" \
   -H "Accept: application/json" \
@@ -91,7 +148,7 @@ curl -X POST "$BASE_URL/auth/login" \
   -d '{"username":"admin","password":"password123"}'
 ```
 
-### 200 Response Body
+### 200 Full Response Body
 
 ```json
 {
@@ -108,7 +165,22 @@ curl -X POST "$BASE_URL/auth/login" \
       "no_telepon": "081234567890",
       "alamat": "Kantor BPBD",
       "id_desa": 1,
-      "desa": null
+      "desa": {
+        "id": 1,
+        "nama": "Sukamaju",
+        "kecamatan": {
+          "id": 12,
+          "nama": "Kec. Tengah",
+          "kabupaten": {
+            "id": 5,
+            "nama": "Kab. Maju",
+            "provinsi": {
+              "id": 2,
+              "nama": "Jawa Barat"
+            }
+          }
+        }
+      }
     },
     "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...",
     "token_type": "Bearer",
@@ -118,7 +190,7 @@ curl -X POST "$BASE_URL/auth/login" \
 }
 ```
 
-### 401 Response Body
+### 401 Full Response Body
 
 ```json
 {
@@ -129,13 +201,45 @@ curl -X POST "$BASE_URL/auth/login" \
 }
 ```
 
-## 3) GET `/auth/roles`
+### 422 Full Response Body
 
-```bash
-curl -X GET "$BASE_URL/auth/roles" -H "Accept: application/json"
+```json
+{
+  "success": false,
+  "message": "Validasi gagal",
+  "code": "VALIDATION_ERROR",
+  "errors": {
+    "username": [
+      "The username field is required."
+    ],
+    "password": [
+      "The password field is required."
+    ]
+  },
+  "details": {
+    "username": [
+      "The username field is required."
+    ],
+    "password": [
+      "The password field is required."
+    ]
+  },
+  "request_id": "req_01HZY2P0W7D3G4"
+}
 ```
 
-### 200 Response Body
+## 3) GET `/auth/roles`
+
+Mengambil daftar role yang didukung sistem.
+
+### CURL
+
+```bash
+curl -X GET "$BASE_URL/auth/roles" \
+  -H "Accept: application/json"
+```
+
+### 200 Full Response Body
 
 ```json
 {
@@ -153,40 +257,20 @@ curl -X GET "$BASE_URL/auth/roles" -H "Accept: application/json"
 
 ## 4) BMKG Public
 
-Endpoint:
+Endpoint public BMKG:
+
 - `GET /bmkg/gempa/terbaru`
 - `GET /bmkg/gempa/terkini`
 - `GET /bmkg/gempa/dirasakan`
-- `GET /bmkg/peringatan-tsunami`
-- `GET /bmkg/prakiraan-cuaca?wilayah_id=3171`
+- `GET /bmkg/prakiraan-cuaca?wilayah_id=...`
+- `GET /bmkg/peringatan-dini-cuaca`
 
-Contoh `GET /bmkg/gempa/terbaru`:
-
-```bash
-curl -X GET "$BASE_URL/bmkg/gempa/terbaru" -H "Accept: application/json"
-```
-
-### 200 Response Body
-
-```json
-{
-  "success": true,
-  "message": "Data gempa terbaru berhasil diambil",
-  "data": {
-    "Tanggal": "20 Mar 2026",
-    "Jam": "08:10:01 WIB",
-    "Magnitude": "5.2",
-    "Kedalaman": "10 km",
-    "Wilayah": "Selatan Jawa",
-    "Potensi": "Tidak berpotensi tsunami"
-  },
-  "request_id": "req_01HZY2P0W7D3G4"
-}
-```
+Lihat contoh super lengkap di `FETCH_BMKG.md`.
 
 ## 5) Wilayah Public
 
-Endpoint:
+Endpoint public wilayah:
+
 - `GET /wilayah`
 - `GET /wilayah?jenis=desa&per_page=20`
 - `GET /wilayah/{id}?jenis=desa`
@@ -199,13 +283,22 @@ Endpoint:
 - `GET /wilayah/hierarchy/{desa_id}`
 - `GET /wilayah/search?q=jakarta`
 
-Contoh `GET /wilayah?jenis=desa&per_page=20`:
+### Contoh Full Request + CURL: List Desa Paginated
 
-```bash
-curl -X GET "$BASE_URL/wilayah?jenis=desa&per_page=20" -H "Accept: application/json"
+Request query:
+
+```text
+GET /wilayah?jenis=desa&per_page=20
 ```
 
-### 200 Response Body (Paginated)
+CURL:
+
+```bash
+curl -X GET "$BASE_URL/wilayah?jenis=desa&per_page=20" \
+  -H "Accept: application/json"
+```
+
+### 200 Full Response Body (Paginated)
 
 ```json
 {
@@ -244,7 +337,7 @@ curl -X GET "$BASE_URL/wilayah?jenis=desa&per_page=20" -H "Accept: application/j
 }
 ```
 
-### 400 Response Body
+### 400 Full Response Body (Search q kosong)
 
 ```json
 {
@@ -255,7 +348,7 @@ curl -X GET "$BASE_URL/wilayah?jenis=desa&per_page=20" -H "Accept: application/j
 }
 ```
 
-### 404 Response Body
+### 404 Full Response Body
 
 ```json
 {
@@ -266,85 +359,16 @@ curl -X GET "$BASE_URL/wilayah?jenis=desa&per_page=20" -H "Accept: application/j
 }
 ```
 
-## 6) Matriks Status Semua Endpoint Public
+## 6) Matriks Status Endpoint Public
 
-- `POST /auth/register`
-  - `201` -> lihat section `201 Response Body` register
-  - `422` -> lihat section `422 Response Body` register
-  - `429` -> lihat section `429 Response Body` register
-  - `500` -> gunakan body standar:
+- `POST /auth/register` -> `201`, `422`, `429`, `500`
+- `POST /auth/login` -> `200`, `401`, `422`, `429`
+- `GET /auth/roles` -> `200`
+- `GET /bmkg/*` public -> `200`, `404`, `422` (khusus prakiraan), `500`
+- `GET /wilayah*` public -> `200`, `400`, `404`
 
-```json
-{
-  "success": false,
-  "message": "Terjadi kesalahan pada server",
-  "code": "INTERNAL_SERVER_ERROR",
-  "request_id": "req_01HZY2P0W7D3G4"
-}
-```
+## 7) Catatan Penting
 
-- `POST /auth/login`
-  - `200` -> lihat section `200 Response Body` login
-  - `401` -> lihat section `401 Response Body` login
-  - `422` -> body validasi sama seperti section validasi register
-  - `429` -> body rate limit sama seperti section `429 Response Body`
-
-- `GET /auth/roles`
-  - `200` -> lihat section `200 Response Body` roles
-
-- `GET /bmkg/gempa/terbaru`
-- `GET /bmkg/gempa/terkini`
-- `GET /bmkg/gempa/dirasakan`
-- `GET /bmkg/peringatan-tsunami`
-  - `200` -> contoh body BMKG section `200 Response Body`
-  - `404` ->
-
-```json
-{
-  "success": false,
-  "message": "Data tidak tersedia",
-  "code": "RESOURCE_NOT_FOUND",
-  "request_id": "req_01HZY2P0W7D3G4"
-}
-```
-
-  - `500` -> body internal error standar
-
-- `GET /bmkg/prakiraan-cuaca?wilayah_id=3171`
-  - `200` -> contoh body BMKG section `200 Response Body`
-  - `404` -> body `Data tidak tersedia` (lihat di atas)
-  - `422` ->
-
-```json
-{
-  "success": false,
-  "message": "Validasi gagal",
-  "code": "VALIDATION_ERROR",
-  "errors": {
-    "wilayah_id": [
-      "The wilayah id field is required."
-    ]
-  },
-  "details": {
-    "wilayah_id": [
-      "The wilayah id field is required."
-    ]
-  },
-  "request_id": "req_01HZY2P0W7D3G4"
-}
-```
-
-- `GET /wilayah`
-- `GET /wilayah?jenis=desa&per_page=20`
-- `GET /wilayah/{id}?jenis=desa`
-- `GET /wilayah/provinsi`
-- `GET /wilayah/provinsi/{id}`
-- `GET /wilayah/kabupaten/{provinsi_id}`
-- `GET /wilayah/kecamatan/{kabupaten_id}`
-- `GET /wilayah/desa/{kecamatan_id}`
-- `GET /wilayah/detail/{desa_id}`
-- `GET /wilayah/hierarchy/{desa_id}`
-- `GET /wilayah/search?q=jakarta`
-  - `200` -> lihat section `200 Response Body (Paginated)` (shape list) atau object sesuai endpoint detail
-  - `400` -> lihat section `400 Response Body`
-  - `404` -> lihat section `404 Response Body`
+- Endpoint non-versioned (`/api/*`) tidak dipakai; gunakan `/api/v1/*`.
+- Untuk call protected (di dokumen role), sertakan `Authorization: Bearer <token>`.
+- Jika response tidak sesuai dokumen, cek `request_id` lalu cocokkan dengan log backend.

@@ -1,4 +1,6 @@
-# FETCH Role: Admin (Full Response)
+# FETCH Role: Admin (Lengkap)
+
+Dokumen ini adalah panduan paling lengkap untuk role `Admin`, mencakup Auth utilitas, Users, Laporan, Operasional, Master, Wilayah, dan BMKG.
 
 ## Setup
 
@@ -9,13 +11,15 @@ TOKEN="token_admin"
 
 ## 1) Check Token
 
+### CURL
+
 ```bash
 curl -X GET "$BASE_URL/check-token" \
   -H "Accept: application/json" \
   -H "Authorization: Bearer $TOKEN"
 ```
 
-### 200 Response Body
+### 200 Full Response Body
 
 ```json
 {
@@ -29,9 +33,10 @@ curl -X GET "$BASE_URL/check-token" \
 }
 ```
 
-## 2) User Management
+## 2) Users
 
 Endpoint:
+
 - `GET /users`
 - `POST /users`
 - `GET /users/statistics`
@@ -39,7 +44,24 @@ Endpoint:
 - `PUT /users/{id}`
 - `DELETE /users/{id}`
 
-Contoh `POST /users`:
+### A. POST `/users`
+
+#### Full Request Body
+
+```json
+{
+  "nama": "Operator Desa A",
+  "username": "operator_a",
+  "email": "operator_a@example.com",
+  "password": "password123",
+  "role": "OperatorDesa",
+  "no_telepon": "081234567890",
+  "alamat": "Kantor Desa A",
+  "id_desa": 1
+}
+```
+
+#### CURL
 
 ```bash
 curl -X POST "$BASE_URL/users" \
@@ -52,11 +74,13 @@ curl -X POST "$BASE_URL/users" \
     "email":"operator_a@example.com",
     "password":"password123",
     "role":"OperatorDesa",
+    "no_telepon":"081234567890",
+    "alamat":"Kantor Desa A",
     "id_desa":1
   }'
 ```
 
-### 201 Response Body
+#### 201 Full Response Body
 
 ```json
 {
@@ -90,15 +114,17 @@ curl -X POST "$BASE_URL/users" \
 }
 ```
 
-Contoh `GET /users?per_page=20`:
+### B. GET `/users?per_page=20&search=operator`
+
+#### CURL
 
 ```bash
-curl -X GET "$BASE_URL/users?per_page=20" \
+curl -X GET "$BASE_URL/users?per_page=20&search=operator" \
   -H "Accept: application/json" \
   -H "Authorization: Bearer $TOKEN"
 ```
 
-### 200 Response Body (Paginated)
+#### 200 Full Response Body (Paginated)
 
 ```json
 {
@@ -126,9 +152,45 @@ curl -X GET "$BASE_URL/users?per_page=20" \
 }
 ```
 
-## 3) Laporan Management
+### C. GET `/users/statistics`
+
+#### CURL
+
+```bash
+curl -X GET "$BASE_URL/users/statistics" \
+  -H "Accept: application/json" \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+#### 200 Full Response Body
+
+```json
+{
+  "success": true,
+  "message": "Statistik pengguna berhasil diambil",
+  "data": {
+    "total_users": 120,
+    "by_role": [
+      {
+        "role": "Warga",
+        "total": 80
+      },
+      {
+        "role": "OperatorDesa",
+        "total": 20
+      }
+    ],
+    "recent_users": [],
+    "users_this_month": 9
+  },
+  "request_id": "req_01HZY2P0W7D3G4"
+}
+```
+
+## 3) Laporan
 
 Endpoint:
+
 - `GET /laporans`
 - `GET /laporans/pelapor/{pelaporId}`
 - `POST /laporans`
@@ -137,7 +199,9 @@ Endpoint:
 - `DELETE /laporans/{id}`
 - `GET /laporans/statistics`
 
-Contoh `GET /laporans?limit=15`:
+### A. GET `/laporans?limit=15`
+
+#### CURL
 
 ```bash
 curl -X GET "$BASE_URL/laporans?limit=15" \
@@ -145,7 +209,55 @@ curl -X GET "$BASE_URL/laporans?limit=15" \
   -H "Authorization: Bearer $TOKEN"
 ```
 
-Contoh `GET /laporans/pelapor/{pelaporId}`:
+#### 200 Full Response Body (Nested + Pagination)
+
+```json
+{
+  "success": true,
+  "message": "Data laporan berhasil diambil",
+  "data": [
+    {
+      "id": 1,
+      "id_pelapor": 5,
+      "id_kategori_bencana": 1,
+      "id_desa": 1,
+      "judul_laporan": "Banjir RT 03",
+      "deskripsi": "Air setinggi lutut",
+      "tingkat_keparahan": "Tinggi",
+      "status": "Diproses",
+      "pelapor": {
+        "id": 5,
+        "nama": "Andi Warga"
+      },
+      "kategori": {
+        "id": 1,
+        "nama_kategori": "Banjir"
+      },
+      "desa": {
+        "id": 1,
+        "nama": "Sukamaju"
+      },
+      "monitoring": [],
+      "tindak_lanjut": []
+    }
+  ],
+  "meta": {
+    "pagination": {
+      "current_page": 1,
+      "last_page": 2,
+      "per_page": 15,
+      "total": 26,
+      "from": 1,
+      "to": 15
+    }
+  },
+  "request_id": "req_01HZY2P0W7D3G4"
+}
+```
+
+### B. GET `/laporans/pelapor/{pelaporId}`
+
+#### CURL
 
 ```bash
 curl -X GET "$BASE_URL/laporans/pelapor/5?status=Draft&limit=10" \
@@ -153,7 +265,7 @@ curl -X GET "$BASE_URL/laporans/pelapor/5?status=Draft&limit=10" \
   -H "Authorization: Bearer $TOKEN"
 ```
 
-### 200 Response Body (By Pelapor)
+#### 200 Full Response Body
 
 ```json
 {
@@ -185,65 +297,34 @@ curl -X GET "$BASE_URL/laporans/pelapor/5?status=Draft&limit=10" \
 }
 ```
 
-### 200 Response Body (Nested + Pagination)
+### C. POST `/laporans` (Multipart + Attachment)
 
-```json
-{
-  "success": true,
-  "message": "Data laporan berhasil diambil",
-  "data": [
-    {
-      "id": 1,
-      "id_pelapor": 5,
-      "id_kategori_bencana": 1,
-      "id_desa": 1,
-      "judul_laporan": "Banjir RT 03",
-      "deskripsi": "Air setinggi lutut",
-      "tingkat_keparahan": "Tinggi",
-      "status": "Diproses",
-      "pelapor": {
-        "id": 5,
-        "nama": "Andi Warga"
-      },
-      "kategori": {
-        "id": 1,
-        "nama_kategori": "Banjir"
-      },
-      "desa": {
-        "id": 1,
-        "nama": "Sukamaju",
-        "kecamatan": {
-          "id": 12,
-          "nama": "Kec. Tengah",
-          "kabupaten": {
-            "id": 5,
-            "nama": "Kab. Maju",
-            "provinsi": {
-              "id": 2,
-              "nama": "Jawa Barat"
-            }
-          }
-        }
-      },
-      "monitoring": [],
-      "tindak_lanjut": []
-    }
-  ],
-  "meta": {
-    "pagination": {
-      "current_page": 1,
-      "last_page": 2,
-      "per_page": 15,
-      "total": 26,
-      "from": 1,
-      "to": 15
-    }
-  },
-  "request_id": "req_01HZY2P0W7D3G4"
-}
+#### CURL
+
+```bash
+curl -X POST "$BASE_URL/laporans" \
+  -H "Accept: application/json" \
+  -H "Authorization: Bearer $TOKEN" \
+  -F "judul_laporan=Banjir RT 03" \
+  -F "deskripsi=Air setinggi lutut" \
+  -F "tingkat_keparahan=Tinggi" \
+  -F "latitude=-6.2" \
+  -F "longitude=106.8" \
+  -F "id_kategori_bencana=1" \
+  -F "id_desa=1" \
+  -F "alamat=Pariaman" \
+  -F "jumlah_korban=0" \
+  -F "jumlah_rumah_rusak=0" \
+  -F "is_prioritas=true" \
+  -F "foto_bukti_1=@./sample1.png" \
+  -F "foto_bukti_2=@./sample2.png" \
+  -F "foto_bukti_3=@./sample3.png" \
+  -F "video_bukti=@./sample.mp4"
 ```
 
-Contoh `GET /laporans/statistics?period=monthly`:
+### D. GET `/laporans/statistics?period=monthly`
+
+#### CURL
 
 ```bash
 curl -X GET "$BASE_URL/laporans/statistics?period=monthly" \
@@ -251,7 +332,7 @@ curl -X GET "$BASE_URL/laporans/statistics?period=monthly" \
   -H "Authorization: Bearer $TOKEN"
 ```
 
-### 200 Response Body (Statistics)
+#### 200 Full Response Body
 
 ```json
 {
@@ -294,16 +375,41 @@ curl -X GET "$BASE_URL/laporans/statistics?period=monthly" \
 }
 ```
 
-## 4) Operasional dan Master
+## 4) Workflow, Operasional, Master, dan Wilayah
 
-Endpoint:
+### Workflow Laporan
+
+- `POST /laporans/{id}/verifikasi`
+- `POST /laporans/{id}/proses`
+- `GET /laporans/{id}/riwayat`
+
+### Operasional
+
 - `GET/POST/PUT/DELETE /monitoring`
 - `GET/POST/PUT/DELETE /tindak-lanjut`
 - `GET/POST/PUT/DELETE /riwayat-tindakan`
-- `GET/POST/PUT/PATCH/DELETE /kategori-bencana`
-- `GET/POST/PUT/DELETE /wilayah` dan turunannya
 
-### 400 Response Body
+### Kategori Bencana
+
+- `GET /kategori-bencana`
+- `GET /kategori-bencana/{id}`
+- `POST /kategori-bencana`
+- `PUT/PATCH /kategori-bencana/{id}`
+- `DELETE /kategori-bencana/{id}`
+
+### Wilayah
+
+- Public read: `GET /wilayah*`
+- Admin CRUD: `POST/PUT/DELETE /wilayah` + endpoint level (`/wilayah/provinsi`, `/wilayah/kabupaten`, `/wilayah/kecamatan`, `/wilayah/desa`)
+
+### BMKG
+
+- Public: `GET /bmkg/gempa/*`, `GET /bmkg/prakiraan-cuaca`, `GET /bmkg/peringatan-dini-cuaca`
+- Protected: `GET /bmkg`, `GET /bmkg/cache/status`, `POST /bmkg/cache/clear`
+
+## 5) Full Error Body Contoh
+
+### 400
 
 ```json
 {
@@ -314,7 +420,7 @@ Endpoint:
 }
 ```
 
-### 404 Response Body
+### 404
 
 ```json
 {
@@ -325,7 +431,7 @@ Endpoint:
 }
 ```
 
-### 422 Response Body
+### 422
 
 ```json
 {
@@ -346,7 +452,7 @@ Endpoint:
 }
 ```
 
-### 500 Response Body
+### 500
 
 ```json
 {
@@ -357,101 +463,13 @@ Endpoint:
 }
 ```
 
-## 5) Matriks Status Semua Endpoint Admin
+## 6) Matriks Status Endpoint Admin
 
-- `GET /auth/me`, `GET /users/profile`, `GET /check-token`
-  - `200`, `401`
-
-- `POST /auth/refresh`, `POST /auth/logout`
-  - `200`, `401`
-
-- `GET /auth/roles`
-  - `200`
-
-- `GET /users`
-  - `200`
-
-- `POST /users`
-  - `201`, `422`, `403`
-
-- `GET /users/statistics`
-  - `200`, `403`
-
-- `GET /users/{id}`
-  - `200`, `404`, `403`
-
-- `PUT /users/{id}`
-  - `200`, `404`, `422`, `403`
-
-- `DELETE /users/{id}`
-  - `200`, `404`, `403`
-
-- `GET /laporans`
-  - `200`
-
-- `POST /laporans`
-  - `201`, `422`, `401`
-
-- `GET /laporans/{id}`
-  - `200`, `404`
-
-- `PUT /laporans/{id}`
-  - `200`, `403`, `422`, `404`
-
-- `DELETE /laporans/{id}`
-  - `200`, `403`, `404`
-
-- `GET /laporans/statistics`
-  - `200`, `500`
-
-- `POST /laporans/{id}/verifikasi`
-- `POST /laporans/{id}/proses`
-  - `200`, `403`, `404`, `422`
-
-- `GET /laporans/{id}/riwayat`
-  - `200`, `404`
-
-- `GET/POST/PUT/DELETE /monitoring`
-  - `GET`: `200`
-  - `POST`: `201`, `422`, `403`
-  - `PUT`: `200`, `404`, `422`, `403`
-  - `DELETE`: `200`, `404`, `403`
-
-- `GET/POST/PUT/DELETE /tindak-lanjut`
-  - `GET`: `200`
-  - `POST`: `201`, `422`, `403`
-  - `PUT`: `200`, `404`, `422`, `403`
-  - `DELETE`: `200`, `404`, `403`
-
-- `GET/POST/PUT/DELETE /riwayat-tindakan`
-  - `GET`: `200`
-  - `POST`: `201`, `422`, `403`
-  - `PUT`: `200`, `404`, `422`, `403`
-  - `DELETE`: `200`, `404`, `403`
-
-- `GET /kategori-bencana`
-  - `200`
-
-- `GET /kategori-bencana/{id}`
-  - `200`, `404`
-
-- `POST /kategori-bencana`
-  - `201`, `422`, `403`
-
-- `PUT/PATCH /kategori-bencana/{id}`
-  - `200`, `404`, `422`, `403`
-
-- `DELETE /kategori-bencana/{id}`
-  - `200`, `404`, `400`, `403`
-
-- `GET /wilayah`, `GET /wilayah/{id}`, `GET /wilayah/provinsi*`, `GET /wilayah/kabupaten/*`, `GET /wilayah/kecamatan/*`, `GET /wilayah/desa/*`, `GET /wilayah/detail/*`, `GET /wilayah/hierarchy/*`, `GET /wilayah/search`
-  - `200`, `400`, `404`
-
-- `POST/PUT/DELETE /wilayah` dan endpoint CRUD level wilayah
-  - `201`/`200`, `400`, `404`, `422`, `403`
-
-- `GET /bmkg/gempa/*`, `GET /bmkg/peringatan-tsunami`, `GET /bmkg/prakiraan-cuaca`
-  - `200`, `404`, `422`, `500`
-
-- `GET /bmkg`, `GET /bmkg/cache/status`, `POST /bmkg/cache/clear`
-  - `200`, `500`, `401`
+- Auth/session: `GET /auth/me`, `POST /auth/refresh`, `POST /auth/logout`, `GET /auth/roles`, `GET /check-token` -> `200`, `401`
+- Users: `GET/POST/GET{id}/PUT{id}/DELETE{id}` + `GET /users/statistics` -> `200`, `201`, `403`, `404`, `422`
+- Laporan: `GET/POST/GET{id}/PUT{id}/DELETE{id}` + `GET /laporans/pelapor/{pelaporId}` + `GET /laporans/statistics` -> `200`, `201`, `401`, `403`, `404`, `422`, `500`
+- Workflow: `POST /laporans/{id}/verifikasi`, `POST /laporans/{id}/proses`, `GET /laporans/{id}/riwayat` -> `200`, `403`, `404`, `422`
+- Monitoring/TindakLanjut/RiwayatTindakan CRUD -> `200`, `201`, `403`, `404`, `422`
+- Kategori Bencana CRUD -> `200`, `201`, `400`, `403`, `404`, `422`
+- Wilayah read + CRUD -> `200`, `201`, `400`, `403`, `404`, `422`
+- BMKG public/protected -> `200`, `401`, `404`, `422`, `500`

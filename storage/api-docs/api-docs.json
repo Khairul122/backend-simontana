@@ -7,8 +7,8 @@
     },
     "servers": [
         {
-            "url": "http://localhost:8000/api",
-            "description": "Local API server"
+            "url": "http://localhost:8000/api/v1",
+            "description": "Local API server (v1)"
         }
     ],
     "paths": {
@@ -16,7 +16,7 @@
         "/auth/roles": {
             "get": {
                 "tags": [
-                    "User Management"
+                    "Auth"
                 ],
                 "summary": "Daftar role yang tersedia",
                 "operationId": "a76ad526f72e021374dc9546ab2ab6e8",
@@ -37,7 +37,7 @@
         "/check-token": {
             "get": {
                 "tags": [
-                    "User Management"
+                    "Auth"
                 ],
                 "summary": "Validasi token aktif",
                 "operationId": "2b136e32dc23fdad7ec5afcf96e02de8",
@@ -73,7 +73,7 @@
         "/auth/register": {
             "post": {
                 "tags": [
-                    "User Management"
+                    "Auth"
                 ],
                 "summary": "Registrasi pengguna baru",
                 "operationId": "dbc9e711b01cef19e38cc24a43aefda8",
@@ -182,7 +182,7 @@
         "/auth/login": {
             "post": {
                 "tags": [
-                    "User Management"
+                    "Auth"
                 ],
                 "summary": "Login pengguna",
                 "operationId": "ae523cda9aa0c2a202f13b3fc01fd063",
@@ -258,7 +258,7 @@
         "/auth/logout": {
             "post": {
                 "tags": [
-                    "User Management"
+                    "Auth"
                 ],
                 "summary": "Logout pengguna",
                 "operationId": "daa94e12eb34625697158f9670fad332",
@@ -294,7 +294,7 @@
         "/auth/refresh": {
             "post": {
                 "tags": [
-                    "User Management"
+                    "Auth"
                 ],
                 "summary": "Refresh token",
                 "operationId": "a2afc1f7c904cbaa09c87cb0fe307162",
@@ -330,7 +330,7 @@
         "/auth/me": {
             "get": {
                 "tags": [
-                    "User Management"
+                    "Auth"
                 ],
                 "summary": "Ambil profil user login",
                 "operationId": "abdab0d54c0995b4688d1567a40263ee",
@@ -366,7 +366,7 @@
         "/laporans": {
             "get": {
                 "tags": [
-                    "Wilayah Management"
+                    "Laporan"
                 ],
                 "summary": "Daftar laporan dengan filter",
                 "operationId": "0df8512c6656ec7b18d3ee7268950658",
@@ -512,7 +512,7 @@
             },
             "post": {
                 "tags": [
-                    "Wilayah Management"
+                    "Laporan"
                 ],
                 "summary": "Buat laporan baru",
                 "operationId": "9c118eb39bdcca4300fe597218dce7cc",
@@ -545,6 +545,16 @@
                                             "Tinggi",
                                             "Kritis"
                                         ]
+                                    },
+                                    "status": {
+                                        "description": "Status awal laporan. Jika tidak dikirim, default Draft",
+                                        "type": "string",
+                                        "enum": [
+                                            "Draft",
+                                            "Menunggu Verifikasi"
+                                        ],
+                                        "example": "Draft",
+                                        "nullable": true
                                     },
                                     "latitude": {
                                         "type": "number",
@@ -654,7 +664,7 @@
         "/laporans/pelapor/{pelaporId}": {
             "get": {
                 "tags": [
-                    "Laporan Management"
+                    "Laporan"
                 ],
                 "summary": "Daftar laporan berdasarkan ID pelapor",
                 "operationId": "97bbb1078b4fa6b7b19017406892d1e6",
@@ -784,7 +794,7 @@
         "/laporans/{id}": {
             "get": {
                 "tags": [
-                    "Laporan Management"
+                    "Laporan"
                 ],
                 "summary": "Detail laporan",
                 "operationId": "c90bbf7f8dbd89075c5af68e05dabc7b",
@@ -838,7 +848,7 @@
             },
             "put": {
                 "tags": [
-                    "Laporan Management"
+                    "Laporan"
                 ],
                 "summary": "Update laporan",
                 "operationId": "1d736eb6be4e0d7ef74def1fdda7038d",
@@ -871,6 +881,15 @@
                                             "Tinggi",
                                             "Kritis"
                                         ]
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "enum": [
+                                            "Draft",
+                                            "Menunggu Verifikasi"
+                                        ],
+                                        "example": "Menunggu Verifikasi",
+                                        "nullable": true
                                     },
                                     "latitude": {
                                         "type": "number",
@@ -988,7 +1007,7 @@
             },
             "delete": {
                 "tags": [
-                    "Laporan Management"
+                    "Laporan"
                 ],
                 "summary": "Hapus laporan",
                 "operationId": "0f44c69a367d7e6d4508b6eaac8aa297",
@@ -1051,12 +1070,68 @@
                 ]
             }
         },
+        "/warga/laporans/{id}/detail-lengkap": {
+            "get": {
+                "tags": [
+                    "Laporan"
+                ],
+                "summary": "Detail lengkap laporan untuk Warga (laporan + tindak lanjut + riwayat)",
+                "operationId": "9bcc43894e3ac02ce6220103bf11a8c4",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Detail lengkap laporan warga berhasil diambil",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/WargaLaporanDetailSuccessResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Akses ditolak atau bukan milik warga",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Laporan tidak ditemukan",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            }
+        },
         "/laporans/statistics": {
             "get": {
                 "tags": [
-                    "Laporan Management"
+                    "Laporan"
                 ],
-                "summary": "Statistik laporan",
+                "summary": "Statistik laporan (mendukung filter desa/pelapor)",
                 "operationId": "a55d6c91121b55882feabd1cf2444949",
                 "parameters": [
                     {
@@ -1065,16 +1140,33 @@
                         "schema": {
                             "type": "string",
                             "enum": [
+                                "all",
                                 "weekly",
                                 "monthly",
                                 "yearly"
                             ]
                         }
+                    },
+                    {
+                        "name": "id_desa",
+                        "in": "query",
+                        "description": "Filter statistik berdasarkan desa",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "id_pelapor",
+                        "in": "query",
+                        "description": "Filter statistik berdasarkan user pelapor",
+                        "schema": {
+                            "type": "integer"
+                        }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Statistik laporan berhasil diambil (agregasi status, tren, kategori, top pengguna)",
+                        "description": "Statistik laporan berhasil diambil (agregasi status, tren, kategori, top pengguna) sesuai filter",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1104,7 +1196,7 @@
         "/bmkg": {
             "get": {
                 "tags": [
-                    "BMKG Integration"
+                    "BMKG"
                 ],
                 "summary": "Ringkasan data BMKG",
                 "operationId": "d1e550629e105c471b42d1fdd89c7e28",
@@ -1140,7 +1232,7 @@
         "/bmkg/gempa/terbaru": {
             "get": {
                 "tags": [
-                    "BMKG Integration"
+                    "BMKG"
                 ],
                 "summary": "Gempa terbaru",
                 "operationId": "b81a1fd031001c306794f86ee1361af1",
@@ -1181,7 +1273,7 @@
         "/bmkg/gempa/terkini": {
             "get": {
                 "tags": [
-                    "BMKG Integration"
+                    "BMKG"
                 ],
                 "summary": "Daftar gempa terkini",
                 "operationId": "4e3eb05ac96ecfdf8610a98547e3b878",
@@ -1222,7 +1314,7 @@
         "/bmkg/gempa/dirasakan": {
             "get": {
                 "tags": [
-                    "BMKG Integration"
+                    "BMKG"
                 ],
                 "summary": "Gempa dirasakan",
                 "operationId": "9873a8ed8e894ed65db0bf7ddc34960b",
@@ -1263,7 +1355,7 @@
         "/bmkg/prakiraan-cuaca": {
             "get": {
                 "tags": [
-                    "BMKG Integration"
+                    "BMKG"
                 ],
                 "summary": "Prakiraan cuaca berdasarkan wilayah",
                 "operationId": "fd63592e96c7f3815f2573314b835fbf",
@@ -1324,7 +1416,7 @@
         "/bmkg/peringatan-dini-cuaca": {
             "get": {
                 "tags": [
-                    "BMKG Integration"
+                    "BMKG"
                 ],
                 "summary": "Peringatan dini cuaca (Nowcast)",
                 "operationId": "2a4e60e7048e2246a115640a9edc63a1",
@@ -1365,7 +1457,7 @@
         "/bmkg/cache/status": {
             "get": {
                 "tags": [
-                    "BMKG Integration"
+                    "BMKG"
                 ],
                 "summary": "Status cache BMKG",
                 "operationId": "093c3fbd9e73ffb38229881cbd38679d",
@@ -1401,7 +1493,7 @@
         "/bmkg/cache/clear": {
             "post": {
                 "tags": [
-                    "BMKG Integration"
+                    "BMKG"
                 ],
                 "summary": "Bersihkan cache BMKG",
                 "operationId": "7b928c06f8bb05e316a381a31d34f2fb",
@@ -1437,7 +1529,7 @@
         "/laporans/{id}/verifikasi": {
             "post": {
                 "tags": [
-                    "Laporan Workflow"
+                    "Workflow Laporan"
                 ],
                 "summary": "Verifikasi laporan",
                 "operationId": "2e6f41867da37d835d2a46c4e17f900c",
@@ -1541,7 +1633,7 @@
         "/laporans/{id}/proses": {
             "post": {
                 "tags": [
-                    "Laporan Workflow"
+                    "Workflow Laporan"
                 ],
                 "summary": "Proses laporan",
                 "operationId": "40a6424a3408d7412761594678af1d69",
@@ -1640,7 +1732,7 @@
         "/laporans/{id}/riwayat": {
             "get": {
                 "tags": [
-                    "Laporan Workflow"
+                    "Workflow Laporan"
                 ],
                 "summary": "Ambil riwayat tindakan laporan",
                 "operationId": "27c5b79d89000c32159a8b7f59fbd1f0",
@@ -2027,7 +2119,7 @@
                 "tags": [
                     "Tindak Lanjut"
                 ],
-                "summary": "Daftar tindak lanjut",
+                "summary": "Daftar tindak lanjut (Warga hanya milik laporannya sendiri)",
                 "operationId": "1ec857af3fe1356ccd8359fd4948ee56",
                 "parameters": [
                     {
@@ -2066,21 +2158,11 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Data tindak lanjut berhasil diambil dengan nested laporan/petugas penuh dan meta pagination",
+                        "description": "Data tindak lanjut berhasil diambil; role Warga otomatis dibatasi ke laporan miliknya",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/TindakLanjutPaginatedSuccessResponse"
-                                }
-                            }
-                        }
-                    },
-                    "403": {
-                        "description": "Tidak memiliki izin",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
                                 }
                             }
                         }
@@ -2365,7 +2447,7 @@
                 "tags": [
                     "Riwayat Tindakan"
                 ],
-                "summary": "Daftar riwayat tindakan",
+                "summary": "Daftar riwayat tindakan (Warga hanya milik laporannya sendiri)",
                 "operationId": "92a0d048ca955512f8201619115a59db",
                 "parameters": [
                     {
@@ -2393,21 +2475,11 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Data riwayat tindakan berhasil diambil dengan nested tindak lanjut/petugas penuh dan meta pagination",
+                        "description": "Data riwayat tindakan berhasil diambil; role Warga otomatis dibatasi ke laporan miliknya",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/RiwayatTindakanPaginatedSuccessResponse"
-                                }
-                            }
-                        }
-                    },
-                    "403": {
-                        "description": "Tidak memiliki izin",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
                                 }
                             }
                         }
@@ -2683,7 +2755,7 @@
         "/users/profile": {
             "get": {
                 "tags": [
-                    "Authentication"
+                    "Users"
                 ],
                 "summary": "Profil pengguna saat ini",
                 "operationId": "819e580380a5c949ea610457f3b32516",
@@ -2717,7 +2789,7 @@
             },
             "put": {
                 "tags": [
-                    "Authentication"
+                    "Users"
                 ],
                 "summary": "Update profil pengguna saat ini",
                 "operationId": "e1917e79698ac18711ad52ac293fe06d",
@@ -2786,7 +2858,7 @@
         "/users": {
             "get": {
                 "tags": [
-                    "Authentication"
+                    "Users"
                 ],
                 "summary": "Daftar pengguna (Admin only)",
                 "operationId": "2b69a275c5a5b445798df34e22386525",
@@ -2844,7 +2916,7 @@
             },
             "post": {
                 "tags": [
-                    "Authentication"
+                    "Users"
                 ],
                 "summary": "Buat pengguna baru (Admin only)",
                 "operationId": "798777a0feb84b0c6e8fe62f647cfbf5",
@@ -2934,7 +3006,7 @@
         "/users/statistics": {
             "get": {
                 "tags": [
-                    "Authentication"
+                    "Users"
                 ],
                 "summary": "Statistik pengguna (Admin only)",
                 "operationId": "4d9f17907a9865fd36f9e9b49ebefd66",
@@ -2970,7 +3042,7 @@
         "/users/{id}": {
             "get": {
                 "tags": [
-                    "Authentication"
+                    "Users"
                 ],
                 "summary": "Detail pengguna (Admin only)",
                 "operationId": "f84d4ab5effc063225aafc0cef9a849d",
@@ -3014,7 +3086,7 @@
             },
             "put": {
                 "tags": [
-                    "Authentication"
+                    "Users"
                 ],
                 "summary": "Update pengguna (Admin only)",
                 "operationId": "bdd132f7af213264952b5eb27242078c",
@@ -3068,7 +3140,7 @@
             },
             "delete": {
                 "tags": [
-                    "Authentication"
+                    "Users"
                 ],
                 "summary": "Hapus pengguna (Admin only)",
                 "operationId": "3106770d4058ecceb7900cee8c6e9aee",
@@ -3114,7 +3186,7 @@
         "/kategori-bencana": {
             "get": {
                 "tags": [
-                    "Laporan Management"
+                    "Kategori Bencana"
                 ],
                 "summary": "Daftar kategori bencana",
                 "operationId": "cec65868c2606c0a551b9153fc08b409",
@@ -3173,7 +3245,7 @@
             },
             "post": {
                 "tags": [
-                    "Laporan Management"
+                    "Kategori Bencana"
                 ],
                 "summary": "Tambah kategori bencana (Admin only)",
                 "operationId": "d8e9dce54398594b3b3ff305640a8e2e",
@@ -3235,7 +3307,7 @@
         "/kategori-bencana/{id}": {
             "get": {
                 "tags": [
-                    "Laporan Management"
+                    "Kategori Bencana"
                 ],
                 "summary": "Detail kategori bencana",
                 "operationId": "3755600cde4d36ac0cc7bd925ffa11ae",
@@ -3279,7 +3351,7 @@
             },
             "put": {
                 "tags": [
-                    "Laporan Management"
+                    "Kategori Bencana"
                 ],
                 "summary": "Update kategori bencana (Admin only)",
                 "operationId": "c122c82bf58f6e11e2526169e98becbe",
@@ -3333,7 +3405,7 @@
             },
             "delete": {
                 "tags": [
-                    "Laporan Management"
+                    "Kategori Bencana"
                 ],
                 "summary": "Hapus kategori bencana (Admin only)",
                 "operationId": "e79a14aade6f3320b143258751ecaabd",
@@ -3389,7 +3461,7 @@
         "/wilayah": {
             "get": {
                 "tags": [
-                    "Laporan Management"
+                    "Wilayah"
                 ],
                 "summary": "Daftar wilayah (all jenis atau per jenis)",
                 "operationId": "225813b70be19a9770b7e13e2da8ccbf",
@@ -3438,7 +3510,7 @@
             },
             "post": {
                 "tags": [
-                    "Wilayah Management"
+                    "Wilayah"
                 ],
                 "summary": "Tambah wilayah (Admin only)",
                 "operationId": "aab58bca3e2de1234d2233231b3af33e",
@@ -3506,7 +3578,7 @@
         "/wilayah/{id}": {
             "get": {
                 "tags": [
-                    "Laporan Management"
+                    "Wilayah"
                 ],
                 "summary": "Detail wilayah by jenis",
                 "operationId": "81b12105164cdf3eff2ea1b14612ad13",
@@ -3566,7 +3638,7 @@
             },
             "put": {
                 "tags": [
-                    "Wilayah Management"
+                    "Wilayah"
                 ],
                 "summary": "Update wilayah (Admin only)",
                 "operationId": "181b86832eec2feba7eab1f521d20513",
@@ -3642,7 +3714,7 @@
             },
             "delete": {
                 "tags": [
-                    "Wilayah Management"
+                    "Wilayah"
                 ],
                 "summary": "Hapus wilayah (Admin only)",
                 "operationId": "4a4b14a4bbb89d3ca1b38fb33f435bf7",
@@ -3712,7 +3784,7 @@
         "/wilayah/provinsi": {
             "get": {
                 "tags": [
-                    "Wilayah Management"
+                    "Wilayah"
                 ],
                 "summary": "Daftar provinsi",
                 "operationId": "37a3b8bc48e85a5f70025e9cbe13e26e",
@@ -3733,7 +3805,7 @@
         "/wilayah/provinsi/{id}": {
             "get": {
                 "tags": [
-                    "Wilayah Management"
+                    "Wilayah"
                 ],
                 "summary": "Detail provinsi",
                 "operationId": "ba3155817b5b551c8c4e7fb846fc0121",
@@ -3774,7 +3846,7 @@
         "/wilayah/kabupaten/{provinsi_id}": {
             "get": {
                 "tags": [
-                    "Wilayah Management"
+                    "Wilayah"
                 ],
                 "summary": "Daftar kabupaten by provinsi",
                 "operationId": "f57e73447c7e94ff954ff015596de500",
@@ -3815,7 +3887,7 @@
         "/wilayah/kecamatan/{kabupaten_id}": {
             "get": {
                 "tags": [
-                    "Wilayah Management"
+                    "Wilayah"
                 ],
                 "summary": "Daftar kecamatan by kabupaten",
                 "operationId": "ce92f64b3cf2771998a8096e94931a7c",
@@ -3856,7 +3928,7 @@
         "/wilayah/desa/{kecamatan_id}": {
             "get": {
                 "tags": [
-                    "Wilayah Management"
+                    "Wilayah"
                 ],
                 "summary": "Daftar desa by kecamatan",
                 "operationId": "d0d2210d175ab4bf5f9f4b3376731da7",
@@ -3897,7 +3969,7 @@
         "/wilayah/detail/{desa_id}": {
             "get": {
                 "tags": [
-                    "Wilayah Management"
+                    "Wilayah"
                 ],
                 "summary": "Detail wilayah by desa",
                 "operationId": "a19450f13defe6d37cc2a20ac424e6fd",
@@ -3938,7 +4010,7 @@
         "/wilayah/hierarchy/{desa_id}": {
             "get": {
                 "tags": [
-                    "Wilayah Management"
+                    "Wilayah"
                 ],
                 "summary": "Hierarchy wilayah by desa",
                 "operationId": "8ed8cfe049e6ddcfa581e0e0f6acc1c5",
@@ -3979,7 +4051,7 @@
         "/wilayah/search": {
             "get": {
                 "tags": [
-                    "Wilayah Management"
+                    "Wilayah"
                 ],
                 "summary": "Pencarian wilayah",
                 "operationId": "6479a61e35e644dc8866b3b9412e5945",
@@ -4893,6 +4965,41 @@
                     }
                 ]
             },
+            "WargaLaporanDetailData": {
+                "properties": {
+                    "detail_laporan": {
+                        "$ref": "#/components/schemas/LaporanItem"
+                    },
+                    "tindak_lanjut": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/TindakLanjutItem"
+                        }
+                    },
+                    "riwayat_tindakan": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/RiwayatTindakanItem"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "WargaLaporanDetailSuccessResponse": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/SuccessResponse"
+                    },
+                    {
+                        "properties": {
+                            "data": {
+                                "$ref": "#/components/schemas/WargaLaporanDetailData"
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
             "LaporanStatisticsData": {
                 "properties": {
                     "total_laporan": {
@@ -5473,24 +5580,28 @@
     },
     "tags": [
         {
-            "name": "Authentication",
-            "description": "Authentication endpoints"
+            "name": "Auth",
+            "description": "Endpoint autentikasi"
         },
         {
-            "name": "User Management",
+            "name": "Users",
             "description": "Manajemen pengguna"
         },
         {
-            "name": "Wilayah Management",
+            "name": "Wilayah",
             "description": "Referensi dan manajemen wilayah"
         },
         {
-            "name": "Laporan Management",
+            "name": "Laporan",
             "description": "CRUD dan statistik laporan"
         },
         {
-            "name": "Laporan Workflow",
-            "description": "Workflow status laporan"
+            "name": "Workflow Laporan",
+            "description": "Perubahan status dan riwayat laporan"
+        },
+        {
+            "name": "Kategori Bencana",
+            "description": "Master data kategori bencana"
         },
         {
             "name": "Monitoring",
@@ -5505,7 +5616,7 @@
             "description": "Riwayat tindakan operasional"
         },
         {
-            "name": "BMKG Integration",
+            "name": "BMKG",
             "description": "Integrasi data BMKG"
         }
     ],

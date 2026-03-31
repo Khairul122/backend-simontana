@@ -34,11 +34,13 @@ class RiwayatTindakanController extends Controller
             return $this->unauthorized();
         }
 
-        if ($user->role === 'Warga') {
-            return $this->deniedByPolicy('Warga tidak memiliki akses ke data riwayat tindakan operasional');
-        }
-
         $query = RiwayatTindakan::with(self::FULL_RELATIONS);
+
+        if ($user->role === 'Warga') {
+            $query->whereHas('tindakLanjut.laporan', function ($laporanQuery) use ($user) {
+                $laporanQuery->where('id_pelapor', $user->id);
+            });
+        }
 
         if ($request->has('tindaklanjut_id')) {
             $query->where('tindaklanjut_id', $request->tindaklanjut_id);

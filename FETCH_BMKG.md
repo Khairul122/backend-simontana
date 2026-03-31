@@ -1,27 +1,41 @@
-# FETCH Referensi: BMKG (Full Response)
+# FETCH BMKG (Lengkap)
 
-Endpoint ini bersifat Public dan bisa diakses oleh role apa saja (maupun publik tanpa token) untuk mendapatkan data cuaca dan gempa dari BMKG yang sudah di-cache oleh sistem Simonta.
+Dokumen ini fokus untuk domain BMKG: endpoint public dan endpoint protected (cache management).
 
 ## Setup
 
 ```bash
 BASE_URL="http://127.0.0.1:8000/api/v1"
-# Jika endpoint protected, gunakan token
-# TOKEN="token_api"
+TOKEN="token_admin_atau_petugas"
 ```
 
----
+## Endpoint Ringkas
 
-## 1) GET `/bmkg` (Dashboard Summary)
+Public:
 
-Menampilkan ringkasan data BMKG (gempa terbaru, dirasakan, terkini, dan status cache).
+- `GET /bmkg/gempa/terbaru`
+- `GET /bmkg/gempa/terkini`
+- `GET /bmkg/gempa/dirasakan`
+- `GET /bmkg/prakiraan-cuaca?wilayah_id=...`
+- `GET /bmkg/peringatan-dini-cuaca`
+
+Protected:
+
+- `GET /bmkg` (ringkasan)
+- `GET /bmkg/cache/status`
+- `POST /bmkg/cache/clear`
+
+## 1) GET `/bmkg` (Protected Ringkasan)
+
+### CURL
 
 ```bash
 curl -X GET "$BASE_URL/bmkg" \
-  -H "Accept: application/json"
+  -H "Accept: application/json" \
+  -H "Authorization: Bearer $TOKEN"
 ```
 
-### 200 Response Body
+### 200 Full Response Body
 
 ```json
 {
@@ -29,40 +43,28 @@ curl -X GET "$BASE_URL/bmkg" \
   "message": "Data BMKG berhasil diambil",
   "data": {
     "gempa_terbaru": {
-      "Tanggal": "21 Mar 2026",
-      "Jam": "10:15:30 WIB",
-      "DateTime": "2026-03-21T03:15:30+00:00",
-      "Coordinates": "-8.15,108.82",
-      "Lintang": "8.15 LS",
-      "Bujur": "108.82 BT",
-      "Magnitude": "5.4",
-      "Kedalaman": "12 km",
-      "Wilayah": "105 km BaratDaya PANGANDARAN-JABAR",
-      "Potensi": "Tidak berpotensi tsunami",
-      "Dirasakan": "III Pangandaran, II Cilacap",
-      "Shakemap": "20260321101530.mmi.jpg"
+      "Tanggal": "31 Mar 2026",
+      "Jam": "08:10:01 WIB",
+      "Magnitude": "5.2",
+      "Kedalaman": "10 km",
+      "Wilayah": "Selatan Jawa",
+      "Potensi": "Tidak berpotensi tsunami"
     },
     "daftar_gempa": [
       {
-        "Tanggal": "21 Mar 2026",
-        "Jam": "08:12:11 WIB",
-        "DateTime": "2026-03-21T01:12:11+00:00",
-        "Coordinates": "-2.15,140.21",
-        "Lintang": "2.15 LS",
-        "Bujur": "140.21 BT",
+        "Tanggal": "31 Mar 2026",
+        "Jam": "07:20:11 WIB",
         "Magnitude": "5.1",
-        "Kedalaman": "10 km",
-        "Wilayah": "32 km TimurLaut JAYAPURA-PAPUA"
+        "Wilayah": "Timur Laut Jayapura"
       }
     ],
     "gempa_dirasakan": [
       {
-        "Tanggal": "21 Mar 2026",
-        "Jam": "10:15:30 WIB",
-        "Coordinates": "-8.15,108.82",
-        "Magnitude": "5.4",
-        "Wilayah": "105 km BaratDaya PANGANDARAN-JABAR",
-        "Dirasakan": "III Pangandaran, II Cilacap"
+        "Tanggal": "31 Mar 2026",
+        "Jam": "06:35:45 WIB",
+        "Magnitude": "4.9",
+        "Wilayah": "Barat Daya Pangandaran",
+        "Dirasakan": "III Pangandaran"
       }
     ],
     "cache_status": {
@@ -74,53 +76,60 @@ curl -X GET "$BASE_URL/bmkg" \
 }
 ```
 
----
-
 ## 2) GET `/bmkg/gempa/terbaru`
 
-Menampilkan informasi 1 gempa bumi paling baru yang dicatat BMKG. Termasuk info shakemap (peta guncangan).
+### CURL
 
 ```bash
 curl -X GET "$BASE_URL/bmkg/gempa/terbaru" \
   -H "Accept: application/json"
 ```
 
-### 200 Response Body
+### 200 Full Response Body
 
 ```json
 {
   "success": true,
   "message": "Data gempa terbaru berhasil diambil",
   "data": {
-    "Tanggal": "21 Mar 2026",
-    "Jam": "10:15:30 WIB",
-    "DateTime": "2026-03-21T03:15:30+00:00",
+    "Tanggal": "31 Mar 2026",
+    "Jam": "08:10:01 WIB",
+    "DateTime": "2026-03-31T01:10:01+00:00",
     "Coordinates": "-8.15,108.82",
     "Lintang": "8.15 LS",
     "Bujur": "108.82 BT",
-    "Magnitude": "5.4",
-    "Kedalaman": "12 km",
-    "Wilayah": "105 km BaratDaya PANGANDARAN-JABAR",
+    "Magnitude": "5.2",
+    "Kedalaman": "10 km",
+    "Wilayah": "105 km BaratDaya Pangandaran",
     "Potensi": "Tidak berpotensi tsunami",
     "Dirasakan": "III Pangandaran, II Cilacap",
-    "Shakemap": "20260321101530.mmi.jpg"
+    "Shakemap": "20260331081001.mmi.jpg"
   },
   "request_id": "req_01HZY2P0W7D3G4"
 }
 ```
 
----
+### 404 Full Response Body
+
+```json
+{
+  "success": false,
+  "message": "Data gempa terbaru tidak tersedia",
+  "code": "RESOURCE_NOT_FOUND",
+  "request_id": "req_01HZY2P0W7D3G4"
+}
+```
 
 ## 3) GET `/bmkg/gempa/terkini`
 
-Menampilkan daftar 15 gempa bumi M >= 5.0 terkini.
+### CURL
 
 ```bash
 curl -X GET "$BASE_URL/bmkg/gempa/terkini" \
   -H "Accept: application/json"
 ```
 
-### 200 Response Body (Array)
+### 200 Full Response Body
 
 ```json
 {
@@ -128,46 +137,38 @@ curl -X GET "$BASE_URL/bmkg/gempa/terkini" \
   "message": "Daftar gempa berhasil diambil",
   "data": [
     {
-      "Tanggal": "21 Mar 2026",
-      "Jam": "10:15:30 WIB",
-      "DateTime": "2026-03-21T03:15:30+00:00",
+      "Tanggal": "31 Mar 2026",
+      "Jam": "08:10:01 WIB",
+      "DateTime": "2026-03-31T01:10:01+00:00",
       "Coordinates": "-8.15,108.82",
-      "Lintang": "8.15 LS",
-      "Bujur": "108.82 BT",
-      "Magnitude": "5.4",
-      "Kedalaman": "12 km",
-      "Wilayah": "105 km BaratDaya PANGANDARAN-JABAR",
-      "Potensi": "Tidak berpotensi tsunami"
+      "Magnitude": "5.2",
+      "Kedalaman": "10 km",
+      "Wilayah": "Selatan Jawa"
     },
     {
-      "Tanggal": "20 Mar 2026",
-      "Jam": "18:22:10 WIB",
-      "DateTime": "2026-03-20T11:22:10+00:00",
-      "Coordinates": "-9.12,112.55",
-      "Lintang": "9.12 LS",
-      "Bujur": "112.55 BT",
-      "Magnitude": "5.0",
-      "Kedalaman": "20 km",
-      "Wilayah": "120 km Tenggara KAB-MALANG-JATIM",
-      "Potensi": "Tidak berpotensi tsunami"
+      "Tanggal": "31 Mar 2026",
+      "Jam": "07:10:22 WIB",
+      "DateTime": "2026-03-31T00:10:22+00:00",
+      "Coordinates": "-2.15,140.21",
+      "Magnitude": "5.1",
+      "Kedalaman": "11 km",
+      "Wilayah": "Jayapura"
     }
   ],
   "request_id": "req_01HZY2P0W7D3G4"
 }
 ```
 
----
-
 ## 4) GET `/bmkg/gempa/dirasakan`
 
-Menampilkan daftar 15 gempa bumi yang dilaporkan dirasakan oleh masyarakat (skala MMI).
+### CURL
 
 ```bash
 curl -X GET "$BASE_URL/bmkg/gempa/dirasakan" \
   -H "Accept: application/json"
 ```
 
-### 200 Response Body (Array)
+### 200 Full Response Body
 
 ```json
 {
@@ -175,15 +176,10 @@ curl -X GET "$BASE_URL/bmkg/gempa/dirasakan" \
   "message": "Data gempa dirasakan berhasil diambil",
   "data": [
     {
-      "Tanggal": "21 Mar 2026",
-      "Jam": "10:15:30 WIB",
-      "DateTime": "2026-03-21T03:15:30+00:00",
-      "Coordinates": "-8.15,108.82",
-      "Lintang": "8.15 LS",
-      "Bujur": "108.82 BT",
-      "Magnitude": "5.4",
-      "Kedalaman": "12 km",
-      "Wilayah": "105 km BaratDaya PANGANDARAN-JABAR",
+      "Tanggal": "31 Mar 2026",
+      "Jam": "08:10:01 WIB",
+      "Magnitude": "5.2",
+      "Wilayah": "Selatan Jawa",
       "Dirasakan": "III Pangandaran, II Cilacap"
     }
   ],
@@ -191,21 +187,18 @@ curl -X GET "$BASE_URL/bmkg/gempa/dirasakan" \
 }
 ```
 
----
+## 5) GET `/bmkg/prakiraan-cuaca?wilayah_id=...`
 
-## 5) GET `/bmkg/prakiraan-cuaca?wilayah_id={adm4}`
+`wilayah_id` wajib diisi, contoh: `31.71.03.1001`.
 
-Menampilkan prakiraan cuaca komplit untuk wilayah kelurahan/desa (3 hari, per 3 jam) menggunakan kode Kemendagri BPS tingkat IV.
-
-**Parameter:**
-- `wilayah_id` (string) - Kode wilayah tingkat IV (Contoh: `31.71.03.1001` untuk Kelurahan Gunung Sahari Utara).
+### CURL
 
 ```bash
 curl -X GET "$BASE_URL/bmkg/prakiraan-cuaca?wilayah_id=31.71.03.1001" \
   -H "Accept: application/json"
 ```
 
-### 200 Response Body (Open API Format)
+### 200 Full Response Body
 
 ```json
 {
@@ -224,8 +217,8 @@ curl -X GET "$BASE_URL/bmkg/prakiraan-cuaca?wilayah_id=31.71.03.1001" \
     "cuaca": [
       [
         {
-          "datetime": "2026-03-21T06:00:00+00:00",
-          "local_datetime": "2026-03-21 13:00:00",
+          "datetime": "2026-03-31T06:00:00+00:00",
+          "local_datetime": "2026-03-31 13:00:00",
           "t": 32,
           "hu": 65,
           "weather_desc": "Cerah Berawan",
@@ -242,7 +235,7 @@ curl -X GET "$BASE_URL/bmkg/prakiraan-cuaca?wilayah_id=31.71.03.1001" \
 }
 ```
 
-### 422 Response Body (Validasi)
+### 422 Full Response Body
 
 ```json
 {
@@ -254,22 +247,25 @@ curl -X GET "$BASE_URL/bmkg/prakiraan-cuaca?wilayah_id=31.71.03.1001" \
       "The wilayah id field is required."
     ]
   },
+  "details": {
+    "wilayah_id": [
+      "The wilayah id field is required."
+    ]
+  },
   "request_id": "req_01HZY2P0W7D3G4"
 }
 ```
 
----
-
 ## 6) GET `/bmkg/peringatan-dini-cuaca`
 
-Mengambil peringatan dini cuaca (Nowcast) terbaru untuk semua wilayah provinsi di Indonesia. (RSS XML Feed parsed ke JSON Array).
+### CURL
 
 ```bash
 curl -X GET "$BASE_URL/bmkg/peringatan-dini-cuaca" \
   -H "Accept: application/json"
 ```
 
-### 200 Response Body
+### 200 Full Response Body
 
 ```json
 {
@@ -280,37 +276,29 @@ curl -X GET "$BASE_URL/bmkg/peringatan-dini-cuaca" \
       {
         "title": "Peringatan Dini Cuaca DKI Jakarta",
         "link": "https://www.bmkg.go.id/cuaca/peringatan-dini.bmkg?prov=DKI",
-        "description": "Berpotensi terjadi hujan sedang-lebat yang dapat disertai kilat/petir dan angin kencang di wilayah Kota Jakarta Pusat dan sekitarnya.",
+        "description": "Berpotensi terjadi hujan sedang-lebat...",
         "author": "BMKG",
-        "pubDate": "Sat, 21 Mar 2026 14:10:00 +0700",
-        "lastBuildDate": "Sat, 21 Mar 2026 07:10:00 UTC"
+        "pubDate": "Tue, 31 Mar 2026 14:10:00 +0700",
+        "lastBuildDate": "Tue, 31 Mar 2026 07:10:00 UTC"
       }
     ],
-    "updated_at": "2026-03-21T07:15:30Z"
+    "updated_at": "2026-03-31T07:15:30Z"
   },
   "request_id": "req_01HZY2P0W7D3G4"
 }
 ```
 
----
+## 7) GET `/bmkg/cache/status` (Protected)
 
-## 7) Cache Management (Admin / BPBD)
-
-Endpoint ini membutuhkan Token Authorization dan hanya role tertentu yang bisa memanggilnya (jika diprotect).
+### CURL
 
 ```bash
-# Cek Status Cache
 curl -X GET "$BASE_URL/bmkg/cache/status" \
-  -H "Accept: application/json" \
-  -H "Authorization: Bearer $TOKEN"
-
-# Bersihkan Cache (Force Refresh Data)
-curl -X POST "$BASE_URL/bmkg/cache/clear" \
   -H "Accept: application/json" \
   -H "Authorization: Bearer $TOKEN"
 ```
 
-### 200 Response Body (`/bmkg/cache/status`)
+### 200 Full Response Body
 
 ```json
 {
@@ -328,7 +316,17 @@ curl -X POST "$BASE_URL/bmkg/cache/clear" \
 }
 ```
 
-### 200 Response Body (`/bmkg/cache/clear`)
+## 8) POST `/bmkg/cache/clear` (Protected)
+
+### CURL
+
+```bash
+curl -X POST "$BASE_URL/bmkg/cache/clear" \
+  -H "Accept: application/json" \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+### 200 Full Response Body
 
 ```json
 {
@@ -339,19 +337,37 @@ curl -X POST "$BASE_URL/bmkg/cache/clear" \
 }
 ```
 
----
+## 9) Error Mapping BMKG
 
-## 8) Matriks Error Global
-
-Semua call ke endpoint `/bmkg/*` dapat menghasilkan error dari server upstream BMKG jika website BMKG sedang down atau datanya korup (XML tidak valid):
-
-### 500 Response Body
+### 401 (endpoint protected)
 
 ```json
 {
   "success": false,
-  "message": "Gagal menghubungi server BMKG: Timeout",
-  "code": "EXTERNAL_API_ERROR",
+  "message": "Tidak terautentikasi",
+  "code": "UNAUTHORIZED",
+  "request_id": "req_01HZY2P0W7D3G4"
+}
+```
+
+### 404 (data upstream tidak ada)
+
+```json
+{
+  "success": false,
+  "message": "Data prakiraan cuaca tidak tersedia",
+  "code": "RESOURCE_NOT_FOUND",
+  "request_id": "req_01HZY2P0W7D3G4"
+}
+```
+
+### 500 (upstream/downstream error)
+
+```json
+{
+  "success": false,
+  "message": "Gagal mengambil data BMKG",
+  "code": "INTERNAL_SERVER_ERROR",
   "request_id": "req_01HZY2P0W7D3G4"
 }
 ```

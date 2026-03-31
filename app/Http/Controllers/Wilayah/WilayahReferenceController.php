@@ -9,8 +9,21 @@ use Illuminate\Http\Request;
 
 class WilayahReferenceController extends Controller
 {
+    private const MAX_LIMIT = 200;
+
     public function __construct(private WilayahManagementService $wilayahManagementService)
     {
+    }
+
+    private function resolveLimit(Request $request, int $default = 50): int
+    {
+        $limit = (int) $request->get('limit', $default);
+
+        if ($limit < 1) {
+            return $default;
+        }
+
+        return min($limit, self::MAX_LIMIT);
     }
 
     public function getAllProvinsi(Request $request): JsonResponse
@@ -18,6 +31,7 @@ class WilayahReferenceController extends Controller
         $provinsi = $this->wilayahManagementService
             ->buildQuery('provinsi', $request->get('include', null))
             ->orderBy('nama')
+            ->limit($this->resolveLimit($request, 100))
             ->get();
 
         return $this->successResponse('Data provinsi berhasil diambil', $provinsi);
@@ -50,6 +64,10 @@ class WilayahReferenceController extends Controller
 
         $kabupaten = $result['data'];
 
+        if ($kabupaten instanceof \Illuminate\Support\Collection) {
+            $kabupaten = $kabupaten->take($this->resolveLimit($request));
+        }
+
         return $this->successResponse('Data kabupaten berhasil diambil', $kabupaten);
     }
 
@@ -67,6 +85,10 @@ class WilayahReferenceController extends Controller
 
         $kecamatan = $result['data'];
 
+        if ($kecamatan instanceof \Illuminate\Support\Collection) {
+            $kecamatan = $kecamatan->take($this->resolveLimit($request));
+        }
+
         return $this->successResponse('Data kecamatan berhasil diambil', $kecamatan);
     }
 
@@ -83,6 +105,10 @@ class WilayahReferenceController extends Controller
         }
 
         $desa = $result['data'];
+
+        if ($desa instanceof \Illuminate\Support\Collection) {
+            $desa = $desa->take($this->resolveLimit($request));
+        }
 
         return $this->successResponse('Data desa berhasil diambil', $desa);
     }

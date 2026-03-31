@@ -1,20 +1,33 @@
-# FETCH Role: PetugasBPBD (Full Response)
+# FETCH Role: PetugasBPBD (Lengkap)
+
+Dokumen ini fokus endpoint yang umum dipakai `PetugasBPBD`.
 
 ## Setup
 
 ```bash
 BASE_URL="http://127.0.0.1:8000/api/v1"
-TOKEN="token_petugas"
+TOKEN="token_petugas_bpbd"
 ```
 
 ## 1) Workflow Laporan
 
 Endpoint:
+
 - `POST /laporans/{id}/verifikasi`
 - `POST /laporans/{id}/proses`
 - `GET /laporans/{id}/riwayat`
 
-Contoh `POST /laporans/1/proses`:
+### Contoh: POST `/laporans/{id}/proses`
+
+#### Full Request Body
+
+```json
+{
+  "status": "Diproses"
+}
+```
+
+#### CURL
 
 ```bash
 curl -X POST "$BASE_URL/laporans/1/proses" \
@@ -24,7 +37,7 @@ curl -X POST "$BASE_URL/laporans/1/proses" \
   -d '{"status":"Diproses"}'
 ```
 
-### 200 Response Body
+#### 200 Full Response Body
 
 ```json
 {
@@ -43,7 +56,7 @@ curl -X POST "$BASE_URL/laporans/1/proses" \
 }
 ```
 
-### 422 Response Body
+#### 422 Full Response Body
 
 ```json
 {
@@ -54,14 +67,17 @@ curl -X POST "$BASE_URL/laporans/1/proses" \
 }
 ```
 
-## 2) Operasional
+## 2) Operasional Lapangan
 
 Endpoint:
+
 - `GET/POST/PUT/DELETE /monitoring`
 - `GET/POST/PUT/DELETE /tindak-lanjut`
 - `GET/POST/PUT/DELETE /riwayat-tindakan`
 
-Contoh `GET /tindak-lanjut`:
+### Contoh: GET `/tindak-lanjut?per_page=20`
+
+#### CURL
 
 ```bash
 curl -X GET "$BASE_URL/tindak-lanjut?per_page=20" \
@@ -69,7 +85,7 @@ curl -X GET "$BASE_URL/tindak-lanjut?per_page=20" \
   -H "Authorization: Bearer $TOKEN"
 ```
 
-### 200 Response Body (Paginated)
+#### 200 Full Response Body (Paginated)
 
 ```json
 {
@@ -80,7 +96,7 @@ curl -X GET "$BASE_URL/tindak-lanjut?per_page=20" \
       "id_tindaklanjut": 7,
       "laporan_id": 1,
       "id_petugas": 3,
-      "tanggal_tanggapan": "2026-03-20 09:00:00",
+      "tanggal_tanggapan": "2026-03-31 09:00:00",
       "status": "Menuju Lokasi",
       "petugas": {
         "id": 3,
@@ -106,7 +122,7 @@ curl -X GET "$BASE_URL/tindak-lanjut?per_page=20" \
 }
 ```
 
-### 403 Response Body
+### 403 Full Response Body
 
 ```json
 {
@@ -117,7 +133,7 @@ curl -X GET "$BASE_URL/tindak-lanjut?per_page=20" \
 }
 ```
 
-### 422 Response Body (validasi)
+### 422 Full Response Body
 
 ```json
 {
@@ -141,11 +157,22 @@ curl -X GET "$BASE_URL/tindak-lanjut?per_page=20" \
 ## 3) BMKG Protected
 
 Endpoint:
+
 - `GET /bmkg`
 - `GET /bmkg/cache/status`
 - `POST /bmkg/cache/clear`
 
-### 200 Response Body (`GET /bmkg`)
+### Contoh: GET `/bmkg`
+
+#### CURL
+
+```bash
+curl -X GET "$BASE_URL/bmkg" \
+  -H "Accept: application/json" \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+#### 200 Full Response Body
 
 ```json
 {
@@ -167,47 +194,16 @@ Endpoint:
 }
 ```
 
-## 4) Matriks Status Semua Endpoint PetugasBPBD
+## 4) Matriks Status Endpoint PetugasBPBD
 
-- `GET /auth/me`, `GET /users/profile`
-  - `200`, `401`
-
-- `POST /auth/refresh`, `POST /auth/logout`
-  - `200`, `401`
-
-- `GET /check-token`
-  - `200`, `401`
-
-- `GET /laporans`, `GET /laporans/pelapor/{pelaporId}`, `GET /laporans/{id}`, `GET /laporans/statistics`
-  - `200`
-  - `404` khusus endpoint detail
-
-- `PUT /laporans/{id}`
-  - `200`, `403`, `422`, `404`
-
-- `POST /laporans/{id}/verifikasi`, `POST /laporans/{id}/proses`
-  - `200`, `403`, `404`, `422`
-
-- `GET /laporans/{id}/riwayat`
-  - `200`, `404`
-
-- `GET/POST/PUT/DELETE /monitoring`
-  - `GET`: `200`
-  - `POST`: `201`, `403`, `422`
-  - `PUT`: `200`, `403`, `404`, `422`
-  - `DELETE`: `200`, `403`, `404`
-
-- `GET/POST/PUT/DELETE /tindak-lanjut`
-  - `GET`: `200`
-  - `POST`: `201`, `403`, `422`
-  - `PUT`: `200`, `403`, `404`, `422`
-  - `DELETE`: `200`, `403`, `404`
-
-- `GET/POST/PUT/DELETE /riwayat-tindakan`
-  - `GET`: `200`
-  - `POST`: `201`, `403`, `422`
-  - `PUT`: `200`, `403`, `404`, `422`
-  - `DELETE`: `200`, `403`, `404`
-
-- `GET /bmkg`, `GET /bmkg/cache/status`, `POST /bmkg/cache/clear`
-  - `200`, `500`
+- `GET /auth/me`, `GET /users/profile` -> `200`, `401`
+- `POST /auth/refresh`, `POST /auth/logout` -> `200`, `401`
+- `GET /check-token` -> `200`, `401`
+- `GET /laporans`, `GET /laporans/pelapor/{pelaporId}`, `GET /laporans/{id}`, `GET /laporans/statistics` -> `200`, `404` (detail)
+- `PUT /laporans/{id}` -> `200`, `403`, `422`, `404`
+- `POST /laporans/{id}/verifikasi`, `POST /laporans/{id}/proses` -> `200`, `403`, `404`, `422`
+- `GET /laporans/{id}/riwayat` -> `200`, `404`
+- `GET/POST/PUT/DELETE /monitoring` -> `200`, `201`, `403`, `404`, `422`
+- `GET/POST/PUT/DELETE /tindak-lanjut` -> `200`, `201`, `403`, `404`, `422`
+- `GET/POST/PUT/DELETE /riwayat-tindakan` -> `200`, `201`, `403`, `404`, `422`
+- `GET /bmkg`, `GET /bmkg/cache/status`, `POST /bmkg/cache/clear` -> `200`, `401`, `500`

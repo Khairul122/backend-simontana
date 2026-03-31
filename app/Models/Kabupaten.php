@@ -15,6 +15,7 @@ class Kabupaten extends Model
 
     protected $fillable = [
         'nama',
+        'adm2',
         'id_provinsi'
     ];
 

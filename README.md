@@ -11,8 +11,9 @@ Dokumen ini sudah disesuaikan dengan **breaking change kontrak API terbaru**:
 ## Ringkasan Fitur
 
 - Autentikasi JWT: register, login, me, refresh, logout, roles.
-- User management (Admin): CRUD user + statistik user.
+- Users (Admin): CRUD user + statistik user.
 - Laporan bencana: CRUD, statistik, workflow (`verifikasi`, `proses`, `riwayat`).
+- Endpoint agregasi warga: detail laporan lengkap (laporan + tindak lanjut + riwayat) dalam satu request.
 - Operasional: monitoring, tindak lanjut, riwayat tindakan.
 - Wilayah: referensi + listing + hierarchy + search + CRUD admin.
 - Kategori bencana: listing + detail + CRUD admin.
@@ -36,6 +37,7 @@ Sumber: `routes/api.php`.
 - `check-token`: validasi token dan ringkasan user.
 - `users/*`: profile (semua role login) + CRUD/statistik (admin only).
 - `laporans/*`: CRUD, statistik, workflow (`verifikasi`, `proses`, `riwayat`).
+- `warga/laporans/{id}/detail-lengkap`: agregasi detail untuk interface warga (owner-only).
 - `monitoring/*`: CRUD operasional monitoring.
 - `tindak-lanjut/*`: CRUD operasional tindak lanjut.
 - `riwayat-tindakan/*`: CRUD operasional riwayat tindakan.
@@ -150,9 +152,9 @@ Ini adalah perubahan kontrak yang disengaja untuk kebutuhan frontend yang memerl
 ## Auth dan Security
 
 - Public auth endpoint:
-  - `POST /api/auth/register`
-  - `POST /api/auth/login`
-  - `GET /api/auth/roles`
+  - `POST /api/v1/auth/register`
+  - `POST /api/v1/auth/login`
+  - `GET /api/v1/auth/roles`
 - Throttling:
   - login: limiter `auth-login`
   - register: limiter `auth-register`
@@ -165,7 +167,32 @@ Ini adalah perubahan kontrak yang disengaja untuk kebutuhan frontend yang memerl
 - `Admin`: akses penuh termasuk manajemen user, kategori, wilayah admin CRUD.
 - `PetugasBPBD`: akses operasional tinggi, tetapi bukan manajemen user admin.
 - `OperatorDesa`: akses operasional sesuai policy, bukan akses admin.
-- `Warga`: fokus laporan pribadi/profil dan referensi; tidak boleh akses data operasional sensitif.
+- `Warga`: fokus laporan pribadi/profil dan referensi; dapat melihat `tindak-lanjut` dan `riwayat-tindakan` milik laporan sendiri (scoped by policy/query).
+
+## Endpoint Warga untuk Detail Interface (Recommended)
+
+Untuk kebutuhan halaman detail warga, gunakan endpoint berikut agar frontend cukup 1 request:
+
+- `GET /api/v1/warga/laporans/{id}/detail-lengkap`
+
+Payload response endpoint ini berisi:
+
+- `data.detail_laporan` -> objek laporan lengkap
+- `data.tindak_lanjut` -> list tindak lanjut terkait laporan
+- `data.riwayat_tindakan` -> list riwayat tindakan terkait laporan
+
+Keamanan:
+
+- hanya role `Warga`
+- hanya untuk laporan milik warga yang sedang login (owner-only)
+
+Contoh cepat:
+
+```bash
+curl -X GET "http://127.0.0.1:8000/api/v1/warga/laporans/10/detail-lengkap" \
+  -H "Accept: application/json" \
+  -H "Authorization: Bearer <TOKEN_WARGA>"
+```
 
 ## Dokumentasi API (Swagger/OpenAPI)
 
@@ -183,6 +210,18 @@ OpenAPI annotations berada di:
 - `app/OpenApi/OpenApiSpec.php`
 - `app/OpenApi/ApiSchemas.php`
 - `app/OpenApi/ApiPaths.php`
+
+Tag endpoint Swagger yang digunakan:
+- `Auth`
+- `Users`
+- `Laporan`
+- `Workflow Laporan`
+- `Kategori Bencana`
+- `Wilayah`
+- `BMKG`
+- `Monitoring`
+- `Tindak Lanjut`
+- `Riwayat Tindakan`
 
 ## Testing
 

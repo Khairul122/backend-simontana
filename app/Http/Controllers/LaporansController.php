@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 
 
@@ -216,7 +217,7 @@ class LaporansController extends Controller
             $data = $request->validated();
             $data['id_pelapor'] = $user->id;
             $data['waktu_laporan'] = $request->waktu_laporan ?? now();
-            $data['status'] = 'Draft';
+            $data['status'] = $data['status'] ?? 'Draft';
             $data['view_count'] = 0;
 
             
@@ -229,8 +230,8 @@ class LaporansController extends Controller
             }
 
             $data['alamat_lengkap'] = $request->alamat_laporan ?? null;
-            $data['jumlah_korban'] = $request->jumlah_korban ?? null;
-            $data['jumlah_rumah_rusak'] = $request->jumlah_rumah_rusak ?? null;
+            $data['jumlah_korban'] = $request->jumlah_korban ?? 0;
+            $data['jumlah_rumah_rusak'] = $request->jumlah_rumah_rusak ?? 0;
             $data['is_prioritas'] = $request->boolean('is_prioritas', false);
             $data['data_tambahan'] = $request->data_tambahan ?? null;
 
@@ -388,31 +389,71 @@ class LaporansController extends Controller
     public function statistics(Request $request): JsonResponse
     {
         try {
-            $period = $request->get('period', 'all');
-            $cacheKey = 'laporans.statistics.' . $period;
+            $user = $this->ensureAuthenticated($request);
+            if (!$user) {
+                return $this->unauthorized();
+            }
 
-            $data = Cache::remember($cacheKey, 300, function () use ($request, $period) {
-                $query = Laporans::query();
+            $validator = Validator::make($request->all(), [
+                'period' => 'nullable|in:all,weekly,monthly,yearly',
+                'id_desa' => 'nullable|integer|exists:desa,id',
+                'id_pelapor' => 'nullable|integer|exists:pengguna,id',
+            ]);
 
-                
-                if ($period && $period !== 'all') {
+            if ($validator->fails()) {
+                return $this->validationErrorResponse($validator->errors());
+            }
+
+            $validated = $validator->validated();
+
+            $period = $validated['period'] ?? 'all';
+            $idDesa = isset($validated['id_desa']) ? (int) $validated['id_desa'] : null;
+            $idPelapor = isset($validated['id_pelapor']) ? (int) $validated['id_pelapor'] : null;
+
+            if ($user->role === 'Warga') {
+                if ($idPelapor !== null && $idPelapor !== (int) $user->id) {
+                    return $this->deniedByPolicy('Warga hanya dapat melihat statistik miliknya sendiri');
+                }
+
+                $idPelapor = (int) $user->id;
+            }
+
+            $cacheContext = [
+                'period' => $period,
+                'id_desa' => $idDesa,
+                'id_pelapor' => $idPelapor,
+            ];
+
+            $cacheKey = 'laporans.statistics.' . md5(json_encode($cacheContext));
+
+            $data = Cache::remember($cacheKey, 300, function () use ($period, $idDesa, $idPelapor) {
+                $query = Laporans::query()->whereNull('laporans.deleted_at');
+
+                if ($period !== 'all') {
                     switch ($period) {
                         case 'weekly':
-                            $query->where('created_at', '>=', now()->subDays(7));
+                            $query->where('laporans.created_at', '>=', now()->subDays(7));
                             break;
                         case 'monthly':
-                            $query->where('created_at', '>=', now()->subMonth());
+                            $query->where('laporans.created_at', '>=', now()->subMonth());
                             break;
                         case 'yearly':
-                            $query->where('created_at', '>=', now()->subYear());
+                            $query->where('laporans.created_at', '>=', now()->subYear());
                             break;
                     }
                 }
 
-                
+                if ($idDesa !== null) {
+                    $query->where('laporans.id_desa', $idDesa);
+                }
+
+                if ($idPelapor !== null) {
+                    $query->where('laporans.id_pelapor', $idPelapor);
+                }
+
                 $statusCounters = (clone $query)
-                    ->selectRaw('status, COUNT(*) as total')
-                    ->groupBy('status')
+                    ->selectRaw('laporans.status as status, COUNT(*) as total')
+                    ->groupBy('laporans.status')
                     ->pluck('total', 'status');
 
                 $total_laporan = (int) $statusCounters->sum();
@@ -421,9 +462,9 @@ class LaporansController extends Controller
                 $laporan_selesai = (int) ($statusCounters['Selesai'] ?? 0);
                 $laporan_ditolak = (int) ($statusCounters['Ditolak'] ?? 0);
 
-                $weeklyBuckets = Laporans::query()
-                    ->selectRaw('DATE(created_at) as day, COUNT(*) as total')
-                    ->where('created_at', '>=', now()->subDays(6)->startOfDay())
+                $weeklyBuckets = (clone $query)
+                    ->selectRaw('DATE(laporans.created_at) as day, COUNT(*) as total')
+                    ->where('laporans.created_at', '>=', now()->subDays(6)->startOfDay())
                     ->groupBy('day')
                     ->pluck('total', 'day');
 
@@ -435,18 +476,9 @@ class LaporansController extends Controller
                 }
 
                 
-                $categories_stats = DB::table('laporans')
+                $categories_stats = (clone $query)
                     ->join('kategori_bencana', 'laporans.id_kategori_bencana', '=', 'kategori_bencana.id')
                     ->select('kategori_bencana.nama_kategori as category_name', DB::raw('count(*) as count'))
-                    ->when($period && $period !== 'all', function ($q) use ($period) {
-                        return match ($period) {
-                            'weekly' => $q->where('laporans.created_at', '>=', now()->subDays(7)),
-                            'monthly' => $q->where('laporans.created_at', '>=', now()->subMonth()),
-                            'yearly' => $q->where('laporans.created_at', '>=', now()->subYear()),
-                            default => $q,
-                        };
-                    })
-                    ->whereNull('laporans.deleted_at')
                     ->groupBy('kategori_bencana.id', 'kategori_bencana.nama_kategori')
                     ->orderBy('count', 'desc')
                     ->get()
@@ -455,10 +487,9 @@ class LaporansController extends Controller
                     ->toArray();
 
                 
-                $monthly_trend = DB::table('laporans')
-                    ->select(DB::raw('DATE_FORMAT(created_at, "%Y-%m") as month'), DB::raw('count(*) as count'))
-                    ->where('created_at', '>=', now()->subYear())
-                    ->whereNull('deleted_at')
+                $monthly_trend = (clone $query)
+                    ->select(DB::raw('DATE_FORMAT(laporans.created_at, "%Y-%m") as month'), DB::raw('count(*) as count'))
+                    ->where('laporans.created_at', '>=', now()->subYear())
                     ->groupBy('month')
                     ->orderBy('month')
                     ->get()
@@ -466,18 +497,9 @@ class LaporansController extends Controller
                     ->toArray();
 
                 
-                $top_pengguna = DB::table('laporans')
+                $top_pengguna = (clone $query)
                     ->join('pengguna', 'laporans.id_pelapor', '=', 'pengguna.id')
                     ->select('pengguna.nama as pengguna_name', DB::raw('count(*) as laporan_count'))
-                    ->when($period && $period !== 'all', function ($q) use ($period) {
-                        return match ($period) {
-                            'weekly' => $q->where('laporans.created_at', '>=', now()->subDays(7)),
-                            'monthly' => $q->where('laporans.created_at', '>=', now()->subMonth()),
-                            'yearly' => $q->where('laporans.created_at', '>=', now()->subYear()),
-                            default => $q,
-                        };
-                    })
-                    ->whereNull('laporans.deleted_at')
                     ->whereNull('pengguna.deleted_at')
                     ->groupBy('pengguna.id', 'pengguna.nama')
                     ->orderBy('laporan_count', 'desc')

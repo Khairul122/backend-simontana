@@ -112,20 +112,73 @@ class ProductionReadinessTest extends TestCase
         Cache::flush();
 
         $this->withHeader('Authorization', 'Bearer ' . $token)
-            ->getJson('/api/laporans/statistics')
+            ->getJson('/api/v1/laporans/statistics')
             ->assertStatus(200);
+
+        $cacheContext = [
+            'period' => 'all',
+            'id_desa' => null,
+            'id_pelapor' => null,
+        ];
+        $cacheKey = 'laporans.statistics.' . md5(json_encode($cacheContext));
 
         // Setelah request pertama, cache harus sudah terisi
         $this->assertTrue(
-            Cache::has('laporans.statistics.all'),
-            'Cache statistics.all harus terisi setelah request pertama'
+            Cache::has($cacheKey),
+            'Cache statistik terfilter harus terisi setelah request pertama'
         );
 
         // Request kedua harus mengambil dari cache (key masih sama)
         $this->withHeader('Authorization', 'Bearer ' . $token)
-            ->getJson('/api/laporans/statistics')
+            ->getJson('/api/v1/laporans/statistics')
             ->assertStatus(200)
             ->assertJsonPath('success', true);
+    }
+
+    public function test_statistics_can_be_filtered_by_id_desa_and_id_pelapor(): void
+    {
+        $desaA = $this->seedWilayahMinimal();
+
+        $provinsiB  = Provinsi::create(['nama' => 'Provinsi Test B']);
+        $kabupatenB = Kabupaten::create(['nama' => 'Kabupaten Test B', 'id_provinsi' => $provinsiB->id]);
+        $kecamatanB = Kecamatan::create(['nama' => 'Kecamatan Test B', 'id_kabupaten' => $kabupatenB->id]);
+        $desaB = Desa::create(['nama' => 'Desa Test B', 'id_kecamatan' => $kecamatanB->id]);
+
+        $admin = $this->createUser('Admin', $desaA->id);
+        $pelaporA = $this->createUser('Warga', $desaA->id);
+        $pelaporB = $this->createUser('Warga', $desaB->id);
+
+        $this->makeLaporan($pelaporA, $desaA->id);
+        $this->makeLaporan($pelaporA, $desaA->id);
+        $this->makeLaporan($pelaporB, $desaB->id);
+
+        $token = JWTAuth::fromUser($admin);
+
+        $this->withHeader('Authorization', 'Bearer ' . $token)
+            ->getJson('/api/v1/laporans/statistics?id_desa=' . $desaA->id)
+            ->assertStatus(200)
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('data.total_laporan', 2);
+
+        $this->withHeader('Authorization', 'Bearer ' . $token)
+            ->getJson('/api/v1/laporans/statistics?id_pelapor=' . $pelaporB->id)
+            ->assertStatus(200)
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('data.total_laporan', 1);
+    }
+
+    public function test_statistics_for_warga_forbids_other_pelapor_filter(): void
+    {
+        $desa = $this->seedWilayahMinimal();
+        $warga = $this->createUser('Warga', $desa->id);
+        $otherWarga = $this->createUser('Warga', $desa->id);
+
+        $token = JWTAuth::fromUser($warga);
+
+        $this->withHeader('Authorization', 'Bearer ' . $token)
+            ->getJson('/api/v1/laporans/statistics?id_pelapor=' . $otherWarga->id)
+            ->assertStatus(403)
+            ->assertJsonPath('code', 'INSUFFICIENT_PERMISSIONS');
     }
 
     // ────────────────────────────────────────────────────────────────────────

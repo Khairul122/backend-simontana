@@ -6,6 +6,28 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateLaporanRequest extends FormRequest
 {
+    protected function prepareForValidation(): void
+    {
+        if (!$this->has('is_prioritas')) {
+            return;
+        }
+
+        $isPrioritas = $this->input('is_prioritas');
+
+        if (is_string($isPrioritas)) {
+            $normalized = strtolower(trim($isPrioritas));
+
+            if ($normalized === 'true') {
+                $this->merge(['is_prioritas' => true]);
+                return;
+            }
+
+            if ($normalized === 'false') {
+                $this->merge(['is_prioritas' => false]);
+            }
+        }
+    }
+
     public function authorize(): bool
     {
         return true; // Auth already enforced by jwt.auth middleware
@@ -17,6 +39,7 @@ class UpdateLaporanRequest extends FormRequest
             'judul_laporan'       => 'sometimes|string|max:255',
             'deskripsi'           => 'sometimes|string',
             'tingkat_keparahan'   => 'sometimes|string|in:Rendah,Sedang,Tinggi,Kritis',
+            'status'              => 'sometimes|string|in:Draft,Menunggu Verifikasi',
             'latitude'            => 'sometimes|numeric|between:-90,90',
             'longitude'           => 'sometimes|numeric|between:-180,180',
             'id_kategori_bencana' => 'sometimes|exists:kategori_bencana,id',
@@ -38,6 +61,7 @@ class UpdateLaporanRequest extends FormRequest
     {
         return [
             'tingkat_keparahan.in' => 'Tingkat keparahan harus salah satu dari: Rendah, Sedang, Tinggi, Kritis.',
+            'status.in' => 'Status hanya boleh Draft atau Menunggu Verifikasi.',
             'latitude.between'     => 'Latitude harus antara -90 dan 90.',
             'longitude.between'    => 'Longitude harus antara -180 dan 180.',
             'id_kategori_bencana.exists' => 'Kategori bencana tidak valid.',

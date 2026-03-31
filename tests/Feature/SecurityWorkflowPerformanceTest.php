@@ -185,6 +185,235 @@ class SecurityWorkflowPerformanceTest extends TestCase
             ->assertJsonPath('code', 'INSUFFICIENT_PERMISSIONS');
     }
 
+    public function test_tindak_lanjut_index_allows_warga_and_scopes_to_own_laporan(): void
+    {
+        $desa = $this->seedWilayahMinimal();
+        $wargaA = $this->createUser('Warga', $desa->id);
+        $wargaB = $this->createUser('Warga', $desa->id);
+        $operator = $this->createUser('OperatorDesa', $desa->id);
+
+        $laporanA = $this->makeLaporan($wargaA, $desa->id, 'Diverifikasi');
+        $laporanB = $this->makeLaporan($wargaB, $desa->id, 'Diverifikasi');
+
+        $tlA = TindakLanjut::create([
+            'laporan_id' => $laporanA->id,
+            'id_petugas' => $operator->id,
+            'tanggal_tanggapan' => now(),
+            'status' => 'Menuju Lokasi',
+        ]);
+
+        $tlB = TindakLanjut::create([
+            'laporan_id' => $laporanB->id,
+            'id_petugas' => $operator->id,
+            'tanggal_tanggapan' => now(),
+            'status' => 'Selesai',
+        ]);
+
+        $token = JWTAuth::fromUser($wargaA);
+
+        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+            ->getJson('/api/v1/tindak-lanjut');
+
+        $response->assertStatus(200)
+            ->assertJsonPath('success', true);
+
+        $data = collect($response->json('data'));
+        $ids = $data->pluck('id_tindaklanjut')->all();
+
+        $this->assertContains($tlA->id_tindaklanjut, $ids);
+        $this->assertNotContains($tlB->id_tindaklanjut, $ids);
+    }
+
+    public function test_tindak_lanjut_show_allows_warga_for_own_laporan_only(): void
+    {
+        $desa = $this->seedWilayahMinimal();
+        $wargaA = $this->createUser('Warga', $desa->id);
+        $wargaB = $this->createUser('Warga', $desa->id);
+        $operator = $this->createUser('OperatorDesa', $desa->id);
+
+        $laporanA = $this->makeLaporan($wargaA, $desa->id, 'Diverifikasi');
+        $laporanB = $this->makeLaporan($wargaB, $desa->id, 'Diverifikasi');
+
+        $tlA = TindakLanjut::create([
+            'laporan_id' => $laporanA->id,
+            'id_petugas' => $operator->id,
+            'tanggal_tanggapan' => now(),
+            'status' => 'Menuju Lokasi',
+        ]);
+
+        $tlB = TindakLanjut::create([
+            'laporan_id' => $laporanB->id,
+            'id_petugas' => $operator->id,
+            'tanggal_tanggapan' => now(),
+            'status' => 'Selesai',
+        ]);
+
+        $token = JWTAuth::fromUser($wargaA);
+
+        $this->withHeader('Authorization', 'Bearer ' . $token)
+            ->getJson('/api/v1/tindak-lanjut/' . $tlA->id_tindaklanjut)
+            ->assertStatus(200)
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('data.id_tindaklanjut', $tlA->id_tindaklanjut);
+
+        $this->withHeader('Authorization', 'Bearer ' . $token)
+            ->getJson('/api/v1/tindak-lanjut/' . $tlB->id_tindaklanjut)
+            ->assertStatus(403)
+            ->assertJsonPath('code', 'INSUFFICIENT_PERMISSIONS');
+    }
+
+    public function test_riwayat_index_allows_warga_and_scopes_to_own_laporan(): void
+    {
+        $desa = $this->seedWilayahMinimal();
+        $wargaA = $this->createUser('Warga', $desa->id);
+        $wargaB = $this->createUser('Warga', $desa->id);
+        $operator = $this->createUser('OperatorDesa', $desa->id);
+
+        $laporanA = $this->makeLaporan($wargaA, $desa->id, 'Diverifikasi');
+        $laporanB = $this->makeLaporan($wargaB, $desa->id, 'Diverifikasi');
+
+        $tlA = TindakLanjut::create([
+            'laporan_id' => $laporanA->id,
+            'id_petugas' => $operator->id,
+            'tanggal_tanggapan' => now(),
+            'status' => 'Menuju Lokasi',
+        ]);
+
+        $tlB = TindakLanjut::create([
+            'laporan_id' => $laporanB->id,
+            'id_petugas' => $operator->id,
+            'tanggal_tanggapan' => now(),
+            'status' => 'Selesai',
+        ]);
+
+        $riwayatA = \App\Models\RiwayatTindakan::create([
+            'tindaklanjut_id' => $tlA->id_tindaklanjut,
+            'id_petugas' => $operator->id,
+            'keterangan' => 'Aksi untuk laporan A',
+            'waktu_tindakan' => now(),
+        ]);
+
+        $riwayatB = \App\Models\RiwayatTindakan::create([
+            'tindaklanjut_id' => $tlB->id_tindaklanjut,
+            'id_petugas' => $operator->id,
+            'keterangan' => 'Aksi untuk laporan B',
+            'waktu_tindakan' => now(),
+        ]);
+
+        $token = JWTAuth::fromUser($wargaA);
+
+        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+            ->getJson('/api/v1/riwayat-tindakan');
+
+        $response->assertStatus(200)
+            ->assertJsonPath('success', true);
+
+        $data = collect($response->json('data'));
+        $ids = $data->pluck('id')->all();
+
+        $this->assertContains($riwayatA->id, $ids);
+        $this->assertNotContains($riwayatB->id, $ids);
+    }
+
+    public function test_riwayat_show_allows_warga_for_own_laporan_only(): void
+    {
+        $desa = $this->seedWilayahMinimal();
+        $wargaA = $this->createUser('Warga', $desa->id);
+        $wargaB = $this->createUser('Warga', $desa->id);
+        $operator = $this->createUser('OperatorDesa', $desa->id);
+
+        $laporanA = $this->makeLaporan($wargaA, $desa->id, 'Diverifikasi');
+        $laporanB = $this->makeLaporan($wargaB, $desa->id, 'Diverifikasi');
+
+        $tlA = TindakLanjut::create([
+            'laporan_id' => $laporanA->id,
+            'id_petugas' => $operator->id,
+            'tanggal_tanggapan' => now(),
+            'status' => 'Menuju Lokasi',
+        ]);
+
+        $tlB = TindakLanjut::create([
+            'laporan_id' => $laporanB->id,
+            'id_petugas' => $operator->id,
+            'tanggal_tanggapan' => now(),
+            'status' => 'Selesai',
+        ]);
+
+        $riwayatA = \App\Models\RiwayatTindakan::create([
+            'tindaklanjut_id' => $tlA->id_tindaklanjut,
+            'id_petugas' => $operator->id,
+            'keterangan' => 'Aksi untuk laporan A',
+            'waktu_tindakan' => now(),
+        ]);
+
+        $riwayatB = \App\Models\RiwayatTindakan::create([
+            'tindaklanjut_id' => $tlB->id_tindaklanjut,
+            'id_petugas' => $operator->id,
+            'keterangan' => 'Aksi untuk laporan B',
+            'waktu_tindakan' => now(),
+        ]);
+
+        $token = JWTAuth::fromUser($wargaA);
+
+        $this->withHeader('Authorization', 'Bearer ' . $token)
+            ->getJson('/api/v1/riwayat-tindakan/' . $riwayatA->id)
+            ->assertStatus(200)
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('data.id', $riwayatA->id);
+
+        $this->withHeader('Authorization', 'Bearer ' . $token)
+            ->getJson('/api/v1/riwayat-tindakan/' . $riwayatB->id)
+            ->assertStatus(403)
+            ->assertJsonPath('code', 'INSUFFICIENT_PERMISSIONS');
+    }
+
+    public function test_warga_detail_lengkap_route_returns_laporan_tindak_lanjut_and_riwayat(): void
+    {
+        $desa = $this->seedWilayahMinimal();
+        $warga = $this->createUser('Warga', $desa->id);
+        $operator = $this->createUser('OperatorDesa', $desa->id);
+        $laporan = $this->makeLaporan($warga, $desa->id, 'Diverifikasi');
+
+        $tindakLanjut = TindakLanjut::create([
+            'laporan_id' => $laporan->id,
+            'id_petugas' => $operator->id,
+            'tanggal_tanggapan' => now(),
+            'status' => 'Menuju Lokasi',
+        ]);
+
+        $riwayat = \App\Models\RiwayatTindakan::create([
+            'tindaklanjut_id' => $tindakLanjut->id_tindaklanjut,
+            'id_petugas' => $operator->id,
+            'keterangan' => 'Evakuasi awal',
+            'waktu_tindakan' => now(),
+        ]);
+
+        $token = JWTAuth::fromUser($warga);
+
+        $this->withHeader('Authorization', 'Bearer ' . $token)
+            ->getJson('/api/v1/warga/laporans/' . $laporan->id . '/detail-lengkap')
+            ->assertStatus(200)
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('data.detail_laporan.id', $laporan->id)
+            ->assertJsonPath('data.tindak_lanjut.0.id_tindaklanjut', $tindakLanjut->id_tindaklanjut)
+            ->assertJsonPath('data.riwayat_tindakan.0.id', $riwayat->id);
+    }
+
+    public function test_warga_detail_lengkap_route_rejects_non_warga_role(): void
+    {
+        $desa = $this->seedWilayahMinimal();
+        $admin = $this->createUser('Admin', $desa->id);
+        $warga = $this->createUser('Warga', $desa->id);
+        $laporan = $this->makeLaporan($warga, $desa->id, 'Draft');
+
+        $token = JWTAuth::fromUser($admin);
+
+        $this->withHeader('Authorization', 'Bearer ' . $token)
+            ->getJson('/api/v1/warga/laporans/' . $laporan->id . '/detail-lengkap')
+            ->assertStatus(403)
+            ->assertJsonPath('code', 'INSUFFICIENT_PERMISSIONS');
+    }
+
     public function test_riwayat_create_denies_non_assigned_petugas(): void
     {
         $desa = $this->seedWilayahMinimal();

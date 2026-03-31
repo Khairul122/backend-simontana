@@ -180,4 +180,87 @@ class ApiSmokeTest extends TestCase
             ->assertJsonPath('message', 'Data laporan pelapor berhasil diambil')
             ->assertJsonPath('data.0.id', $laporan->id);
     }
+
+    public function test_laporan_store_defaults_status_to_draft_when_not_provided(): void
+    {
+        $wilayah = $this->seedWilayahMinimal();
+        $warga = $this->createUser('Warga', $wilayah['desa']->id);
+        $kategori = KategoriBencana::create([
+            'nama_kategori' => 'Banjir Create',
+            'deskripsi' => 'Kategori create',
+        ]);
+
+        $token = JWTAuth::fromUser($warga);
+
+        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+            ->postJson('/api/v1/laporans', [
+                'judul_laporan' => 'Laporan Baru',
+                'deskripsi' => 'Deskripsi laporan baru',
+                'tingkat_keparahan' => 'Sedang',
+                'latitude' => -6.2,
+                'longitude' => 106.8,
+                'id_kategori_bencana' => $kategori->id,
+                'id_desa' => $wilayah['desa']->id,
+            ]);
+
+        $response->assertStatus(201)
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('data.status', 'Draft');
+    }
+
+    public function test_laporan_store_accepts_status_menunggu_verifikasi(): void
+    {
+        $wilayah = $this->seedWilayahMinimal();
+        $warga = $this->createUser('Warga', $wilayah['desa']->id);
+        $kategori = KategoriBencana::create([
+            'nama_kategori' => 'Longsor Create',
+            'deskripsi' => 'Kategori create',
+        ]);
+
+        $token = JWTAuth::fromUser($warga);
+
+        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+            ->postJson('/api/v1/laporans', [
+                'judul_laporan' => 'Laporan Menunggu Verifikasi',
+                'deskripsi' => 'Deskripsi laporan',
+                'tingkat_keparahan' => 'Tinggi',
+                'status' => 'Menunggu Verifikasi',
+                'latitude' => -6.21,
+                'longitude' => 106.81,
+                'id_kategori_bencana' => $kategori->id,
+                'id_desa' => $wilayah['desa']->id,
+            ]);
+
+        $response->assertStatus(201)
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('data.status', 'Menunggu Verifikasi');
+    }
+
+    public function test_laporan_store_rejects_invalid_status_value(): void
+    {
+        $wilayah = $this->seedWilayahMinimal();
+        $warga = $this->createUser('Warga', $wilayah['desa']->id);
+        $kategori = KategoriBencana::create([
+            'nama_kategori' => 'Gempa Create',
+            'deskripsi' => 'Kategori create',
+        ]);
+
+        $token = JWTAuth::fromUser($warga);
+
+        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+            ->postJson('/api/v1/laporans', [
+                'judul_laporan' => 'Laporan Invalid Status',
+                'deskripsi' => 'Deskripsi laporan',
+                'tingkat_keparahan' => 'Rendah',
+                'status' => 'Diproses',
+                'latitude' => -6.22,
+                'longitude' => 106.82,
+                'id_kategori_bencana' => $kategori->id,
+                'id_desa' => $wilayah['desa']->id,
+            ]);
+
+        $response->assertStatus(422)
+            ->assertJsonPath('success', false)
+            ->assertJsonPath('message', 'Validasi gagal');
+    }
 }

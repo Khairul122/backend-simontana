@@ -14,7 +14,8 @@ class Provinsi extends Model
     public $timestamps = true;
 
     protected $fillable = [
-        'nama'
+        'nama',
+        'adm1',
     ];
 
     protected $casts = [

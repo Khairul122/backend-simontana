@@ -421,6 +421,22 @@ use OpenApi\Annotations as OA;
  * )
  *
  * @OA\Schema(
+ *     schema="WargaLaporanDetailData",
+ *     type="object",
+ *     @OA\Property(property="detail_laporan", ref="#/components/schemas/LaporanItem"),
+ *     @OA\Property(property="tindak_lanjut", type="array", @OA\Items(ref="#/components/schemas/TindakLanjutItem")),
+ *     @OA\Property(property="riwayat_tindakan", type="array", @OA\Items(ref="#/components/schemas/RiwayatTindakanItem"))
+ * )
+ *
+ * @OA\Schema(
+ *     schema="WargaLaporanDetailSuccessResponse",
+ *     allOf={
+ *         @OA\Schema(ref="#/components/schemas/SuccessResponse"),
+ *         @OA\Schema(type="object", @OA\Property(property="data", ref="#/components/schemas/WargaLaporanDetailData"))
+ *     }
+ * )
+ *
+ * @OA\Schema(
  *     schema="LaporanStatisticsData",
  *     type="object",
  *     @OA\Property(property="total_laporan", type="integer", example=120),
