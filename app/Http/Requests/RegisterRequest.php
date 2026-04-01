@@ -20,11 +20,20 @@ class RegisterRequest extends FormRequest
             'username' => 'required|string|max:255|unique:pengguna,username',
             'email' => 'required|string|email|max:255|unique:pengguna,email',
             'password' => 'required|string|min:6|confirmed',
-            'role' => 'required|in:Admin,PetugasBPBD,OperatorDesa,Warga',
+            'role' => 'sometimes|in:Warga',
             'no_telepon' => 'nullable|string|max:20|regex:/^[0-9\-\+\s]*$/',
             'alamat' => 'nullable|string|max:500',
             'id_desa' => 'nullable|exists:desa,id',
         ];
+    }
+
+    protected function prepareForValidation(): void
+    {
+        if (!$this->has('role')) {
+            $this->merge([
+                'role' => 'Warga',
+            ]);
+        }
     }
 
     
