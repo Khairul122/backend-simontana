@@ -247,10 +247,16 @@ Dokumen fetch/curl dipisah per konteks role:
 
 - `FETCH.md` (index + konvensi umum)
 - `FETCH_PUBLIC.md`
+- `FETCH_BMKG.md`
 - `FETCH_WARGA.md`
 - `FETCH_OPERATOR_DESA.md`
 - `FETCH_PETUGAS_BPBD.md`
 - `FETCH_ADMIN.md`
+
+Catatan penting kontrak terbaru:
+
+- register publik (`POST /api/v1/auth/register`) hanya untuk role `Warga`,
+- provisioning role internal (`Admin`, `PetugasBPBD`, `OperatorDesa`) dilakukan via endpoint admin `POST /api/v1/users`.
 
 ## Troubleshooting
 

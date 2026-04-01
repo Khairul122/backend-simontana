@@ -1,6 +1,6 @@
-# FETCH Role: OperatorDesa (Lengkap)
+# FETCH Role: OperatorDesa
 
-Dokumen ini fokus untuk role `OperatorDesa`: workflow laporan + operasional lapangan.
+Panduan endpoint utama untuk role `OperatorDesa`: workflow laporan + operasional lapangan.
 
 ## Setup
 
@@ -17,9 +17,9 @@ Endpoint:
 - `POST /laporans/{id}/proses`
 - `GET /laporans/{id}/riwayat`
 
-### A. POST `/laporans/{id}/verifikasi`
+### POST /laporans/{id}/verifikasi
 
-#### Full Request Body
+Body:
 
 ```json
 {
@@ -27,8 +27,6 @@ Endpoint:
   "catatan_verifikasi": "Data valid dari lapangan"
 }
 ```
-
-#### CURL
 
 ```bash
 curl -X POST "$BASE_URL/laporans/1/verifikasi" \
@@ -41,44 +39,25 @@ curl -X POST "$BASE_URL/laporans/1/verifikasi" \
   }'
 ```
 
-#### 200 Full Response Body
+Status valid verifikasi:
 
-```json
-{
-  "success": true,
-  "message": "Laporan berhasil diverifikasi",
-  "data": {
-    "id": 1,
-    "status": "Diverifikasi",
-    "id_verifikator": 2,
-    "catatan_verifikasi": "Data valid dari lapangan",
-    "pelapor": {
-      "id": 5,
-      "nama": "Andi Warga"
-    },
-    "desa": {
-      "id": 1,
-      "nama": "Sukamaju"
-    }
-  },
-  "request_id": "req_01HZY2P0W7D3G4"
-}
-```
+- `Diverifikasi`
+- `Ditolak`
 
-#### 422 Full Response Body (invalid transition)
+Jika transisi status tidak valid:
 
 ```json
 {
   "success": false,
   "message": "Transisi status tidak valid: Selesai -> Diproses",
   "code": "INVALID_STATUS_TRANSITION",
-  "request_id": "req_01HZY2P0W7D3G4"
+  "request_id": "f79802f8-4778-4a8f-a6cc-2794f20a2ee2"
 }
 ```
 
-### B. POST `/laporans/{id}/proses`
+### POST /laporans/{id}/proses
 
-#### Full Request Body
+Body:
 
 ```json
 {
@@ -86,7 +65,10 @@ curl -X POST "$BASE_URL/laporans/1/verifikasi" \
 }
 ```
 
-#### CURL
+Nilai `status` yang diizinkan pada endpoint ini:
+
+- `Diproses`
+- `Selesai`
 
 ```bash
 curl -X POST "$BASE_URL/laporans/1/proses" \
@@ -96,48 +78,12 @@ curl -X POST "$BASE_URL/laporans/1/proses" \
   -d '{"status":"Diproses"}'
 ```
 
-#### 200 Full Response Body
-
-```json
-{
-  "success": true,
-  "message": "Status laporan berhasil diperbarui",
-  "data": {
-    "id": 1,
-    "status": "Diproses",
-    "id_penanggung_jawab": 2
-  },
-  "request_id": "req_01HZY2P0W7D3G4"
-}
-```
-
-### C. GET `/laporans/{id}/riwayat`
-
-#### CURL
+### GET /laporans/{id}/riwayat
 
 ```bash
 curl -X GET "$BASE_URL/laporans/1/riwayat" \
   -H "Accept: application/json" \
   -H "Authorization: Bearer $TOKEN"
-```
-
-#### 200 Full Response Body
-
-```json
-{
-  "success": true,
-  "message": "Riwayat laporan berhasil diambil",
-  "data": [
-    {
-      "id": 21,
-      "tindaklanjut_id": 7,
-      "id_petugas": 2,
-      "keterangan": "Evakuasi tahap awal",
-      "waktu_tindakan": "2026-03-31 10:00:00"
-    }
-  ],
-  "request_id": "req_01HZY2P0W7D3G4"
-}
 ```
 
 ## 2) Monitoring
@@ -150,9 +96,7 @@ Endpoint:
 - `PUT /monitoring/{id}`
 - `DELETE /monitoring/{id}`
 
-### A. GET `/monitoring?per_page=20`
-
-#### CURL
+### GET /monitoring?per_page=20
 
 ```bash
 curl -X GET "$BASE_URL/monitoring?per_page=20" \
@@ -160,59 +104,19 @@ curl -X GET "$BASE_URL/monitoring?per_page=20" \
   -H "Authorization: Bearer $TOKEN"
 ```
 
-#### 200 Full Response Body (Paginated)
+### POST /monitoring
 
-```json
-{
-  "success": true,
-  "message": "Data monitoring berhasil diambil",
-  "data": [
-    {
-      "id_monitoring": 99,
-      "id_laporan": 1,
-      "id_operator": 2,
-      "waktu_monitoring": "2026-03-31 08:00:00",
-      "hasil_monitoring": "Kondisi terkendali",
-      "koordinat_gps": "-6.2,106.8",
-      "operator": {
-        "id": 2,
-        "nama": "Operator Desa"
-      },
-      "laporan": {
-        "id": 1,
-        "judul_laporan": "Banjir RT 03"
-      }
-    }
-  ],
-  "meta": {
-    "pagination": {
-      "current_page": 1,
-      "last_page": 2,
-      "per_page": 20,
-      "total": 34,
-      "from": 1,
-      "to": 20
-    }
-  },
-  "request_id": "req_01HZY2P0W7D3G4"
-}
-```
-
-### B. POST `/monitoring`
-
-#### Full Request Body
+Body:
 
 ```json
 {
   "id_laporan": 1,
   "id_operator": 2,
-  "waktu_monitoring": "2026-03-31 09:00:00",
+  "waktu_monitoring": "2026-04-01 09:00:00",
   "hasil_monitoring": "Debit air menurun",
   "koordinat_gps": "-6.2000,106.8000"
 }
 ```
-
-#### CURL
 
 ```bash
 curl -X POST "$BASE_URL/monitoring" \
@@ -222,29 +126,128 @@ curl -X POST "$BASE_URL/monitoring" \
   -d '{
     "id_laporan":1,
     "id_operator":2,
-    "waktu_monitoring":"2026-03-31 09:00:00",
+    "waktu_monitoring":"2026-04-01 09:00:00",
     "hasil_monitoring":"Debit air menurun",
     "koordinat_gps":"-6.2000,106.8000"
   }'
 ```
 
-#### 201 Full Response Body
+Catatan policy:
+
+- Non-admin tidak bisa spoof `id_operator` user lain
+- Update monitoring milik operator lain akan ditolak (`403`)
+
+## 3) Tindak Lanjut
+
+Endpoint:
+
+- `GET /tindak-lanjut`
+- `POST /tindak-lanjut`
+- `GET /tindak-lanjut/{id}`
+- `PUT /tindak-lanjut/{id}`
+- `DELETE /tindak-lanjut/{id}`
+
+### POST /tindak-lanjut
+
+Body:
 
 ```json
 {
-  "success": true,
-  "message": "Monitoring berhasil dibuat",
-  "data": {
-    "id_monitoring": 100,
-    "id_laporan": 1,
-    "id_operator": 2,
-    "hasil_monitoring": "Debit air menurun"
-  },
-  "request_id": "req_01HZY2P0W7D3G4"
+  "laporan_id": 1,
+  "id_petugas": 2,
+  "tanggal_tanggapan": "2026-04-01 10:00:00",
+  "status": "Menuju Lokasi"
 }
 ```
 
-#### 422 Full Response Body
+Status tindak lanjut yang diizinkan:
+
+- `Menuju Lokasi`
+- `Selesai`
+
+```bash
+curl -X POST "$BASE_URL/tindak-lanjut" \
+  -H "Accept: application/json" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TOKEN" \
+  -d '{
+    "laporan_id":1,
+    "id_petugas":2,
+    "tanggal_tanggapan":"2026-04-01 10:00:00",
+    "status":"Menuju Lokasi"
+  }'
+```
+
+## 4) Riwayat Tindakan
+
+Endpoint:
+
+- `GET /riwayat-tindakan`
+- `POST /riwayat-tindakan`
+- `GET /riwayat-tindakan/{id}`
+- `PUT /riwayat-tindakan/{id}`
+- `DELETE /riwayat-tindakan/{id}`
+
+### POST /riwayat-tindakan
+
+Body:
+
+```json
+{
+  "tindaklanjut_id": 7,
+  "id_petugas": 2,
+  "keterangan": "Evakuasi tahap awal",
+  "waktu_tindakan": "2026-04-01 10:30:00"
+}
+```
+
+```bash
+curl -X POST "$BASE_URL/riwayat-tindakan" \
+  -H "Accept: application/json" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TOKEN" \
+  -d '{
+    "tindaklanjut_id":7,
+    "id_petugas":2,
+    "keterangan":"Evakuasi tahap awal",
+    "waktu_tindakan":"2026-04-01 10:30:00"
+  }'
+```
+
+## 5) Laporan Read/Update Tambahan
+
+OperatorDesa juga dapat mengakses endpoint laporan protected:
+
+- `GET /laporans`
+- `GET /laporans/{id}`
+- `PUT /laporans/{id}` (sesuai policy)
+- `GET /laporans/statistics`
+
+## 6) Error Contract Umum
+
+### 401
+
+```json
+{
+  "success": false,
+  "message": "Token tidak valid",
+  "code": "UNAUTHORIZED",
+  "request_id": "f79802f8-4778-4a8f-a6cc-2794f20a2ee2"
+}
+```
+
+### 403
+
+```json
+{
+  "success": false,
+  "message": "Tidak memiliki izin untuk mengubah monitoring ini",
+  "code": "INSUFFICIENT_PERMISSIONS",
+  "request_id": "f79802f8-4778-4a8f-a6cc-2794f20a2ee2"
+}
+```
+
+### 422
 
 ```json
 {
@@ -261,133 +264,6 @@ curl -X POST "$BASE_URL/monitoring" \
       "The selected id laporan is invalid."
     ]
   },
-  "request_id": "req_01HZY2P0W7D3G4"
+  "request_id": "f79802f8-4778-4a8f-a6cc-2794f20a2ee2"
 }
 ```
-
-## 3) Tindak Lanjut
-
-Endpoint:
-
-- `GET /tindak-lanjut`
-- `POST /tindak-lanjut`
-- `GET /tindak-lanjut/{id}`
-- `PUT /tindak-lanjut/{id}`
-- `DELETE /tindak-lanjut/{id}`
-
-### POST `/tindak-lanjut` Full Request + Response
-
-#### Request Body
-
-```json
-{
-  "laporan_id": 1,
-  "id_petugas": 2,
-  "tanggal_tanggapan": "2026-03-31 10:00:00",
-  "status": "Menuju Lokasi"
-}
-```
-
-#### CURL
-
-```bash
-curl -X POST "$BASE_URL/tindak-lanjut" \
-  -H "Accept: application/json" \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer $TOKEN" \
-  -d '{
-    "laporan_id":1,
-    "id_petugas":2,
-    "tanggal_tanggapan":"2026-03-31 10:00:00",
-    "status":"Menuju Lokasi"
-  }'
-```
-
-#### 201 Full Response Body
-
-```json
-{
-  "success": true,
-  "message": "Tindak lanjut berhasil dibuat",
-  "data": {
-    "id_tindaklanjut": 7,
-    "laporan_id": 1,
-    "id_petugas": 2,
-    "status": "Menuju Lokasi",
-    "petugas": {
-      "id": 2,
-      "nama": "Operator Desa"
-    }
-  },
-  "request_id": "req_01HZY2P0W7D3G4"
-}
-```
-
-## 4) Riwayat Tindakan
-
-Endpoint:
-
-- `GET /riwayat-tindakan`
-- `POST /riwayat-tindakan`
-- `GET /riwayat-tindakan/{id}`
-- `PUT /riwayat-tindakan/{id}`
-- `DELETE /riwayat-tindakan/{id}`
-
-### POST `/riwayat-tindakan` Full Request + Response
-
-#### Request Body
-
-```json
-{
-  "tindaklanjut_id": 7,
-  "id_petugas": 2,
-  "keterangan": "Evakuasi tahap awal",
-  "waktu_tindakan": "2026-03-31 10:30:00"
-}
-```
-
-#### CURL
-
-```bash
-curl -X POST "$BASE_URL/riwayat-tindakan" \
-  -H "Accept: application/json" \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer $TOKEN" \
-  -d '{
-    "tindaklanjut_id":7,
-    "id_petugas":2,
-    "keterangan":"Evakuasi tahap awal",
-    "waktu_tindakan":"2026-03-31 10:30:00"
-  }'
-```
-
-#### 201 Full Response Body
-
-```json
-{
-  "success": true,
-  "message": "Riwayat tindakan berhasil dibuat",
-  "data": {
-    "id": 21,
-    "tindaklanjut_id": 7,
-    "id_petugas": 2,
-    "keterangan": "Evakuasi tahap awal",
-    "waktu_tindakan": "2026-03-31 10:30:00"
-  },
-  "request_id": "req_01HZY2P0W7D3G4"
-}
-```
-
-## 5) Matriks Status OperatorDesa
-
-- `GET /laporans` -> `200`
-- `GET /laporans/pelapor/{pelaporId}` -> `200`
-- `GET /laporans/{id}` -> `200`, `404`
-- `PUT /laporans/{id}` -> `200`, `403`, `422`, `404`
-- `GET /laporans/statistics` -> `200`
-- `POST /laporans/{id}/verifikasi` -> `200`, `403`, `404`, `422`
-- `POST /laporans/{id}/proses` -> `200`, `403`, `404`, `422`
-- `GET /laporans/{id}/riwayat` -> `200`, `404`
-- `GET/POST/PUT/DELETE /monitoring` -> `200`, `201`, `403`, `404`, `422`
-- `GET/POST/PUT/DELETE /tindak-lanjut` -> `200`, `201`, `403`, `404`, `422`
-- `GET/POST/PUT/DELETE /riwayat-tindakan` -> `200`, `201`, `403`, `404`, `422`
